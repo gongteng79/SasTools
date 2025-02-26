@@ -1,0 +1,7 @@
+**/.vs/
+**/bin
+# Ignore all obj folders
+**/obj/
+**/SynthesisSetup/Debug
+**/SynthesisSetup/Release
+**/.svn/
