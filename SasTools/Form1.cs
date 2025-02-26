@@ -16,10 +16,5 @@ namespace SasTools
         {
             InitializeComponent();
         }
-
-        public void TestFunction()
-        {
-            MessageBox.Show("Test Function");
-        }
     }
 }
