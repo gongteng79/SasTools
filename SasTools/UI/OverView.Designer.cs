@@ -32,16 +32,15 @@ namespace SasTools
         /// </summary>
         private void InitializeComponent()
         {
-            AntdUI.MenuItem menuItem17 = new AntdUI.MenuItem();
-            AntdUI.MenuItem menuItem18 = new AntdUI.MenuItem();
-            AntdUI.MenuItem menuItem19 = new AntdUI.MenuItem();
-            AntdUI.MenuItem menuItem20 = new AntdUI.MenuItem();
+            AntdUI.MenuItem menuItem1 = new AntdUI.MenuItem();
+            AntdUI.MenuItem menuItem2 = new AntdUI.MenuItem();
+            AntdUI.MenuItem menuItem3 = new AntdUI.MenuItem();
             this.windowBar = new AntdUI.PageHeader();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.virtualPanel1 = new AntdUI.VirtualPanel();
-            this.menu1 = new AntdUI.Menu();
-            this.btnLogin = new AntdUI.Button();
             this.button1 = new AntdUI.Button();
+            this.btnLogin = new AntdUI.Button();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.menu1 = new AntdUI.Menu();
+            this.pnlView = new System.Windows.Forms.Panel();
             this.windowBar.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -61,63 +60,7 @@ namespace SasTools
             this.windowBar.Size = new System.Drawing.Size(1300, 58);
             this.windowBar.SubText = "Version 1.0.0.1";
             this.windowBar.TabIndex = 0;
-            this.windowBar.Text = "好帮手";
-            // 
-            // tableLayoutPanel1
-            // 
-            this.tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
-            this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.virtualPanel1, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.menu1, 0, 0);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 58);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 1;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1300, 662);
-            this.tableLayoutPanel1.TabIndex = 1;
-            // 
-            // virtualPanel1
-            // 
-            this.virtualPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.virtualPanel1.Location = new System.Drawing.Point(205, 4);
-            this.virtualPanel1.Name = "virtualPanel1";
-            this.virtualPanel1.Size = new System.Drawing.Size(1091, 654);
-            this.virtualPanel1.TabIndex = 0;
-            this.virtualPanel1.Text = "virtualPanel1";
-            // 
-            // menu1
-            // 
-            this.menu1.Dock = System.Windows.Forms.DockStyle.Fill;
-            menuItem17.IconSvg = "HomeOutlined";
-            menuItem17.Text = "主界面";
-            menuItem18.IconSvg = "SettingOutlined";
-            menuItem18.Text = "参数配置";
-            menuItem19.IconSvg = "FileTextOutlined";
-            menuItem19.Text = "配方管理";
-            menuItem20.IconSvg = "ScheduleOutlined";
-            menuItem20.Text = "日志系统";
-            this.menu1.Items.Add(menuItem17);
-            this.menu1.Items.Add(menuItem18);
-            this.menu1.Items.Add(menuItem19);
-            this.menu1.Items.Add(menuItem20);
-            this.menu1.Location = new System.Drawing.Point(4, 4);
-            this.menu1.Name = "menu1";
-            this.menu1.Size = new System.Drawing.Size(194, 654);
-            this.menu1.TabIndex = 1;
-            this.menu1.Text = "menu1";
-            // 
-            // btnLogin
-            // 
-            this.btnLogin.Dock = System.Windows.Forms.DockStyle.Right;
-            this.btnLogin.IconSvg = "UserSwitchOutlined";
-            this.btnLogin.Location = new System.Drawing.Point(859, 0);
-            this.btnLogin.Name = "btnLogin";
-            this.btnLogin.Size = new System.Drawing.Size(153, 58);
-            this.btnLogin.TabIndex = 0;
-            this.btnLogin.Text = "用户登录";
+            this.windowBar.Text = "TestTool";
             // 
             // button1
             // 
@@ -128,6 +71,61 @@ namespace SasTools
             this.button1.Size = new System.Drawing.Size(153, 58);
             this.button1.TabIndex = 1;
             this.button1.Text = "连接设备";
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // btnLogin
+            // 
+            this.btnLogin.Dock = System.Windows.Forms.DockStyle.Right;
+            this.btnLogin.IconSvg = "UserSwitchOutlined";
+            this.btnLogin.Location = new System.Drawing.Point(859, 0);
+            this.btnLogin.Name = "btnLogin";
+            this.btnLogin.Size = new System.Drawing.Size(153, 58);
+            this.btnLogin.TabIndex = 0;
+            this.btnLogin.Text = "用户登录";
+            this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
+            this.tableLayoutPanel1.ColumnCount = 2;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.menu1, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.pnlView, 1, 0);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 58);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 1;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1300, 662);
+            this.tableLayoutPanel1.TabIndex = 1;
+            // 
+            // menu1
+            // 
+            this.menu1.Dock = System.Windows.Forms.DockStyle.Fill;
+            menuItem1.IconSvg = "HomeOutlined";
+            menuItem1.Text = "主界面";
+            menuItem2.IconSvg = "SettingOutlined";
+            menuItem2.Text = "参数配置";
+            menuItem3.IconSvg = "FileTextOutlined";
+            menuItem3.Text = "配方管理";
+            this.menu1.Items.Add(menuItem1);
+            this.menu1.Items.Add(menuItem2);
+            this.menu1.Items.Add(menuItem3);
+            this.menu1.Location = new System.Drawing.Point(4, 4);
+            this.menu1.Name = "menu1";
+            this.menu1.Size = new System.Drawing.Size(194, 654);
+            this.menu1.TabIndex = 1;
+            this.menu1.Text = "menu1";
+            this.menu1.SelectChanged += new AntdUI.SelectEventHandler(this.menu1_SelectChanged);
+            // 
+            // pnlView
+            // 
+            this.pnlView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlView.Location = new System.Drawing.Point(205, 4);
+            this.pnlView.Name = "pnlView";
+            this.pnlView.Size = new System.Drawing.Size(1091, 654);
+            this.pnlView.TabIndex = 2;
             // 
             // OverView
             // 
@@ -152,10 +150,10 @@ namespace SasTools
 
         private PageHeader windowBar;
         private TableLayoutPanel tableLayoutPanel1;
-        private VirtualPanel virtualPanel1;
         private AntdUI.Menu menu1;
         private AntdUI.Button btnLogin;
         private AntdUI.Button button1;
+        private System.Windows.Forms.Panel pnlView;
     }
 }
 
