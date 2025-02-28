@@ -1,4 +1,8 @@
-﻿namespace SasTools
+﻿using AntdUI;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace SasTools
 {
     partial class OverView
     {
@@ -28,68 +32,117 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.windowBar1 = new AntdUI.WindowBar();
+            AntdUI.MenuItem menuItem17 = new AntdUI.MenuItem();
+            AntdUI.MenuItem menuItem18 = new AntdUI.MenuItem();
+            AntdUI.MenuItem menuItem19 = new AntdUI.MenuItem();
+            AntdUI.MenuItem menuItem20 = new AntdUI.MenuItem();
+            this.windowBar = new AntdUI.PageHeader();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.panel1 = new AntdUI.Panel();
-            this.panel2 = new AntdUI.Panel();
+            this.virtualPanel1 = new AntdUI.VirtualPanel();
+            this.menu1 = new AntdUI.Menu();
+            this.btnLogin = new AntdUI.Button();
+            this.button1 = new AntdUI.Button();
+            this.windowBar.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // windowBar1
+            // windowBar
             // 
-            this.windowBar1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.windowBar1.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.windowBar1.IsMax = false;
-            this.windowBar1.Location = new System.Drawing.Point(0, 0);
-            this.windowBar1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.windowBar1.Name = "windowBar1";
-            this.windowBar1.Size = new System.Drawing.Size(1458, 46);
-            this.windowBar1.TabIndex = 0;
-            this.windowBar1.Text = "好帮手";
+            this.windowBar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.windowBar.Controls.Add(this.button1);
+            this.windowBar.Controls.Add(this.btnLogin);
+            this.windowBar.DividerMargin = 3;
+            this.windowBar.DividerShow = true;
+            this.windowBar.Dock = System.Windows.Forms.DockStyle.Top;
+            this.windowBar.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F);
+            this.windowBar.Location = new System.Drawing.Point(0, 0);
+            this.windowBar.Name = "windowBar";
+            this.windowBar.ShowButton = true;
+            this.windowBar.Size = new System.Drawing.Size(1300, 58);
+            this.windowBar.SubText = "Version 1.0.0.1";
+            this.windowBar.TabIndex = 0;
+            this.windowBar.Text = "好帮手";
             // 
             // tableLayoutPanel1
             // 
+            this.tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
             this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.69959F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 89.30042F));
-            this.tableLayoutPanel1.Controls.Add(this.panel2, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 0);
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.virtualPanel1, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.menu1, 0, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 46);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 58);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1458, 854);
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1300, 662);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
-            // panel1
+            // virtualPanel1
             // 
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(3, 3);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(150, 848);
-            this.panel1.TabIndex = 0;
-            this.panel1.Text = "panel1";
+            this.virtualPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.virtualPanel1.Location = new System.Drawing.Point(205, 4);
+            this.virtualPanel1.Name = "virtualPanel1";
+            this.virtualPanel1.Size = new System.Drawing.Size(1091, 654);
+            this.virtualPanel1.TabIndex = 0;
+            this.virtualPanel1.Text = "virtualPanel1";
             // 
-            // panel2
+            // menu1
             // 
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(159, 3);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1296, 848);
-            this.panel2.TabIndex = 1;
-            this.panel2.Text = "panel2";
+            this.menu1.Dock = System.Windows.Forms.DockStyle.Fill;
+            menuItem17.IconSvg = "HomeOutlined";
+            menuItem17.Text = "主界面";
+            menuItem18.IconSvg = "SettingOutlined";
+            menuItem18.Text = "参数配置";
+            menuItem19.IconSvg = "FileTextOutlined";
+            menuItem19.Text = "配方管理";
+            menuItem20.IconSvg = "ScheduleOutlined";
+            menuItem20.Text = "日志系统";
+            this.menu1.Items.Add(menuItem17);
+            this.menu1.Items.Add(menuItem18);
+            this.menu1.Items.Add(menuItem19);
+            this.menu1.Items.Add(menuItem20);
+            this.menu1.Location = new System.Drawing.Point(4, 4);
+            this.menu1.Name = "menu1";
+            this.menu1.Size = new System.Drawing.Size(194, 654);
+            this.menu1.TabIndex = 1;
+            this.menu1.Text = "menu1";
+            // 
+            // btnLogin
+            // 
+            this.btnLogin.Dock = System.Windows.Forms.DockStyle.Right;
+            this.btnLogin.IconSvg = "UserSwitchOutlined";
+            this.btnLogin.Location = new System.Drawing.Point(859, 0);
+            this.btnLogin.Name = "btnLogin";
+            this.btnLogin.Size = new System.Drawing.Size(153, 58);
+            this.btnLogin.TabIndex = 0;
+            this.btnLogin.Text = "用户登录";
+            // 
+            // button1
+            // 
+            this.button1.Dock = System.Windows.Forms.DockStyle.Right;
+            this.button1.IconSvg = "PlusOutlined";
+            this.button1.Location = new System.Drawing.Point(706, 0);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(153, 58);
+            this.button1.TabIndex = 1;
+            this.button1.Text = "连接设备";
             // 
             // OverView
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(19F, 41F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1458, 900);
+            this.BackColor = System.Drawing.Color.White;
+            this.ClientSize = new System.Drawing.Size(1300, 720);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.Controls.Add(this.windowBar1);
-            this.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.Margin = new System.Windows.Forms.Padding(9, 10, 9, 10);
+            this.Controls.Add(this.windowBar);
+            this.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F);
+            this.ForeColor = System.Drawing.Color.Black;
+            this.Margin = new System.Windows.Forms.Padding(6);
+            this.MinimumSize = new System.Drawing.Size(660, 400);
             this.Name = "OverView";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "AntdUI Overview";
+            this.windowBar.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -97,10 +150,12 @@
 
         #endregion
 
-        private AntdUI.WindowBar windowBar1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private AntdUI.Panel panel2;
-        private AntdUI.Panel panel1;
+        private PageHeader windowBar;
+        private TableLayoutPanel tableLayoutPanel1;
+        private VirtualPanel virtualPanel1;
+        private AntdUI.Menu menu1;
+        private AntdUI.Button btnLogin;
+        private AntdUI.Button button1;
     }
 }
 

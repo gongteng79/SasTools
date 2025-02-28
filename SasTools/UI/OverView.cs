@@ -16,7 +16,13 @@ namespace SasTools
     {
         public OverView()
         {
+            InitialCompoent();
+        }
+
+        private void InitialCompoent()
+        {
             InitializeComponent();
+            this.menu1.SelectIndex(0);
         }
     }
 }
