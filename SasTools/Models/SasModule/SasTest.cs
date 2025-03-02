@@ -42,18 +42,18 @@ namespace SasTools.Models.SasModule
 
         public string ReadData(RequestData data)
         {
-            // 将消息对象序列化为 JSON 字符串
-            string sendData = JsonConvert.SerializeObject(data);
+            string jsonString = JsonConvert.SerializeObject(data, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
+            byte[] sendData = Encoding.ASCII.GetBytes(jsonString);
 
-            // 将 JSON 字符串转换为字节数组，准备发送
-            byte[] sendBytes = Encoding.ASCII.GetBytes(sendData);
+            var result = _tcpCommunication.SendAsync(sendData);
 
-            var result = _tcpCommunication.SendAsync(sendBytes);
-
-            this._eventBus.Publish(new SendDataEvent(sendData, result.Result.ToJsonString()));
+            this._eventBus.Publish(new SendDataEvent(jsonString, result.Result));
 
             // 返回 JSON 字符串（或根据需要返回字节数组）
-            return result.Result.ToJsonString();
+            return result.Result;
         }
     }
 }

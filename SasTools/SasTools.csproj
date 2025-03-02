@@ -37,9 +37,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libs\AntdUI.dll</HintPath>
     </Reference>
-    <Reference Include="HslCommunication, Version=12.2.0.0, Culture=neutral, PublicKeyToken=3d72ad3b6b5ec0e3, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\HslCommunication.dll</HintPath>
+    <Reference Include="HslCommunication">
+      <HintPath>Libs\HslCommunication.dll</HintPath>
     </Reference>
     <Reference Include="log4net">
       <HintPath>Libs\log4net.dll</HintPath>
