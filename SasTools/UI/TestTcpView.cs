@@ -61,8 +61,13 @@ namespace SasTools.UI
             // 将 evt 的消息格式化并显示在 TextBox 上
             if (evt != null)
             {
-                textBox1.Text += $"{evt.TimeStamp}: 发送: {evt.SendData}{Environment.NewLine}";
-                textBox1.Text += $"{evt.TimeStamp}: 接收: {evt.RecieveData}{Environment.NewLine}";
+                Action action = () =>
+                {
+                    textBox1.Text += $"{evt.TimeStamp}: 发送: {evt.SendData}{Environment.NewLine}";
+                    textBox1.Text += $"{evt.TimeStamp}: 接收: {evt.RecieveData}{Environment.NewLine}";
+                };
+                this.Invoke(action);
+
             }
         }
 

@@ -69,7 +69,8 @@ namespace SasTools.Models.Communication
             {
                 var response = _client.ReadFromCoreServer(data);
 
-                return Task.FromResult(response.Message.ToJsonString());
+                string receivedJsonString = Encoding.ASCII.GetString(response.Content);
+                return Task.FromResult(receivedJsonString);
             }
             catch (Exception)
             {
