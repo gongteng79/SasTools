@@ -11,19 +11,24 @@ using AntdUI;
 using log4net;
 using SasTools.Domain;
 using SasTools.Interface;
+using SasTools.Models.Communication;
+using SasTools.Models.SasModule;
 using SasTools.UI;
+using WpFramework.EventBus;
 using WpFramework.LogFactory;
 
 namespace SasTools
 {
     public partial class OverView: Window
     {
+        private IEventBus eventBus;
         private readonly ILog _logger = LogManager.GetLogger("OverView");
         private int prevIndex = -1;
         private Dictionary<int, Control> subViews = new Dictionary<int, Control>();
 
         public OverView()
         {
+            eventBus = new EventBus(false);
             InitialCompoent();
         }
 
@@ -80,6 +85,12 @@ namespace SasTools
                     ctrl = new ReciepeView();
                     break;
 
+                case 3:
+                    var tcpCommunication = CommunicationFactory.CreateTcpCommunication("192.168.1.12", 6062);
+                    SasTest sasTest = new SasTest(tcpCommunication, eventBus);
+                    ctrl = new TestTcpView(sasTest, eventBus);
+                    break;
+
                 default:
                     break;
             }
@@ -105,12 +116,13 @@ namespace SasTools
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void btnAddDevice_Click(object sender, EventArgs e)
         {
-            CreateDeviceView createView = new CreateDeviceView();
-            var align = AntdUI.TAlignMini.Right;
-            createView.Size = new Size(500, 100);
-            AntdUI.Drawer.open(this, createView, align);
+            //CreateDeviceView createView = new CreateDeviceView();
+            //var align = AntdUI.TAlignMini.Right;
+            //createView.Size = new Size(500, 100);
+            //AntdUI.Drawer.open(this, createView, align);
+
         }
     }
 }
