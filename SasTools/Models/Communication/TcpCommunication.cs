@@ -74,7 +74,6 @@ namespace SasTools.Models.Communication
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
