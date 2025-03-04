@@ -67,7 +67,7 @@ namespace SasTools.Domain
                 case FunctionType.MotorSelfTest:
                     return new RequestData { request = 122, slaveId = 1, ctrl = 0 };
                 case FunctionType.LockMode:
-                    return new RequestData { request = 123, slaveId = 1, productId = 1, screwId = 1 };
+                    return new RequestData { request = 123, slaveId = 1, screwId = 1 };
                 case FunctionType.PowerControl:
                     return new RequestData { request = 124, slaveId = 1, powerEnable = 1 };
                 case FunctionType.TightenInfoControl:
