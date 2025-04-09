@@ -91,6 +91,9 @@ namespace SasTools
                     ctrl = new TestTcpView(sasTest, eventBus);
                     break;
 
+                case 4:
+                    ctrl = new ManualView();
+                    break;
                 default:
                     break;
             }
@@ -118,11 +121,10 @@ namespace SasTools
 
         private void btnAddDevice_Click(object sender, EventArgs e)
         {
-            //CreateDeviceView createView = new CreateDeviceView();
-            //var align = AntdUI.TAlignMini.Right;
-            //createView.Size = new Size(500, 100);
-            //AntdUI.Drawer.open(this, createView, align);
-
+            CreateDeviceView createView = new CreateDeviceView();
+            var align = AntdUI.TAlignMini.Right;
+            createView.Size = new Size(500, 100);
+            AntdUI.Drawer.open(this, createView, align);
         }
     }
 }
