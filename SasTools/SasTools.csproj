@@ -95,6 +95,12 @@
     <Compile Include="UI\LoginView.Designer.cs">
       <DependentUpon>LoginView.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\ManualView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\ManualView.Designer.cs">
+      <DependentUpon>ManualView.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\OverView.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -138,6 +144,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\LoginView.resx">
       <DependentUpon>LoginView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\ManualView.resx">
+      <DependentUpon>ManualView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\OverView.resx">
       <DependentUpon>OverView.cs</DependentUpon>
