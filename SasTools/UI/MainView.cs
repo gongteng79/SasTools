@@ -13,7 +13,6 @@ namespace SasTools.UI
 {
     public partial class MainView : UserControl
     {
-
         DataTable dataTable;
         public MainView()
         {

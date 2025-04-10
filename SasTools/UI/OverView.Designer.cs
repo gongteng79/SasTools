@@ -37,12 +37,13 @@ namespace SasTools
             AntdUI.MenuItem menuItem3 = new AntdUI.MenuItem();
             AntdUI.MenuItem menuItem4 = new AntdUI.MenuItem();
             AntdUI.MenuItem menuItem5 = new AntdUI.MenuItem();
+            AntdUI.MenuItem menuItem6 = new AntdUI.MenuItem();
             this.windowBar = new AntdUI.PageHeader();
+            this.btnAddDevice = new AntdUI.Button();
             this.btnLogin = new AntdUI.Button();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.menu1 = new AntdUI.Menu();
             this.pnlView = new System.Windows.Forms.Panel();
-            this.btnAddDevice = new AntdUI.Button();
             this.windowBar.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -64,11 +65,22 @@ namespace SasTools
             this.windowBar.TabIndex = 0;
             this.windowBar.Text = "TestTool";
             // 
+            // btnAddDevice
+            // 
+            this.btnAddDevice.Dock = System.Windows.Forms.DockStyle.Right;
+            this.btnAddDevice.IconSvg = "PlusOutlined";
+            this.btnAddDevice.Location = new System.Drawing.Point(706, 0);
+            this.btnAddDevice.Name = "btnAddDevice";
+            this.btnAddDevice.Size = new System.Drawing.Size(153, 58);
+            this.btnAddDevice.TabIndex = 1;
+            this.btnAddDevice.Text = "连接设备";
+            this.btnAddDevice.Click += new System.EventHandler(this.btnAddDevice_Click);
+            // 
             // btnLogin
             // 
             this.btnLogin.Dock = System.Windows.Forms.DockStyle.Right;
             this.btnLogin.IconSvg = "UserSwitchOutlined";
-            this.btnLogin.Location = new System.Drawing.Point(1003, 0);
+            this.btnLogin.Location = new System.Drawing.Point(859, 0);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(153, 58);
             this.btnLogin.TabIndex = 0;
@@ -104,11 +116,14 @@ namespace SasTools
             menuItem4.Text = "设备通讯测试";
             menuItem5.IconSvg = "ToolOutlined";
             menuItem5.Text = "手动设置";
+            menuItem6.IconSvg = "AlertOutlined";
+            menuItem6.Text = "报警界面";
             this.menu1.Items.Add(menuItem1);
             this.menu1.Items.Add(menuItem2);
             this.menu1.Items.Add(menuItem3);
             this.menu1.Items.Add(menuItem4);
             this.menu1.Items.Add(menuItem5);
+            this.menu1.Items.Add(menuItem6);
             this.menu1.Location = new System.Drawing.Point(4, 4);
             this.menu1.Name = "menu1";
             this.menu1.Size = new System.Drawing.Size(194, 654);
@@ -123,17 +138,6 @@ namespace SasTools
             this.pnlView.Name = "pnlView";
             this.pnlView.Size = new System.Drawing.Size(1091, 654);
             this.pnlView.TabIndex = 2;
-            // 
-            // btnAddDevice
-            // 
-            this.btnAddDevice.Dock = System.Windows.Forms.DockStyle.Right;
-            this.btnAddDevice.IconSvg = "PlusOutlined";
-            this.btnAddDevice.Location = new System.Drawing.Point(850, 0);
-            this.btnAddDevice.Name = "btnAddDevice";
-            this.btnAddDevice.Size = new System.Drawing.Size(153, 58);
-            this.btnAddDevice.TabIndex = 1;
-            this.btnAddDevice.Text = "连接设备";
-            this.btnAddDevice.Click += new System.EventHandler(this.btnAddDevice_Click);
             // 
             // OverView
             // 
