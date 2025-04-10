@@ -94,6 +94,11 @@ namespace SasTools
                 case 4:
                     ctrl = new ManualView();
                     break;
+
+                case 5:
+                    ctrl = new AbnormalAlarmView();
+                    break;
+
                 default:
                     break;
             }

@@ -77,6 +77,12 @@
     <Compile Include="Models\Communication\TcpCommunication.cs" />
     <Compile Include="Models\SasModule\SasTest.cs" />
     <Compile Include="Services\CommunicationService.cs" />
+    <Compile Include="UI\AbnormalAlarmView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\AbnormalAlarmView.Designer.cs">
+      <DependentUpon>AbnormalAlarmView.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\CreateDeviceView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -136,6 +142,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="UI\AbnormalAlarmView.resx">
+      <DependentUpon>AbnormalAlarmView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\CreateDeviceView.resx">
       <DependentUpon>CreateDeviceView.cs</DependentUpon>
     </EmbeddedResource>
