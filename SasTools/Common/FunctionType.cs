@@ -8,6 +8,8 @@ namespace SasTools.Common
 {
     public enum FunctionType
     {
+        Subcribe,//订阅
+
         LockScrew,
         IdleRun,
         RemoveScrew,
