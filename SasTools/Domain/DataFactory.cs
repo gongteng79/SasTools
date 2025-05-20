@@ -65,7 +65,7 @@ namespace SasTools.Domain
                 case FunctionType.ProductInfoQuery:
                     return new RequestData { request = 120, slave_Id = 1 };
                 case FunctionType.TorqueCalibration:
-                    return new RequestData { request = 121, slave_Id = 1,index = 1,count = 12,currentPercent = 20,  torque = 0.5 };
+                    return new RequestData { request = 121, slave_Id = 1,currentPercent = 20,  torque = 0.5 };
                 case FunctionType.MotorSelfTest:
                     return new RequestData { request = 122, slave_Id = 1, ctrl = 0 };
                 case FunctionType.LockMode:
