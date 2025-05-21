@@ -30,18 +30,17 @@
         {
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.lbBrakeError = new AntdUI.Label();
             this.lbRotationTimes = new AntdUI.Label();
             this.lbStartupInterval = new AntdUI.Label();
             this.lbRotationInterval = new AntdUI.Label();
             this.lbReverseDelay = new AntdUI.Label();
             this.lbForwardDelay = new AntdUI.Label();
-            this.tbBrakeError = new AntdUI.InputNumber();
-            this.tbForwardDelay = new AntdUI.InputNumber();
-            this.tbReverseDelay = new AntdUI.InputNumber();
-            this.tbRotationInterval = new AntdUI.InputNumber();
-            this.tbStartupInterval = new AntdUI.InputNumber();
-            this.tbRotationTimes = new AntdUI.InputNumber();
+            this.txtForwardDelay = new AntdUI.InputNumber();
+            this.txtReverseDelay = new AntdUI.InputNumber();
+            this.txtRotationInterval = new AntdUI.InputNumber();
+            this.txtStartupInterval = new AntdUI.InputNumber();
+            this.txtRotationTimes = new AntdUI.InputNumber();
+            this.Savebutton = new AntdUI.Button();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.button1 = new AntdUI.Button();
             this.button2 = new AntdUI.Button();
@@ -59,11 +58,12 @@
             this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 0, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 85F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 15F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(754, 589);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1382, 1031);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // tableLayoutPanel2
@@ -74,25 +74,25 @@
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel2.Controls.Add(this.lbBrakeError, 0, 2);
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 37F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 37F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 37F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 37F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 37F));
             this.tableLayoutPanel2.Controls.Add(this.lbRotationTimes, 4, 0);
             this.tableLayoutPanel2.Controls.Add(this.lbStartupInterval, 3, 0);
             this.tableLayoutPanel2.Controls.Add(this.lbRotationInterval, 2, 0);
             this.tableLayoutPanel2.Controls.Add(this.lbReverseDelay, 1, 0);
             this.tableLayoutPanel2.Controls.Add(this.lbForwardDelay, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this.tbBrakeError, 0, 3);
-            this.tableLayoutPanel2.Controls.Add(this.tbForwardDelay, 0, 1);
-            this.tableLayoutPanel2.Controls.Add(this.tbReverseDelay, 1, 1);
-            this.tableLayoutPanel2.Controls.Add(this.tbRotationInterval, 2, 1);
-            this.tableLayoutPanel2.Controls.Add(this.tbStartupInterval, 3, 1);
-            this.tableLayoutPanel2.Controls.Add(this.tbRotationTimes, 4, 1);
+            this.tableLayoutPanel2.Controls.Add(this.txtForwardDelay, 0, 1);
+            this.tableLayoutPanel2.Controls.Add(this.txtReverseDelay, 1, 1);
+            this.tableLayoutPanel2.Controls.Add(this.txtRotationInterval, 2, 1);
+            this.tableLayoutPanel2.Controls.Add(this.txtStartupInterval, 3, 1);
+            this.tableLayoutPanel2.Controls.Add(this.txtRotationTimes, 4, 1);
+            this.tableLayoutPanel2.Controls.Add(this.Savebutton, 2, 2);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(6, 5);
+            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 10;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
@@ -105,151 +105,142 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(748, 494);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(1370, 866);
             this.tableLayoutPanel2.TabIndex = 0;
-            // 
-            // lbBrakeError
-            // 
-            this.lbBrakeError.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lbBrakeError.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lbBrakeError.Location = new System.Drawing.Point(3, 101);
-            this.lbBrakeError.Name = "lbBrakeError";
-            this.lbBrakeError.Size = new System.Drawing.Size(143, 43);
-            this.lbBrakeError.TabIndex = 10;
-            this.lbBrakeError.Text = "刹车异常";
-            this.lbBrakeError.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lbRotationTimes
             // 
             this.lbRotationTimes.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lbRotationTimes.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lbRotationTimes.Location = new System.Drawing.Point(599, 3);
+            this.lbRotationTimes.Location = new System.Drawing.Point(1102, 5);
+            this.lbRotationTimes.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.lbRotationTimes.Name = "lbRotationTimes";
-            this.lbRotationTimes.Size = new System.Drawing.Size(146, 43);
+            this.lbRotationTimes.Size = new System.Drawing.Size(262, 76);
             this.lbRotationTimes.TabIndex = 5;
-            this.lbRotationTimes.Text = "旋转次数";
+            this.lbRotationTimes.Text = "超时设置";
             this.lbRotationTimes.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lbStartupInterval
             // 
             this.lbStartupInterval.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lbStartupInterval.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lbStartupInterval.Location = new System.Drawing.Point(450, 3);
+            this.lbStartupInterval.Location = new System.Drawing.Point(828, 5);
+            this.lbStartupInterval.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.lbStartupInterval.Name = "lbStartupInterval";
-            this.lbStartupInterval.Size = new System.Drawing.Size(143, 43);
+            this.lbStartupInterval.Size = new System.Drawing.Size(262, 76);
             this.lbStartupInterval.TabIndex = 4;
-            this.lbStartupInterval.Text = "启动间隔";
+            this.lbStartupInterval.Text = "循环启动间隔";
             this.lbStartupInterval.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lbRotationInterval
             // 
             this.lbRotationInterval.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lbRotationInterval.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lbRotationInterval.Location = new System.Drawing.Point(301, 3);
+            this.lbRotationInterval.Location = new System.Drawing.Point(554, 5);
+            this.lbRotationInterval.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.lbRotationInterval.Name = "lbRotationInterval";
-            this.lbRotationInterval.Size = new System.Drawing.Size(143, 43);
+            this.lbRotationInterval.Size = new System.Drawing.Size(262, 76);
             this.lbRotationInterval.TabIndex = 3;
-            this.lbRotationInterval.Text = "旋转间隔";
+            this.lbRotationInterval.Text = "正反转切换间隔";
             this.lbRotationInterval.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lbReverseDelay
             // 
             this.lbReverseDelay.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lbReverseDelay.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lbReverseDelay.Location = new System.Drawing.Point(152, 3);
+            this.lbReverseDelay.Location = new System.Drawing.Point(280, 5);
+            this.lbReverseDelay.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.lbReverseDelay.Name = "lbReverseDelay";
-            this.lbReverseDelay.Size = new System.Drawing.Size(143, 43);
+            this.lbReverseDelay.Size = new System.Drawing.Size(262, 76);
             this.lbReverseDelay.TabIndex = 2;
-            this.lbReverseDelay.Text = "反转延时";
+            this.lbReverseDelay.Text = "反转启动延时";
             this.lbReverseDelay.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lbForwardDelay
             // 
             this.lbForwardDelay.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lbForwardDelay.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lbForwardDelay.Location = new System.Drawing.Point(3, 3);
+            this.lbForwardDelay.Location = new System.Drawing.Point(6, 5);
+            this.lbForwardDelay.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.lbForwardDelay.Name = "lbForwardDelay";
-            this.lbForwardDelay.Size = new System.Drawing.Size(143, 43);
+            this.lbForwardDelay.Size = new System.Drawing.Size(262, 76);
             this.lbForwardDelay.TabIndex = 0;
-            this.lbForwardDelay.Text = "正转延时";
+            this.lbForwardDelay.Text = "正转启动延时";
             this.lbForwardDelay.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // tbBrakeError
+            // txtForwardDelay
             // 
-            this.tbBrakeError.DecimalPlaces = 1;
-            this.tbBrakeError.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tbBrakeError.EnableMouseWheel = false;
-            this.tbBrakeError.Font = new System.Drawing.Font("微软雅黑", 12F);
-            this.tbBrakeError.Location = new System.Drawing.Point(3, 150);
-            this.tbBrakeError.Name = "tbBrakeError";
-            this.tbBrakeError.Size = new System.Drawing.Size(143, 43);
-            this.tbBrakeError.TabIndex = 18;
-            this.tbBrakeError.Text = "0.0";
-            this.tbBrakeError.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txtForwardDelay.DecimalPlaces = 1;
+            this.txtForwardDelay.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtForwardDelay.Font = new System.Drawing.Font("微软雅黑", 12F);
+            this.txtForwardDelay.Location = new System.Drawing.Point(6, 91);
+            this.txtForwardDelay.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.txtForwardDelay.Name = "txtForwardDelay";
+            this.txtForwardDelay.Size = new System.Drawing.Size(262, 76);
+            this.txtForwardDelay.TabIndex = 22;
+            this.txtForwardDelay.Text = "0.0";
+            this.txtForwardDelay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // tbForwardDelay
+            // txtReverseDelay
             // 
-            this.tbForwardDelay.DecimalPlaces = 1;
-            this.tbForwardDelay.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tbForwardDelay.EnableMouseWheel = false;
-            this.tbForwardDelay.Font = new System.Drawing.Font("微软雅黑", 12F);
-            this.tbForwardDelay.Location = new System.Drawing.Point(3, 52);
-            this.tbForwardDelay.Name = "tbForwardDelay";
-            this.tbForwardDelay.Size = new System.Drawing.Size(143, 43);
-            this.tbForwardDelay.TabIndex = 22;
-            this.tbForwardDelay.Text = "0.0";
-            this.tbForwardDelay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txtReverseDelay.DecimalPlaces = 1;
+            this.txtReverseDelay.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtReverseDelay.Font = new System.Drawing.Font("微软雅黑", 12F);
+            this.txtReverseDelay.Location = new System.Drawing.Point(280, 91);
+            this.txtReverseDelay.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.txtReverseDelay.Name = "txtReverseDelay";
+            this.txtReverseDelay.Size = new System.Drawing.Size(262, 76);
+            this.txtReverseDelay.TabIndex = 19;
+            this.txtReverseDelay.Text = "0.0";
+            this.txtReverseDelay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // tbReverseDelay
+            // txtRotationInterval
             // 
-            this.tbReverseDelay.DecimalPlaces = 1;
-            this.tbReverseDelay.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tbReverseDelay.EnableMouseWheel = false;
-            this.tbReverseDelay.Font = new System.Drawing.Font("微软雅黑", 12F);
-            this.tbReverseDelay.Location = new System.Drawing.Point(152, 52);
-            this.tbReverseDelay.Name = "tbReverseDelay";
-            this.tbReverseDelay.Size = new System.Drawing.Size(143, 43);
-            this.tbReverseDelay.TabIndex = 19;
-            this.tbReverseDelay.Text = "0.0";
-            this.tbReverseDelay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txtRotationInterval.DecimalPlaces = 1;
+            this.txtRotationInterval.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtRotationInterval.Font = new System.Drawing.Font("微软雅黑", 12F);
+            this.txtRotationInterval.Location = new System.Drawing.Point(554, 91);
+            this.txtRotationInterval.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.txtRotationInterval.Name = "txtRotationInterval";
+            this.txtRotationInterval.Size = new System.Drawing.Size(262, 76);
+            this.txtRotationInterval.TabIndex = 20;
+            this.txtRotationInterval.Text = "0.0";
+            this.txtRotationInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // tbRotationInterval
+            // txtStartupInterval
             // 
-            this.tbRotationInterval.DecimalPlaces = 1;
-            this.tbRotationInterval.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tbRotationInterval.EnableMouseWheel = false;
-            this.tbRotationInterval.Font = new System.Drawing.Font("微软雅黑", 12F);
-            this.tbRotationInterval.Location = new System.Drawing.Point(301, 52);
-            this.tbRotationInterval.Name = "tbRotationInterval";
-            this.tbRotationInterval.Size = new System.Drawing.Size(143, 43);
-            this.tbRotationInterval.TabIndex = 20;
-            this.tbRotationInterval.Text = "0.0";
-            this.tbRotationInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txtStartupInterval.DecimalPlaces = 1;
+            this.txtStartupInterval.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtStartupInterval.Font = new System.Drawing.Font("微软雅黑", 12F);
+            this.txtStartupInterval.Location = new System.Drawing.Point(828, 91);
+            this.txtStartupInterval.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.txtStartupInterval.Name = "txtStartupInterval";
+            this.txtStartupInterval.Size = new System.Drawing.Size(262, 76);
+            this.txtStartupInterval.TabIndex = 21;
+            this.txtStartupInterval.Text = "0.0";
+            this.txtStartupInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // tbStartupInterval
+            // txtRotationTimes
             // 
-            this.tbStartupInterval.DecimalPlaces = 1;
-            this.tbStartupInterval.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tbStartupInterval.EnableMouseWheel = false;
-            this.tbStartupInterval.Font = new System.Drawing.Font("微软雅黑", 12F);
-            this.tbStartupInterval.Location = new System.Drawing.Point(450, 52);
-            this.tbStartupInterval.Name = "tbStartupInterval";
-            this.tbStartupInterval.Size = new System.Drawing.Size(143, 43);
-            this.tbStartupInterval.TabIndex = 21;
-            this.tbStartupInterval.Text = "0.0";
-            this.tbStartupInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txtRotationTimes.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtRotationTimes.Font = new System.Drawing.Font("微软雅黑", 12F);
+            this.txtRotationTimes.Location = new System.Drawing.Point(1102, 91);
+            this.txtRotationTimes.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.txtRotationTimes.Name = "txtRotationTimes";
+            this.txtRotationTimes.Size = new System.Drawing.Size(262, 76);
+            this.txtRotationTimes.TabIndex = 23;
+            this.txtRotationTimes.Text = "0";
+            this.txtRotationTimes.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // tbRotationTimes
+            // Savebutton
             // 
-            this.tbRotationTimes.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tbRotationTimes.EnableMouseWheel = false;
-            this.tbRotationTimes.Font = new System.Drawing.Font("微软雅黑", 12F);
-            this.tbRotationTimes.Location = new System.Drawing.Point(599, 52);
-            this.tbRotationTimes.Name = "tbRotationTimes";
-            this.tbRotationTimes.Size = new System.Drawing.Size(146, 43);
-            this.tbRotationTimes.TabIndex = 23;
-            this.tbRotationTimes.Text = "0";
-            this.tbRotationTimes.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.Savebutton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Savebutton.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.Savebutton.Location = new System.Drawing.Point(551, 175);
+            this.Savebutton.Name = "Savebutton";
+            this.Savebutton.Size = new System.Drawing.Size(268, 80);
+            this.Savebutton.TabIndex = 24;
+            this.Savebutton.Text = "保存";
             // 
             // flowLayoutPanel1
             // 
@@ -257,18 +248,19 @@
             this.flowLayoutPanel1.Controls.Add(this.button2);
             this.flowLayoutPanel1.Controls.Add(this.button3);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 503);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(6, 881);
+            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(748, 83);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(1370, 145);
             this.flowLayoutPanel1.TabIndex = 1;
             // 
             // button1
             // 
             this.button1.Font = new System.Drawing.Font("微软雅黑", 12F);
-            this.button1.Location = new System.Drawing.Point(20, 5);
-            this.button1.Margin = new System.Windows.Forms.Padding(20, 5, 5, 5);
+            this.button1.Location = new System.Drawing.Point(37, 9);
+            this.button1.Margin = new System.Windows.Forms.Padding(37, 9, 9, 9);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(116, 42);
+            this.button1.Size = new System.Drawing.Size(213, 74);
             this.button1.TabIndex = 0;
             this.button1.Text = "上下气缸手动";
             this.button1.Type = AntdUI.TTypeMini.Primary;
@@ -276,10 +268,10 @@
             // button2
             // 
             this.button2.Font = new System.Drawing.Font("微软雅黑", 12F);
-            this.button2.Location = new System.Drawing.Point(161, 5);
-            this.button2.Margin = new System.Windows.Forms.Padding(20, 5, 5, 5);
+            this.button2.Location = new System.Drawing.Point(296, 9);
+            this.button2.Margin = new System.Windows.Forms.Padding(37, 9, 9, 9);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(116, 42);
+            this.button2.Size = new System.Drawing.Size(213, 74);
             this.button2.TabIndex = 1;
             this.button2.Text = "电批正转";
             this.button2.Type = AntdUI.TTypeMini.Primary;
@@ -287,21 +279,22 @@
             // button3
             // 
             this.button3.Font = new System.Drawing.Font("微软雅黑", 12F);
-            this.button3.Location = new System.Drawing.Point(302, 5);
-            this.button3.Margin = new System.Windows.Forms.Padding(20, 5, 5, 5);
+            this.button3.Location = new System.Drawing.Point(555, 9);
+            this.button3.Margin = new System.Windows.Forms.Padding(37, 9, 9, 9);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(116, 42);
+            this.button3.Size = new System.Drawing.Size(213, 74);
             this.button3.TabIndex = 2;
             this.button3.Text = "电批反转";
             this.button3.Type = AntdUI.TTypeMini.Primary;
             // 
             // ManualView
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tableLayoutPanel1);
+            this.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.Name = "ManualView";
-            this.Size = new System.Drawing.Size(754, 589);
+            this.Size = new System.Drawing.Size(1382, 1031);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.flowLayoutPanel1.ResumeLayout(false);
@@ -313,7 +306,6 @@
 
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private AntdUI.Label lbBrakeError;
         private AntdUI.Label lbRotationTimes;
         private AntdUI.Label lbStartupInterval;
         private AntdUI.Label lbRotationInterval;
@@ -323,11 +315,11 @@
         private AntdUI.Button button1;
         private AntdUI.Button button2;
         private AntdUI.Button button3;
-        private AntdUI.InputNumber tbBrakeError;
-        private AntdUI.InputNumber tbForwardDelay;
-        private AntdUI.InputNumber tbStartupInterval;
-        private AntdUI.InputNumber tbRotationInterval;
-        private AntdUI.InputNumber tbReverseDelay;
-        private AntdUI.InputNumber tbRotationTimes;
+        private AntdUI.InputNumber txtForwardDelay;
+        private AntdUI.InputNumber txtStartupInterval;
+        private AntdUI.InputNumber txtRotationInterval;
+        private AntdUI.InputNumber txtReverseDelay;
+        private AntdUI.InputNumber txtRotationTimes;
+        private AntdUI.Button Savebutton;
     }
 }

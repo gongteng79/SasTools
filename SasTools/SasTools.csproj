@@ -33,9 +33,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AntdUI, Version=1.8.9.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libs\AntdUI.dll</HintPath>
+    <Reference Include="AntdUI, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0e24e5118ea3d6af, processorArchitecture=MSIL">
+      <HintPath>packages\AntdUI.2.0.0\lib\net48\AntdUI.dll</HintPath>
     </Reference>
     <Reference Include="HslCommunication">
       <HintPath>Libs\HslCommunication.dll</HintPath>
@@ -48,6 +47,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -68,15 +68,18 @@
     <Compile Include="Domain\DataFactory.cs" />
     <Compile Include="Domain\RequestData.cs" />
     <Compile Include="Domain\Step.cs" />
+    <Compile Include="Domain\TestParameters.cs" />
     <Compile Include="Events\SendDataEvent.cs" />
     <Compile Include="Interface\ICommunicationProtocol.cs" />
     <Compile Include="Interface\ICommunicationService.cs" />
+    <Compile Include="Interface\IParameterService.cs" />
     <Compile Include="Interface\ISasTest.cs" />
     <Compile Include="Models\Communication\CommunicationBase.cs" />
     <Compile Include="Models\Communication\SerialCommunication.cs" />
     <Compile Include="Models\Communication\TcpCommunication.cs" />
     <Compile Include="Models\SasModule\SasTest.cs" />
     <Compile Include="Services\CommunicationService.cs" />
+    <Compile Include="Services\ParameterService.cs" />
     <Compile Include="UI\AbnormalAlarmView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -156,6 +159,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\ManualView.resx">
       <DependentUpon>ManualView.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\OverView.resx">
       <DependentUpon>OverView.cs</DependentUpon>
