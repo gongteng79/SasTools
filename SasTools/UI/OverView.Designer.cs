@@ -69,7 +69,7 @@ namespace SasTools
             // 
             this.btnAddDevice.Dock = System.Windows.Forms.DockStyle.Right;
             this.btnAddDevice.IconSvg = "PlusOutlined";
-            this.btnAddDevice.Location = new System.Drawing.Point(706, 0);
+            this.btnAddDevice.Location = new System.Drawing.Point(742, 0);
             this.btnAddDevice.Name = "btnAddDevice";
             this.btnAddDevice.Size = new System.Drawing.Size(153, 58);
             this.btnAddDevice.TabIndex = 1;
@@ -80,7 +80,7 @@ namespace SasTools
             // 
             this.btnLogin.Dock = System.Windows.Forms.DockStyle.Right;
             this.btnLogin.IconSvg = "UserSwitchOutlined";
-            this.btnLogin.Location = new System.Drawing.Point(859, 0);
+            this.btnLogin.Location = new System.Drawing.Point(895, 0);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(153, 58);
             this.btnLogin.TabIndex = 0;

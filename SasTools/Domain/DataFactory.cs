@@ -14,18 +14,18 @@ namespace SasTools.Domain
             switch (functionType)
             {
                 case FunctionType.Subcribe:
-                    return new RequestData { request = 101, sequence = 0, slave_Id=1,keep_alive = 1, cache_clear = 0 };
-                case FunctionType.LockScrew:
-                    return new RequestData { request = 102, sequence = 0, slave_Id = 1, screw = 0 };
-                case FunctionType.IdleRun:
-                    return new RequestData { request = 111, slave_Id = 1, velocity = 500, time = 0, angle = 0 };
-                case FunctionType.RemoveScrew:
-                    return new RequestData { request = 112, slave_Id = 1, torque = 0.1, velocity = 500, time = 0, angle = 0 };
+                    return new RequestData { request = 101, sequence = 0, slave_id=1,keep_alive = 1, cache_clear = 0 };
+                case FunctionType.InputScrewData:
+                    return new RequestData { request = 102, sequence = 0, slave_id = 1, screw = 0 };
+                case FunctionType.IdleRunParameter:
+                    return new RequestData { request = 111, slave_id = 1, velocity = 500, time = 0, angle = 0 };
+                case FunctionType.RemoveScrewParameter:
+                    return new RequestData { request = 112, slave_id = 1, torque = 0.1, velocity = 500, time = 0, angle = 0 };
                 case FunctionType.ScrewParameters:
                     return new RequestData
                     {
                         request = 113,
-                        slave_Id = 1,
+                        slave_id = 1,
                         screw = 1,
                         torqueCompensation = 0.000,
                         torqueValidTime = 50,
@@ -49,33 +49,33 @@ namespace SasTools.Domain
                     }
                     };
                 case FunctionType.ProductParameters:
-                    return new RequestData { request = 130, slave_Id = 1, product_Id = 1, product_Name = "Product1", screw = 1 };
+                    return new RequestData { request = 130, slave_id = 1, product_id = 1, product_Name = "Product1", screw = 1 };
                 case FunctionType.ControlIdleRun:
-                    return new RequestData { request = 114, slave_Id = 1, velocity = 500, time = 0, angle = 0 };
+                    return new RequestData { request = 114, slave_id = 1, velocity = 500, time = 0, angle = 0 };
                 case FunctionType.RemoveScrewAction:
-                    return new RequestData { request = 115, slave_Id = 1, torque = 0.1, velocity = 500, time = 0, angle = 0 };
+                    return new RequestData { request = 115, slave_id = 1, torque = 0.1, velocity = 500, time = 0, angle = 0 };
                 case FunctionType.LockScrewAction:
-                    return new RequestData { request = 116, slave_Id = 1, screw_Id = 1 };
+                    return new RequestData { request = 116, slave_id = 1, screw_id = 1 };
                 case FunctionType.TorqueTest:
-                    return new RequestData { request = 117, slave_Id = 1, currentPercent = 20, torqueValidTime = 100, velocity = 100 };
+                    return new RequestData { request = 117, slave_id = 1, currentPercent = 20, torqueValidTime = 100, velocity = 100 };
                 case FunctionType.Stop:
-                    return new RequestData { request = 118, slave_Id = 1 };
+                    return new RequestData { request = 118, slave_id = 1 };
                 case FunctionType.StatusQuery:
-                    return new RequestData { request = 119, slave_Id = 1 };
+                    return new RequestData { request = 119, slave_id = 1 };
                 case FunctionType.ProductInfoQuery:
-                    return new RequestData { request = 120, slave_Id = 1 };
+                    return new RequestData { request = 120, slave_id = 1 };
                 case FunctionType.TorqueCalibration:
-                    return new RequestData { request = 121, slave_Id = 1,currentPercent = 20,  torque = 0.5 };
+                    return new RequestData { request = 121, slave_id = 1,currentPercent = 20,  torque = 0.5 };
                 case FunctionType.MotorSelfTest:
-                    return new RequestData { request = 122, slave_Id = 1, ctrl = 0 };
+                    return new RequestData { request = 122, slave_id = 1, ctrl = 0 };
                 case FunctionType.LockMode:
-                    return new RequestData { request = 123, slave_Id = 1, screw_Id = 1 };
+                    return new RequestData { request = 123, slave_id = 1, product_id = 1 };
                 case FunctionType.PowerControl:
-                    return new RequestData { request = 124, slave_Id = 1, powerEnable = 1 };
+                    return new RequestData { request = 124, slave_id = 1, powerEnable = 1 };
                 case FunctionType.TightenInfoControl:
-                    return new RequestData { request = 125, slave_Id = 1, tightenClear = 0 };
+                    return new RequestData { request = 125, slave_id = 1, tightenClear = 0 };
                 case FunctionType.WriteBarcode:
-                    return new RequestData { request = 126, slave_Id = 1, barCode = 20025954 };
+                    return new RequestData { request = 126, slave_id = 1, barCode = 20025954 };
                 default:
                     throw new ArgumentOutOfRangeException(nameof(functionType), functionType, null);
             }

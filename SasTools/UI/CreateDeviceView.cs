@@ -12,6 +12,8 @@ namespace SasTools.UI
 {
     public partial class CreateDeviceView : UserControl
     {
+        internal Action<object, object> DeviceCreated;
+
         public CreateDeviceView()
         {
             InitializeComponent();

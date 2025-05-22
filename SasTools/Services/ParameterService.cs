@@ -30,15 +30,24 @@ namespace SasTools.Services
             }
         }
 
+        //保存参数方法
         public async Task<bool> SaveParameterAsync(TestParameters parameters)
         {
             try
             {
+                //将参数对象序列化为格式化的JSON字符串
                 string json = JsonConvert.SerializeObject(parameters, Formatting.Indented);
-                await File.WriteAllTextAsync(_configFilePath, json);
+                //使用异步文件流写入JSON字符串到文件
+                using (var stream = new FileStream(_configFilePath, FileMode.Create, FileAccess.Write, FileShare.None,
+                                                  bufferSize: 4096, useAsync: true))
+                using (var writer = new StreamWriter(stream, Encoding.UTF8))
+                {
+                    //异步写入JSON字符串到文件
+                    await writer.WriteAsync(json);
+                }
                 _logger.Info("参数保存成功");
                 return true;
-                 
+
             }
             catch (Exception ex)
             {
@@ -55,11 +64,18 @@ namespace SasTools.Services
                 //如果配置文件存在
                 if (File.Exists(_configFilePath))
                 {
-                    //异步读取并反序列化为 TestParameters 对象
-                    string json = await File.ReadAllTextAsync(_configFilePath);
-                    var Parameters = JsonConvert.DeserializeObject<TestParameters>(json);
-                    _logger.Info($"参数加载成功:{_configFilePath}");
-                    return Parameters;
+                    //使用异步文件流读取文件内容
+                    using (var stream = new FileStream(_configFilePath, FileMode.Open, FileAccess.Read, FileShare.Read,
+                                              bufferSize: 4096, useAsync: true))
+                    using (var reader = new StreamReader(stream, Encoding.UTF8))
+                    {
+                        //异步读取文件内容
+                        string json = await reader.ReadToEndAsync();
+                        //反序列化JSON字符串为参数对象
+                        var Parameters = JsonConvert.DeserializeObject<TestParameters>(json);
+                        _logger.Info($"参数加载成功:{_configFilePath}");
+                        return Parameters;
+                    }
                 }
                 else
                 {
@@ -84,11 +100,31 @@ namespace SasTools.Services
             }
 
             //验证各个参数范围
-            if (parameters.ForwardDelay < 0 || parameters.ForwardDelay > 60) { }
-            if (parameters.ReverseDelay < 0 || parameters.ReverseDelay > 60) { }
-            if (parameters.RotationInterval < 0 || parameters.RotationInterval > 60) { }
-            if (parameters.StartupInterval < 0 || parameters.StartupInterval > 60) { }
-            if (parameters.Timeout < 0 || parameters.Timeout > 60) { }
+            if (parameters.ForwardDelay < 0 || parameters.ForwardDelay > 60) 
+            {
+                errorMessage = $"正转启动延时必须在 0-60 秒之间(当前值：{parameters.ForwardDelay})";
+                return false;
+            }
+            if (parameters.ReverseDelay < 0 || parameters.ReverseDelay > 60) 
+            {
+                errorMessage = $"反转启动延时必须在 0-60 秒之间(当前值：{parameters.ReverseDelay})";
+                return false;
+            }
+            if (parameters.RotationInterval < 0 || parameters.RotationInterval > 60) 
+            {
+                errorMessage = $"正反转切换间隔必须在 0-60 秒之间(当前值：{parameters.RotationInterval})";
+                return false;
+            }
+            if (parameters.StartupInterval < 0 || parameters.StartupInterval > 60) 
+            {
+                errorMessage = $"循环启动间隔必须在 0-60 秒之间(当前值：{parameters.StartupInterval})";
+                return false;
+            }
+            if (parameters.Timeout < 0 || parameters.Timeout > 60) 
+            {
+                errorMessage = $"超时时间必须在 0-60 秒之间(当前值：{parameters.Timeout})";
+                return false;
+            }
 
             errorMessage = string.Empty;
             return true;

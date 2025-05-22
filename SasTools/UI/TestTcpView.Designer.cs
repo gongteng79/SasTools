@@ -76,27 +76,7 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1318, 414);
             this.panel1.TabIndex = 0;
-            // 
-            // btnDisConnect
-            // 
-            this.btnDisConnect.Location = new System.Drawing.Point(798, 40);
-            this.btnDisConnect.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.btnDisConnect.Name = "btnDisConnect";
-            this.btnDisConnect.Size = new System.Drawing.Size(154, 56);
-            this.btnDisConnect.TabIndex = 5;
-            this.btnDisConnect.Text = "断开连接";
-            this.btnDisConnect.Click += new System.EventHandler(this.btnDisConnect_Click);
-            // 
-            // btnConnect
-            // 
-            this.btnConnect.Location = new System.Drawing.Point(585, 40);
-            this.btnConnect.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.btnConnect.Name = "btnConnect";
-            this.btnConnect.Size = new System.Drawing.Size(154, 56);
-            this.btnConnect.TabIndex = 4;
-            this.btnConnect.Text = "设备连接";
-            this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
-            // 
+            //
             // functionComboBox
             // 
             this.functionComboBox.Font = new System.Drawing.Font("宋体", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));

@@ -9,9 +9,8 @@ namespace SasTools.Domain
 {
     public class RequestData
     {
-        public int? Subcribe { get; set; }
         public int request { get; set; }
-        public int slave_Id { get; set; }
+        public int slave_id { get; set; }
         public int? sequence { get; set; }
         public int? keep_alive { get; set; }
         public int? cache_clear { get; set; }
@@ -20,9 +19,9 @@ namespace SasTools.Domain
         public int? time { get; set; }
         public double? angle { get; set; }
         public double? torque { get; set; }
-        public int? product_Id { get; set; }
+        public int? product_id { get; set; }
         public string product_Name { get; set; }
-        public int? screw_Id { get; set; }
+        public int? screw_id { get; set; }
         public double? torqueCompensation { get; set; }
         public int? torqueValidTime { get; set; }
         public int? torqueFilterTime { get; set; }

@@ -19,6 +19,7 @@ namespace SasTools.Models.SasModule
     {
         private ICommunication _tcpCommunication;
         private IEventBus _eventBus;
+        private ICommunicationService _communicationService;
 
         public SasTest(ICommunication tcpCommunication, IEventBus eventBus)
         {
@@ -26,18 +27,39 @@ namespace SasTools.Models.SasModule
            this._eventBus = eventBus;
         }
 
+        // 为依赖注入提供的替代构造函数
+        public SasTest(ICommunicationService communicationService, IEventBus eventBus)
+        {
+           this._communicationService = communicationService;
+           this._eventBus = eventBus;
+        }
+
         public bool ConnectServer()
         {
-            var result = this._tcpCommunication.ConnectAsync();
-
-            return result.Result;
+            if (_communicationService != null)
+            {
+                var result = _communicationService.ConnectAsync();
+                return result.Result;
+            }
+            else
+            {
+                var result = this._tcpCommunication.ConnectAsync();
+                return result.Result;
+            }
         }
 
         public bool DisconnectServer()
         {
-            var result = this._tcpCommunication.DisconnectAsync();
-
-            return result.Result;
+            if (_communicationService != null)
+            {
+                var result = _communicationService.DisconnectAsync();
+                return result.Result;
+            }
+            else
+            {
+                var result = this._tcpCommunication.DisconnectAsync();
+                return result.Result;
+            }
         }
 
         public string ReadData(RequestData data)
@@ -48,12 +70,20 @@ namespace SasTools.Models.SasModule
             });
             byte[] sendData = Encoding.ASCII.GetBytes(jsonString);
 
-            var result = _tcpCommunication.SendAsync(sendData);
+            string result;
+            if (_communicationService != null)
+            {
+                result = _communicationService.SendMessageAsync(sendData).Result;
+            }
+            else
+            {
+                result = _tcpCommunication.SendAsync(sendData).Result;
+            }
 
-            this._eventBus.Publish(new SendDataEvent(jsonString, result.Result));
+            this._eventBus.Publish(new SendDataEvent(jsonString, result));
 
             // 返回 JSON 字符串（或根据需要返回字节数组）
-            return result.Result;
+            return result;
         }
     }
 }

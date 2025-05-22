@@ -82,7 +82,7 @@ namespace SasTools.UI
                     {
                         WriteInfoToBox(ex.Message);
                         if (btn.IsDisposed) return;
-                        btn.Loading = false; 
+                        btn.Loading = false;
                     }));
                 }
             });
@@ -117,38 +117,6 @@ namespace SasTools.UI
             }
         }
 
-        private void btnConnect_Click(object sender, EventArgs e)
-        {
-            // 尝试连接设备
-            var result = this._sas.ConnectServer();
-
-            // 根据连接结果显示消息
-            if (result)
-            {
-                WriteInfoToBox("连接成功");
-            }
-            else
-            {
-                WriteInfoToBox("连接失败");
-            }
-        }
-
-        private void btnDisConnect_Click(object sender, EventArgs e)
-        {
-            // 尝试断开连接
-            var result = this._sas.DisconnectServer();
-
-            // 根据断开连接结果显示消息
-            if (result)
-            {
-                WriteInfoToBox("断开连接成功");
-            }
-            else
-            {
-                WriteInfoToBox("断开连接失败");
-            }
-        }
-
         /// <summary>
         /// 将消息写入到TextBox上
         /// </summary>
@@ -163,6 +131,12 @@ namespace SasTools.UI
         {
             public static readonly Dictionary<FunctionType, string> Descriptions = new Dictionary<FunctionType, string>
             {
+                { FunctionType.Subcribe, "订阅" },
+                { FunctionType.InputScrewData, "传入锁付数据" },
+                { FunctionType.IdleRunParameter,"空转运行参数" },
+                { FunctionType.RemoveScrewParameter, "拆螺丝参数" },
+                { FunctionType.ScrewParameters, "螺丝参数" },
+                { FunctionType.ProductParameters, "产品参数" },
                 { FunctionType.ControlIdleRun, "控制螺丝锁付空转运行" },
                 { FunctionType.RemoveScrewAction, "拆螺丝" },
                 { FunctionType.LockScrewAction, "锁螺丝" },
