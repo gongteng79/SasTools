@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using log4net;
+using SasTools.Common;
 using SasTools.Domain;
 using SasTools.Interface;
 using SasTools.Models.Communication;
+using System.Threading;
 
 namespace SasTools.Services
 {
@@ -18,6 +20,8 @@ namespace SasTools.Services
         private readonly string _defaultHost;
         private readonly int _defaultPort;
         private bool _isConnected = false;
+        private Timer _heartbeatTimer;
+        private readonly int _heartbeatInterval = 5000; // 心跳间隔时间,单位:毫秒
 
         // 消息接收事件
         public event EventHandler<string> MessageReceived;
@@ -30,13 +34,12 @@ namespace SasTools.Services
 
 
         // 构造函数，依赖注入通信参数
-
-        //defaultHost:默认主机地址
         public CommunicationService(string defaultHost = "192.168.2.12", int defaultPort = 6062)
         {
             _defaultHost = defaultHost;
             _defaultPort = defaultPort;
         }
+
 
         //连接设备
         public async Task<bool> ConnectAsync(string host = null, int port = 0)
@@ -146,6 +149,37 @@ namespace SasTools.Services
             catch (Exception ex)
             {
                 _logger.Error($"发送数据时发生错误: {ex.Message}", ex);
+                return null;
+            }
+        }
+
+        //发送对象消息(序列化为JSON)
+        public async Task<T> SendObjectAsycn<T, R>(R requestObj) where T : class
+        {
+            if (_communication == null || !IsConnected)
+            {
+                _logger.Warn("尝试在未连接状态下发送消息");
+                return null;
+            }
+            try
+            {
+                //序列化对象为JSON字符串
+                string jsonRequest = JsonMessageCodec.Serialize(requestObj);
+                _logger.Debug($"发送JSON消息:{jsonRequest}");
+
+                //发送JSON消息
+                var jsonResponse = await SendMessageAsync(jsonRequest);
+
+                //反序列化响应
+                if (jsonRequest != null)
+                {
+                    return JsonMessageCodec.Deserialize<T>(jsonRequest);
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"发送对象消息时发生错误: {ex.Message}", ex);
                 return null;
             }
         }

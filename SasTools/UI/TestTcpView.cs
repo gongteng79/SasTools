@@ -117,10 +117,7 @@ namespace SasTools.UI
             }
         }
 
-        /// <summary>
-        /// 将消息写入到TextBox上
-        /// </summary>
-        /// <param name="message"></param>
+        // 将消息写入到TextBox上
         private void WriteInfoToBox(string message)
         {
             this.textBox1.ScrollToCaret();

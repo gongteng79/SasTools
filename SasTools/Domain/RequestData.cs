@@ -1,4 +1,5 @@
 ﻿using AntdUI;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,19 +10,27 @@ namespace SasTools.Domain
 {
     public class RequestData
     {
-        public int request { get; set; }
+        [JsonProperty("slave id")]
         public int slave_id { get; set; }
-        public int? sequence { get; set; }
+
+        [JsonProperty("product id")]
+        public int? product_id { get; set; }
+
+        [JsonProperty("screw id")]
+        public int? screw_id { get; set; }
+
+        [JsonProperty("keep alive")]
         public int? keep_alive { get; set; }
+        [JsonProperty("cache clear")]
         public int? cache_clear { get; set; }
+        public int request { get; set; }
+        public int? sequence { get; set; }
         public int? screw { get; set; }
         public int? velocity { get; set; }
         public int? time { get; set; }
         public double? angle { get; set; }
         public double? torque { get; set; }
-        public int? product_id { get; set; }
         public string product_Name { get; set; }
-        public int? screw_id { get; set; }
         public double? torqueCompensation { get; set; }
         public int? torqueValidTime { get; set; }
         public int? torqueFilterTime { get; set; }

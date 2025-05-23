@@ -169,14 +169,6 @@ namespace SasTools
 
                 if (!_isConnected)
                 {
-                    // 可以添加连接配置对话框（可选）
-                    // CreateDeviceView deviceView = new CreateDeviceView();
-                    // if (deviceView.ShowDialog() == DialogResult.OK)
-                    // {
-                    //     _defaultHost = deviceView.Host;
-                    //     _defaultPort = deviceView.Port;
-                    // }
-
                     // 连接设备
                     bool result = await _communicationService.ConnectAsync(_defaultHost, _defaultPort);
                     string message = result ? "设备连接成功" : "设备连接失败";

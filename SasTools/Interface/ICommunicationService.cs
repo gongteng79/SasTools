@@ -12,7 +12,6 @@ namespace SasTools.Interface
         // 当前连接状态
         bool IsConnected { get; }
 
-
         // 连接设备
         Task<bool> ConnectAsync(string host = null, int port = 0);
 

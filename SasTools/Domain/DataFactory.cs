@@ -55,7 +55,7 @@ namespace SasTools.Domain
                 case FunctionType.RemoveScrewAction:
                     return new RequestData { request = 115, slave_id = 1, torque = 0.1, velocity = 500, time = 0, angle = 0 };
                 case FunctionType.LockScrewAction:
-                    return new RequestData { request = 116, slave_id = 1, screw_id = 1 };
+                    return new RequestData { request = 116, slave_id = 1, product_id = 1 };
                 case FunctionType.TorqueTest:
                     return new RequestData { request = 117, slave_id = 1, currentPercent = 20, torqueValidTime = 100, velocity = 100 };
                 case FunctionType.Stop:
