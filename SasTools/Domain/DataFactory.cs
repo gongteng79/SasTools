@@ -73,7 +73,7 @@ namespace SasTools.Domain
                 case FunctionType.PowerControl:
                     return new RequestData { request = 124, slave_id = 1, powerEnable = 1 };
                 case FunctionType.TightenInfoControl:
-                    return new RequestData { request = 125, slave_id = 1, tightenClear = 0 };
+                    return new RequestData { request = 125, slave_id = 1, tightenClear = 2 };
                 case FunctionType.WriteBarcode:
                     return new RequestData { request = 126, slave_id = 1, barCode = 20025954 };
                 default:

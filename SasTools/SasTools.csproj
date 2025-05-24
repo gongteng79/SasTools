@@ -101,11 +101,14 @@
     <Compile Include="Domain\RequestData.cs" />
     <Compile Include="Domain\Step.cs" />
     <Compile Include="Domain\TestParameters.cs" />
+    <Compile Include="Domain\TestState.cs" />
+    <Compile Include="Domain\TestStateMachine.cs" />
     <Compile Include="Events\SendDataEvent.cs" />
     <Compile Include="Interface\ICommunication.cs" />
     <Compile Include="Interface\ICommunicationService.cs" />
     <Compile Include="Interface\IParameterService.cs" />
     <Compile Include="Interface\ISasTest.cs" />
+    <Compile Include="Interface\ITestStateMachine.cs" />
     <Compile Include="Models\Communication\CommunicationBase.cs" />
     <Compile Include="Models\Communication\SerialCommunication.cs" />
     <Compile Include="Models\Communication\TcpCommunication.cs" />
