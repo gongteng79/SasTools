@@ -96,6 +96,7 @@
     <Compile Include="Common\CommunicationType.cs" />
     <Compile Include="Common\FunctionType.cs" />
     <Compile Include="Common\JsonMessageCodec.cs" />
+    <Compile Include="Domain\CommandType.cs" />
     <Compile Include="Domain\CommunicationFactory.cs" />
     <Compile Include="Domain\DataFactory.cs" />
     <Compile Include="Domain\RequestData.cs" />
@@ -103,18 +104,37 @@
     <Compile Include="Domain\TestParameters.cs" />
     <Compile Include="Domain\TestState.cs" />
     <Compile Include="Domain\TestStateMachine.cs" />
+    <Compile Include="Domain\TestStateMachineContext.cs" />
     <Compile Include="Events\SendDataEvent.cs" />
+    <Compile Include="Interface\ICommandService.cs" />
     <Compile Include="Interface\ICommunication.cs" />
     <Compile Include="Interface\ICommunicationService.cs" />
     <Compile Include="Interface\IParameterService.cs" />
     <Compile Include="Interface\ISasTest.cs" />
+    <Compile Include="Interface\IState.cs" />
+    <Compile Include="Interface\IStateFactory.cs" />
     <Compile Include="Interface\ITestStateMachine.cs" />
     <Compile Include="Models\Communication\CommunicationBase.cs" />
     <Compile Include="Models\Communication\SerialCommunication.cs" />
     <Compile Include="Models\Communication\TcpCommunication.cs" />
     <Compile Include="Models\SasModule\SasTest.cs" />
+    <Compile Include="Services\CommandService.cs" />
     <Compile Include="Services\CommunicationService.cs" />
+    <Compile Include="Services\DefaultStateFactory.cs" />
     <Compile Include="Services\ParameterService.cs" />
+    <Compile Include="State\ErrorState.cs" />
+    <Compile Include="State\ForwardDelayState.cs" />
+    <Compile Include="State\ForwardState.cs" />
+    <Compile Include="State\ForwardWaitingState.cs" />
+    <Compile Include="State\IdleState.cs" />
+    <Compile Include="State\InitializingState.cs" />
+    <Compile Include="State\ReverseDelayState.cs" />
+    <Compile Include="State\ReverseState.cs" />
+    <Compile Include="State\ReverseWaitingState.cs" />
+    <Compile Include="State\RotationIntervalState.cs" />
+    <Compile Include="State\StartupIntervalState.cs" />
+    <Compile Include="State\StateBase.cs" />
+    <Compile Include="State\StoppingState.cs" />
     <Compile Include="UI\AbnormalAlarmView.cs">
       <SubType>UserControl</SubType>
     </Compile>
