@@ -26,13 +26,14 @@ namespace SasTools.States
         // 处理消息
         public virtual void HandleMessage(TestStateMachine stateMachine, string message)
         {
-            
+            _logger.Debug($"状态{GetType().Name} 接收消息:{message}");
         }
 
         // 处理超时
         public virtual void HandleTimeout(TestStateMachine stateMachine)
         {
             // 默认超时处理
+            _logger.Warn($"状态 {GetType().Name} 操作超时");
             stateMachine.NotifyError($"状态 {GetType().Name} 操作超时", -1);
         }
 

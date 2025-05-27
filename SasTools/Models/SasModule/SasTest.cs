@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Wp.FzWater.Mqtt;
 using WpFramework.EventBus;
+using static SasTools.Events.SendDataEvent;
 
 namespace SasTools.Models.SasModule
 {
@@ -80,9 +81,10 @@ namespace SasTools.Models.SasModule
                 result = _tcpCommunication.SendAsync(sendData).Result;
             }
 
-            this._eventBus.Publish(new SendDataEvent(jsonString, result));
+            this._eventBus.Publish(EventFactory.CreateSendDataEvent(jsonString, result));
 
-            // 返回 JSON 字符串（或根据需要返回字节数组）
+
+            // 返回 JSON 字符串
             return result;
         }
     }

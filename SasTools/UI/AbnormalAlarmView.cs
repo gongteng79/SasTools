@@ -47,7 +47,7 @@ namespace SasTools.UI
             _stateMachine = new TestStateMachine(_sasTest, _parameterService);
             _stateMachine.StateChanged += StateMachine_StateChanged;
             _stateMachine.TestResultReceived += StateMachine_TestResultReceived;
-            //_stateMachine.CounterChanged += AbnormalAlarmView_CounterChanged;
+            _stateMachine.CounterChanged += AbnormalAlarmView_CounterChanged;
 
             // 更新UI状态
             UpdateControlState(false);
