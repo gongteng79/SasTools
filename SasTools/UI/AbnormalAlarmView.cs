@@ -23,7 +23,7 @@ namespace SasTools.UI
 
         private DataTable dataTable;
 
-        public AbnormalAlarmView()
+        public AbnormalAlarmView(ISasTest sasTest, IParameterService parameterService)
         {
             InitializeComponent();
 
@@ -35,6 +35,8 @@ namespace SasTools.UI
 
             // 初始化状态显示
             InitializeStatusDisplay();
+
+            Initialize(sasTest, parameterService);
         }
 
         // 由主窗体调用，传入依赖服务

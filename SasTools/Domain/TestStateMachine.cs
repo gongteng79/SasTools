@@ -19,11 +19,13 @@ namespace SasTools.Domain
         private readonly ICommandService _commandService; // 命令服务，用于发送命令
         private readonly IParameterService _parameterService; // 参数服务，用于加载和验证测试参数
         private readonly IStateFactory _stateFactory; // 状态工厂，用于创建状态对象
-
+        private TestState _state = TestState.Idle;
         private IState _currentStateObj; // 当前状态对象
         private TestState _currentState = TestState.Idle; // 当前状态枚举
         private CancellationTokenSource _cancellationTokenSource; // 取消令牌源，用于取消异步操作
         private Timer _timeoutTimer; // 超时定时器
+        private bool _isRunning = false;
+        private bool _isPause = false;
 
         // 状态机上下文
         private readonly TestStateMachineContext _context;
@@ -69,7 +71,7 @@ namespace SasTools.Domain
         public TestStateMachine(ICommandService commandService, IParameterService parameterService, IStateFactory stateFactory)
         {
             _commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
-            _parameterService = parameterService ?? throw new ArgumentNullException(nameof(parameterService));
+            //_parameterService = parameterService ?? throw new ArgumentNullException(nameof(parameterService));
             _stateFactory = stateFactory ?? throw new ArgumentNullException(nameof(stateFactory));
 
             // 初始化上下文
@@ -90,81 +92,96 @@ namespace SasTools.Domain
         // 启动测试
         public async Task<bool> StartTestAsync()
         {
-            if (CurrentState != TestState.Idle)
-            {
-                _logger.Warn("测试已经正在进行，无法启动新测试");
-                return false;
-            }
+            _isRunning = true;
+            _state = TestState.Idle;
+            _cancellationTokenSource = new CancellationTokenSource();
+            Task.Run(() => RunStateMachineAsync(_cancellationTokenSource.Token));
 
-            try
-            {
-                // 加载参数
-                _context.Parameters = await _parameterService.LoadParameterAsync();
-                string errorMessage;
-                if (!_parameterService.ValidateParameters(_context.Parameters, out errorMessage))
-                {
-                    _logger.Error($"参数验证失败: {errorMessage}");
-                    NotifyError(errorMessage, -1);
-                    return false;
-                }
+            return true;
+            //if (CurrentState != TestState.Idle)
+            //{
+            //    _logger.Warn("测试已经正在进行，无法启动新测试");
+            //    return false;
+            //}
 
-                // 重置计数器
-                _context.Reset();
+            //try
+            //{
+            //    // 加载参数
+            //    _context.Parameters = await _parameterService.LoadParameterAsync();
+            //    string errorMessage;
+            //    if (!_parameterService.ValidateParameters(_context.Parameters, out errorMessage))
+            //    {
+            //        _logger.Error($"参数验证失败: {errorMessage}");
+            //        NotifyError(errorMessage, -1);
+            //        return false;
+            //    }
 
-                // 创建取消令牌
-                _cancellationTokenSource = new CancellationTokenSource();
+            //    // 重置计数器
+            //    _context.Reset();
 
-                // 切换到初始化状态
-                CurrentState = TestState.Initializing;
+            //    // 创建取消令牌
+            //    _cancellationTokenSource = new CancellationTokenSource();
 
-                // 启动状态机主循环
-                _ = RunStateMachineAsync(_cancellationTokenSource.Token);
+            //    // 切换到初始化状态
+            //    CurrentState = TestState.Initializing;
 
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"启动测试时发生错误: {ex.Message}", ex);
-                CurrentState = TestState.Error;
-                return false;
-            }
+            //    // 启动状态机主循环
+            //    _ = RunStateMachineAsync(_cancellationTokenSource.Token);
+
+            //    return true;
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logger.Error($"启动测试时发生错误: {ex.Message}", ex);
+            //    CurrentState = TestState.Error;
+            //    return false;
+            //}
         }
 
         // 停止测试
         public async Task<bool> StopTestAsync()
         {
-            if (CurrentState == TestState.Idle)
+            _isRunning = false;
+            _state = TestState.Stopping;
+            //    取消正在进行的任务
+            if (_cancellationTokenSource != null && !_cancellationTokenSource.IsCancellationRequested)
             {
-                _logger.Info("测试已处于空闲状态，无需停止");
-                return true;
+                _cancellationTokenSource.Cancel();
             }
+            return true;
 
-            try
-            {
-                CurrentState = TestState.Stopping;
+            //if (CurrentState == TestState.Idle)
+            //{
+            //    _logger.Info("测试已处于空闲状态，无需停止");
+            //    return true;
+            //}
 
-                // 取消正在进行的任务
-                if (_cancellationTokenSource != null && !_cancellationTokenSource.IsCancellationRequested)
-                {
-                    _cancellationTokenSource.Cancel();
-                }
+            //try
+            //{
+            //    CurrentState = TestState.Stopping;
 
-                // 停止超时定时器
-                StopTimeoutTimer();
+            //    取消正在进行的任务
+            //    if (_cancellationTokenSource != null && !_cancellationTokenSource.IsCancellationRequested)
+            //    {
+            //        _cancellationTokenSource.Cancel();
+            //    }
 
-                // 发送停止指令
-                await _commandService.ExecuteCommandAsync(CommandType.Stop);
+            //    停止超时定时器
+            //    StopTimeoutTimer();
 
-                // 切换到空闲状态
-                CurrentState = TestState.Idle;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"停止测试失败: {ex.Message}", ex);
-                CurrentState = TestState.Error;
-                return false;
-            }
+            //    发送停止指令
+            //   await _commandService.ExecuteCommandAsync(CommandType.Stop);
+
+            //    切换到空闲状态
+            //   CurrentState = TestState.Idle;
+            //    return true;
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logger.Error($"停止测试失败: {ex.Message}", ex);
+            //    CurrentState = TestState.Error;
+            //    return false;
+            //}
         }
 
         // 复位功能 - 清除状态和计数器
@@ -242,7 +259,7 @@ namespace SasTools.Domain
 
         #region 内部方法
         // 状态机主循环
-        private async Task RunStateMachineAsync(CancellationToken cancellationToken)
+        private void RunStateMachineAsync(CancellationToken cancellationToken)
         {
             try
             {
@@ -250,29 +267,35 @@ namespace SasTools.Domain
                 {
                     if (_currentStateObj == null)
                     {
-                        await Task.Delay(100, cancellationToken);
+                        Task.Delay(100, cancellationToken);
                         continue;
                     }
-
-                    // 让当前状态处理逻辑
-                    TestState nextState = await _currentStateObj.ProcessAsync(this, cancellationToken);
-
-                    // 如果需要转换状态
-                    if (nextState != CurrentState)
+                    if (!_isRunning)
                     {
-                        CurrentState = nextState;
-                    }
-                    else
-                    {
-                        // 避免CPU高占用
-                        await Task.Delay(50, cancellationToken);
+                        return;
                     }
 
-                    // 如果是终止状态，退出循环
-                    if (CurrentState == TestState.Idle || CurrentState == TestState.Error)
-                    {
-                        break;
-                    }
+                    TestLockingScrewsAsync();
+
+                    //// 让当前状态处理逻辑
+                    //TestState nextState = await _currentStateObj.ProcessAsync(this, cancellationToken);
+
+                    //// 如果需要转换状态
+                    //if (nextState != CurrentState)
+                    //{
+                    //    CurrentState = nextState;
+                    //}
+                    //else
+                    //{
+                    //    // 避免CPU高占用
+                    //    await Task.Delay(50, cancellationToken);
+                    //}
+
+                    //// 如果是终止状态，退出循环
+                    //if (CurrentState == TestState.Idle || CurrentState == TestState.Error)
+                    //{
+                    //    break;
+                    //}
                 }
             }
             catch (OperationCanceledException)
@@ -387,6 +410,66 @@ namespace SasTools.Domain
             return _commandService;
         }
         #endregion
+
+        private async Task TestLockingScrewsAsync()
+        {
+            switch (_state)
+            {
+                case TestState.Idle:
+                    _state = TestState.Initializing;
+                    break;
+
+                case TestState.Initializing:
+                    _state = TestState.ForwardDelay;
+                    break;
+
+                case TestState.ForwardDelay:
+                    await Task.Delay(2000);
+                    _state = TestState.Forward;
+                    break;
+
+                case TestState.Forward:
+                    await _commandService.ExecuteCommandAsync(CommandType.Forward);
+                    _state = TestState.ForwardWaiting;
+                    break;
+
+                case TestState.ForwardWaiting:
+                    await Task.Delay(2000);
+                    _state = TestState.RotationInterval;
+                    break;
+
+                case TestState.RotationInterval:
+                    _state = TestState.ReverseDelay;
+                    break;
+
+                case TestState.ReverseDelay:
+                    await Task.Delay(2000);
+                    _state = TestState.Reverse;
+                    break;
+
+                case TestState.Reverse:
+                    await _commandService.ExecuteCommandAsync(CommandType.Reverse);
+                    _state = TestState.ReverseWaiting;
+                    break;
+
+                case TestState.ReverseWaiting:
+                    await Task.Delay(2000);
+                    _state = TestState.StartupInterval;
+                    break;
+
+                case TestState.StartupInterval:
+                    _state = TestState.Stopping;
+                    break;
+
+                case TestState.Stopping:
+                    await _commandService.ExecuteCommandAsync(CommandType.Stop);
+                    _state = TestState.Idle;
+                    break;
+
+                case TestState.Error:
+                    break;
+            }
+        }
     }
 }
 

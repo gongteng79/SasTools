@@ -20,44 +20,86 @@ namespace SasTools.Services
         }
 
         // 执行命令
-        public Task<string> ExecuteCommandAsync(CommandType commandType, object parameters = null)
+        public Task<string> ExecuteCommandAsync(CommandType commandType)
         {
             try
             {
                 RequestData requestData;
+                RequestParameter parameters = null;
 
-                // 根据命令类型创建请求数据
                 switch (commandType)
                 {
                     case CommandType.Subscribe:
-                        requestData = DataFactory.CreateData(FunctionType.Subcribe);
+                        parameters = new RequestParameter
+                        {
+                            Request = 101,
+                            Sequence = 0,
+                            SlaveId = 1,
+                            KeepAlive = 1,
+                            CacheClear = 0
+                        };
+                        requestData = DataFactory.CreateRequestCommand(FunctionType.Subcribe, parameters);
                         break;
                     case CommandType.LockMode:
-                        requestData = DataFactory.CreateData(FunctionType.LockMode);
+                        parameters = new RequestParameter
+                        {
+                            Request = 123,
+                            SlaveId = 1,
+                            ProductId = 1
+                        };
+                        requestData = DataFactory.CreateRequestCommand(FunctionType.LockMode, parameters);
                         break;
                     case CommandType.Forward:
-                        requestData = DataFactory.CreateData(FunctionType.LockScrewAction);
+                        parameters = new RequestParameter
+                        {
+                            Request = 116,
+                            SlaveId = 1,
+                            ProductId = 1
+                        };
+                        requestData = DataFactory.CreateRequestCommand(FunctionType.LockScrewAction, parameters);
                         break;
                     case CommandType.Reverse:
-                        requestData = DataFactory.CreateData(FunctionType.RemoveScrewAction);
+                        parameters = new RequestParameter
+                        {
+                            Request = 115,
+                            SlaveId = 1,
+                            ProductId = 1
+                        };
+                        requestData = DataFactory.CreateRequestCommand(FunctionType.RemoveScrewAction, parameters);
                         break;
                     case CommandType.Stop:
-                        requestData = DataFactory.CreateData(FunctionType.Stop);
+                        parameters = new RequestParameter
+                        {
+                            Request = 118,
+                            SlaveId = 1,
+                        };
+                        requestData = DataFactory.CreateRequestCommand(FunctionType.Stop, parameters);
                         break;
                     case CommandType.ClearTightenInfo:
-                        requestData = DataFactory.CreateData(FunctionType.TightenInfoControl);
+                        parameters = new RequestParameter
+                        {
+                            Request = 125,
+                            SlaveId = 1,
+                            TightenClear = 2
+                        };
+                        requestData = DataFactory.CreateRequestCommand(FunctionType.TightenInfoControl, parameters);
                         break;
                     case CommandType.StatusQuery:
-                        requestData = DataFactory.CreateData(FunctionType.StatusQuery);
+                        parameters = new RequestParameter
+                        {
+                            Request = 119,
+                            SlaveId = 1,
+                        };
+                        requestData = DataFactory.CreateRequestCommand(FunctionType.StatusQuery, parameters);
                         break;
                     default:
                         throw new ArgumentException($"未知的命令类型: {commandType}");
                 }
 
                 // 应用参数 (如果有)
-                if (parameters != null)
+                if (parameters == null)
                 {
-                    //处理附加参数的逻辑
+                    System.Windows.Forms.MessageBox.Show("parameters 为空！");
                 }
 
                 // 发送命令并获取响应

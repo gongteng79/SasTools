@@ -55,11 +55,11 @@ namespace SasTools.States
         }
 
         // 发送命令
-        protected async Task<string> ExecuteCommandAsync(TestStateMachine stateMachine, CommandType commandType, object parameters = null)
+        protected async Task<string> ExecuteCommandAsync(TestStateMachine stateMachine, CommandType commandType)
         {
             try
             {
-                return await stateMachine.GetCommandService().ExecuteCommandAsync(commandType, parameters);
+                return await stateMachine.GetCommandService().ExecuteCommandAsync(commandType);
             }
             catch (Exception ex)
             {
