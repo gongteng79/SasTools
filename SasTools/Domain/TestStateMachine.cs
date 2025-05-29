@@ -8,6 +8,7 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using SasTools.Services;
+using System.Text.Json;
 
 
 namespace SasTools.Domain
@@ -142,12 +143,14 @@ namespace SasTools.Domain
         public async Task<bool> StopTestAsync()
         {
             _isRunning = false;
-            _state = TestState.Stopping;
+            _state = TestState.Idle;
             //    取消正在进行的任务
             if (_cancellationTokenSource != null && !_cancellationTokenSource.IsCancellationRequested)
             {
                 _cancellationTokenSource.Cancel();
             }
+
+            await _commandService.ExecuteCommand(CommandType.Stop);
             return true;
 
             //if (CurrentState == TestState.Idle)
@@ -210,7 +213,7 @@ namespace SasTools.Domain
                 OnCounterChanged();
 
                 // 发送清除锁付信息指令
-                await _commandService.ExecuteCommandAsync(CommandType.ClearTightenInfo);
+                await _commandService.ExecuteCommand(CommandType.ClearTightenInfo);
 
                 return true;
             }
@@ -420,6 +423,7 @@ namespace SasTools.Domain
                     break;
 
                 case TestState.Initializing:
+                    await SubscribeScriewMode();
                     _state = TestState.ForwardDelay;
                     break;
 
@@ -429,45 +433,106 @@ namespace SasTools.Domain
                     break;
 
                 case TestState.Forward:
-                    await _commandService.ExecuteCommandAsync(CommandType.Forward);
+                    var forwardResult = await _commandService.ExecuteCommand(CommandType.Forward);
+                    if (CheckLockStatus(forwardResult))
+                    {
+                        _state = TestState.InputScrewData;
+                    }
+                    break;
+
+                case TestState.InputScrewData:
+                    await _commandService.ExecuteCommand(CommandType.InputScrewData);
                     _state = TestState.ForwardWaiting;
                     break;
 
                 case TestState.ForwardWaiting:
-                    await Task.Delay(2000);
-                    _state = TestState.RotationInterval;
-                    break;
-
-                case TestState.RotationInterval:
+                    await Task.Delay(1000);
                     _state = TestState.ReverseDelay;
                     break;
 
                 case TestState.ReverseDelay:
-                    await Task.Delay(2000);
+                    await Task.Delay(1000);
                     _state = TestState.Reverse;
                     break;
 
                 case TestState.Reverse:
-                    await _commandService.ExecuteCommandAsync(CommandType.Reverse);
-                    _state = TestState.ReverseWaiting;
+                    var reverseResult = await _commandService.ExecuteCommand(CommandType.Reverse);
+                    if (CheckLockStatus(reverseResult))
+                    {
+                        _state = TestState.ReverseWaiting;
+                    }
                     break;
 
                 case TestState.ReverseWaiting:
-                    await Task.Delay(2000);
+                    await Task.Delay(1000);
                     _state = TestState.StartupInterval;
                     break;
 
                 case TestState.StartupInterval:
-                    _state = TestState.Stopping;
-                    break;
-
-                case TestState.Stopping:
-                    await _commandService.ExecuteCommandAsync(CommandType.Stop);
-                    _state = TestState.Idle;
+                    await Task.Delay(1000);
+                    _state = TestState.ForwardDelay; // 循环回到 ForwardDelay
                     break;
 
                 case TestState.Error:
+                    _logger.Error("状态机进入错误状态");
                     break;
+            }
+        }
+
+
+        private async Task SubscribeScriewMode()
+        {
+            await _commandService.ExecuteCommand(CommandType.Subscribe);
+        }
+
+        private bool CheckLockStatus(string jsonMsg)
+        {
+            //jsonMsg = jsonMsg.Replace("\\\"", "\"");
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            //LockResult lockResult = System.Text.Json.JsonSerializer.Deserialize<LockResult>(jsonMsg, options);
+
+            try
+            {
+                var response = JsonConvert.DeserializeObject<dynamic>(jsonMsg);
+
+                // 检查是否为锁付结果回复
+                if (response.reply == 203)
+                {
+                    int state = (int)response.state;
+                    int result = (int)response.result;
+
+                    // 如果锁付已停止，进行结果判断
+                    if (state == 0 && result == 0)
+                    {
+                        //if (lockResult.Result == 0 && lockResult.State == 0)
+                        //{
+                        //    return true;
+                        //}
+                        //else
+                        //{
+                        //    return false;
+                        //}
+                        return true;
+                    }
+                    else
+                    {
+                        this._commandService.ExecuteCommand(CommandType.Stop);
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"处理消息失败: {ex.Message}", ex);
+                return false;
             }
         }
     }

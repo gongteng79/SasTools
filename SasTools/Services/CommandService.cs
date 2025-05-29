@@ -20,7 +20,7 @@ namespace SasTools.Services
         }
 
         // 执行命令
-        public Task<string> ExecuteCommandAsync(CommandType commandType)
+        public Task<string> ExecuteCommand(CommandType commandType)
         {
             try
             {
@@ -33,28 +33,27 @@ namespace SasTools.Services
                         parameters = new RequestParameter
                         {
                             Request = 101,
-                            Sequence = 0,
-                            SlaveId = 1,
-                            KeepAlive = 1,
-                            CacheClear = 0
+                            Sequence = 123,
+                            KeepAlive = 0
                         };
                         requestData = DataFactory.CreateRequestCommand(FunctionType.Subcribe, parameters);
                         break;
-                    case CommandType.LockMode:
+                    case CommandType.InputScrewData:
                         parameters = new RequestParameter
                         {
-                            Request = 123,
+                            Request = 102,
+                            Sequence = 123,
                             SlaveId = 1,
-                            ProductId = 1
+                            Screw = 0
                         };
-                        requestData = DataFactory.CreateRequestCommand(FunctionType.LockMode, parameters);
+                        requestData = DataFactory.CreateRequestCommand(FunctionType.InputScrewData, parameters);
                         break;
                     case CommandType.Forward:
                         parameters = new RequestParameter
                         {
                             Request = 116,
                             SlaveId = 1,
-                            ProductId = 1
+                            ScrewId = 1
                         };
                         requestData = DataFactory.CreateRequestCommand(FunctionType.LockScrewAction, parameters);
                         break;
@@ -63,7 +62,10 @@ namespace SasTools.Services
                         {
                             Request = 115,
                             SlaveId = 1,
-                            ProductId = 1
+                            Torque = 0, //最大扭矩
+                            Velocity = 500,
+                            Time = 5000,//反转转动的时间(5s)
+                            Angle = 0
                         };
                         requestData = DataFactory.CreateRequestCommand(FunctionType.RemoveScrewAction, parameters);
                         break;

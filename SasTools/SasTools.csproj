@@ -96,6 +96,7 @@
     <Compile Include="Common\CommunicationType.cs" />
     <Compile Include="Common\FunctionType.cs" />
     <Compile Include="Common\JsonMessageCodec.cs" />
+    <Compile Include="Common\LockResult.cs" />
     <Compile Include="Domain\CommandType.cs" />
     <Compile Include="Domain\CommunicationFactory.cs" />
     <Compile Include="Domain\DataFactory.cs" />

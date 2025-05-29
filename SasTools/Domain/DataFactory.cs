@@ -53,6 +53,7 @@ namespace SasTools.Domain
                 case FunctionType.LockScrewAction:
                 case FunctionType.LockMode:
                     baseData.product_id = options.ProductId ?? 1;
+                    baseData.screw_id = options.ScrewId ?? 1;
                     break;
 
                 case FunctionType.TorqueTest:

@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using AntdUI;
+using System.Runtime.CompilerServices;
 
 namespace SasTools.UI
 {
@@ -200,10 +201,6 @@ namespace SasTools.UI
                     badge1.Text = "测试状态: 反转";
                     badge1.State = AntdUI.TState.Processing;
                     break;
-                case TestState.RotationInterval:
-                    badge1.Text = "测试状态: 正反转切换";
-                    badge1.State = AntdUI.TState.Processing;
-                    break;
                 case TestState.StartupInterval:
                     badge1.Text = "测试状态: 循环间隔";
                     badge1.State = AntdUI.TState.Processing;
@@ -264,18 +261,19 @@ namespace SasTools.UI
 
                 // 启动测试
                 bool success = await _stateMachine.StartTestAsync();
+                button2.Enabled = false;
+                button3.Enabled = true; // 启动后允许停止测试
+                //if (!success)
+                //{
+                //    AntdUI.Message.error(this.ParentForm, "启动测试失败");
+                //}
+                //else
+                //{
+                //    AddLogMessage("测试已启动");
+                //    AntdUI.Message.success(this.ParentForm, "测试已启动");
+                //}
 
-                if (!success)
-                {
-                    AntdUI.Message.error(this.ParentForm, "启动测试失败");
-                }
-                else
-                {
-                    AddLogMessage("测试已启动");
-                    AntdUI.Message.success(this.ParentForm, "测试已启动");
-                }
-
-                button2.Loading = false;
+                //button2.Loading = false;
             }
             catch (Exception ex)
             {
@@ -300,18 +298,21 @@ namespace SasTools.UI
 
                 // 停止测试
                 bool success = await _stateMachine.StopTestAsync();
-
-                if (!success)
-                {
-                    AntdUI.Message.error(this.ParentForm, "停止测试失败");
-                }
-                else
-                {
-                    AddLogMessage("测试已停止");
-                    AntdUI.Message.info(this.ParentForm, "测试已停止");
-                }
-
                 button3.Loading = false;
+                button3.Enabled = false;
+                button2.Loading = false;
+                button2.Enabled = true;
+                //if (!success)
+                //{
+                //    AntdUI.Message.error(this.ParentForm, "停止测试失败");
+                //}
+                //else
+                //{
+                //    AddLogMessage("测试已停止");
+                //    AntdUI.Message.info(this.ParentForm, "测试已停止");
+                //}
+
+                //button3.Loading = false;
             }
             catch (Exception ex)
             {

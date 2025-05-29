@@ -7,7 +7,7 @@ namespace SasTools.Interface
     public interface ICommandService
     {
         // 执行命令
-        Task<string> ExecuteCommandAsync(CommandType commandType);
+        Task<string> ExecuteCommand(CommandType commandType);
     }
 }
 

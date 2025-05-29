@@ -59,7 +59,7 @@ namespace SasTools.States
         {
             try
             {
-                return await stateMachine.GetCommandService().ExecuteCommandAsync(commandType);
+                return await stateMachine.GetCommandService().ExecuteCommand(commandType);
             }
             catch (Exception ex)
             {

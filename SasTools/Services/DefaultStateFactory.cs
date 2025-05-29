@@ -38,9 +38,9 @@ namespace SasTools.Services
                 case TestState.ForwardWaiting:
                     state = new ForwardWaitingState();
                     break;
-                case TestState.RotationInterval:
-                    state = new RotationIntervalState();
-                    break;
+                //case TestState.RotationInterval:
+                //    state = new RotationIntervalState();
+                //    break;
                 case TestState.ReverseDelay:
                     state = new ReverseDelayState();
                     break;

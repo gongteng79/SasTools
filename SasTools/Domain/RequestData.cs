@@ -58,11 +58,12 @@ namespace SasTools.Domain
     {
         public int SlaveId { get; set; } = 1;
         public int Request { get; set; }
-        public int Sequence { get; set; } = 0;
+        public int Sequence { get; set; }
         public int? BarCode { get; set; }
         public int? ProductId { get; set; }
         public string ProductName { get; set; }
         public int? Screw { get; set; }
+        public int? ScrewId { get; set; }
         public double? Torque { get; set; }
         public int? Velocity { get; set; }
         public int? Time { get; set; }
