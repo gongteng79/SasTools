@@ -12,20 +12,25 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using AntdUI;
 using System.Runtime.CompilerServices;
+using WpFramework.EventBus;
+using SasTools.Events;
 
 namespace SasTools.UI
 {
-    public partial class AbnormalAlarmView : UserControl
+    public partial class AbnormalAlarmView : UserControl, IEventHandler<SendDataEvent>
     {
         private readonly ILog _logger = LogManager.GetLogger(typeof(AbnormalAlarmView));
         private ITestStateMachine _stateMachine;
         private ISasTest _sasTest;
         private IParameterService _parameterService;
+        private IEventBus _eventBus;
 
         private DataTable dataTable;
 
-        public AbnormalAlarmView(ISasTest sasTest, IParameterService parameterService)
+        public AbnormalAlarmView(ISasTest sasTest, IParameterService parameterService, IEventBus eventBus)
         {
+            _eventBus = eventBus;
+            _eventBus.Subscribe<SendDataEvent>(this);
             InitializeComponent();
 
             // 初始化表格
@@ -47,7 +52,7 @@ namespace SasTools.UI
             _parameterService = parameterService;
 
             // 创建状态机
-            _stateMachine = new TestStateMachine(_sasTest, _parameterService);
+            _stateMachine = new TestStateMachine(_sasTest, _parameterService, _eventBus);
             _stateMachine.StateChanged += StateMachine_StateChanged;
             _stateMachine.TestResultReceived += StateMachine_TestResultReceived;
             //_stateMachine.CounterChanged += AbnormalAlarmView_CounterChanged;
@@ -400,13 +405,15 @@ namespace SasTools.UI
             {
                 if (tableAlarmInfo.DataSource is DataTable dataSource && dataSource.Rows.Count > 0)
                 {
-                    tableAlarmInfo.SelectedIndex = dataSource.Rows.Count - 1;
+                    tableAlarmInfo.SelectedIndex = dataSource.Rows.Count;
                 }
             }
             catch
             {
                 // 忽略滚动异常
             }
+            this.tableAlarmInfo.ScrollLine(tableAlarmInfo.SelectedIndex -1);
+            this.tableAlarmInfo.Refresh();
         }
 
         // 处理接收到的消息
@@ -435,6 +442,11 @@ namespace SasTools.UI
                 dataTable.Rows.Clear();
                 AddLogMessage("日志已清空");
             }));
+        }
+
+        void IEventHandler<SendDataEvent>.Handle(SendDataEvent evt)
+        {
+            this.BeginInvoke(new Action(() => AddLogMessage(evt.RecieveData)));
         }
     }
 }

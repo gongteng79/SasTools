@@ -9,6 +9,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using SasTools.Services;
 using System.Text.Json;
+using static System.Windows.Forms.AxHost;
+using WpFramework.EventBus;
+using SasTools.Events;
 
 
 namespace SasTools.Domain
@@ -20,6 +23,7 @@ namespace SasTools.Domain
         private readonly ICommandService _commandService; // 命令服务，用于发送命令
         private readonly IParameterService _parameterService; // 参数服务，用于加载和验证测试参数
         private readonly IStateFactory _stateFactory; // 状态工厂，用于创建状态对象
+        private IEventBus _eventBus;
         private TestState _state = TestState.Idle;
         private IState _currentStateObj; // 当前状态对象
         private TestState _currentState = TestState.Idle; // 当前状态枚举
@@ -69,12 +73,12 @@ namespace SasTools.Domain
 
         #region 构造函数
         // 构造函数 - 使用依赖注入
-        public TestStateMachine(ICommandService commandService, IParameterService parameterService, IStateFactory stateFactory)
+        public TestStateMachine(ICommandService commandService, IParameterService parameterService, IStateFactory stateFactory, IEventBus eventBus)
         {
             _commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
             //_parameterService = parameterService ?? throw new ArgumentNullException(nameof(parameterService));
             _stateFactory = stateFactory ?? throw new ArgumentNullException(nameof(stateFactory));
-
+            _eventBus = eventBus;
             // 初始化上下文
             _context = new TestStateMachineContext();
 
@@ -83,8 +87,8 @@ namespace SasTools.Domain
         }
 
         //构造函数
-        public TestStateMachine(ISasTest sasTest, IParameterService parameterService)
-            : this(new CommandService(sasTest), parameterService, new DefaultStateFactory())
+        public TestStateMachine(ISasTest sasTest, IParameterService parameterService, IEventBus eventBus)
+            : this(new CommandService(sasTest), parameterService, new DefaultStateFactory(), eventBus)
         {
         }
         #endregion
@@ -262,7 +266,7 @@ namespace SasTools.Domain
 
         #region 内部方法
         // 状态机主循环
-        private void RunStateMachineAsync(CancellationToken cancellationToken)
+        private async Task RunStateMachineAsync(CancellationToken cancellationToken)
         {
             try
             {
@@ -270,7 +274,7 @@ namespace SasTools.Domain
                 {
                     if (_currentStateObj == null)
                     {
-                        Task.Delay(100, cancellationToken);
+                        await Task.Delay(100, cancellationToken);
                         continue;
                     }
                     if (!_isRunning)
@@ -278,7 +282,7 @@ namespace SasTools.Domain
                         return;
                     }
 
-                    TestLockingScrewsAsync();
+                    await TestLockingScrewsAsync();
 
                     //// 让当前状态处理逻辑
                     //TestState nextState = await _currentStateObj.ProcessAsync(this, cancellationToken);
@@ -434,14 +438,11 @@ namespace SasTools.Domain
 
                 case TestState.Forward:
                     var forwardResult = await _commandService.ExecuteCommand(CommandType.Forward);
-                    if (CheckLockStatus(forwardResult))
-                    {
-                        _state = TestState.InputScrewData;
-                    }
+                    await CheckLockStatusAsync();
+                    _state = TestState.InputScrewData;
                     break;
 
                 case TestState.InputScrewData:
-                    await _commandService.ExecuteCommand(CommandType.InputScrewData);
                     _state = TestState.ForwardWaiting;
                     break;
 
@@ -457,10 +458,8 @@ namespace SasTools.Domain
 
                 case TestState.Reverse:
                     var reverseResult = await _commandService.ExecuteCommand(CommandType.Reverse);
-                    if (CheckLockStatus(reverseResult))
-                    {
-                        _state = TestState.ReverseWaiting;
-                    }
+                    await CheckLockStatusAsync();
+                    _state = TestState.ReverseWaiting;
                     break;
 
                 case TestState.ReverseWaiting:
@@ -470,13 +469,20 @@ namespace SasTools.Domain
 
                 case TestState.StartupInterval:
                     await Task.Delay(1000);
-                    _state = TestState.ForwardDelay; // 循环回到 ForwardDelay
+                    _state = TestState.Stopping; // 循环回到 ForwardDelay
+                    break;
+
+                case TestState.Stopping:
+                    await _commandService.ExecuteCommand(CommandType.Stop);
+                    _state = TestState.ForwardDelay;
                     break;
 
                 case TestState.Error:
                     _logger.Error("状态机进入错误状态");
                     break;
             }
+
+            _eventBus.Publish(new SendDataEvent(string.Empty, _state.ToString()));
         }
 
 
@@ -485,54 +491,38 @@ namespace SasTools.Domain
             await _commandService.ExecuteCommand(CommandType.Subscribe);
         }
 
-        private bool CheckLockStatus(string jsonMsg)
+        private async Task CheckLockStatusAsync()
         {
-            //jsonMsg = jsonMsg.Replace("\\\"", "\"");
-            var options = new JsonSerializerOptions
+            while (true)
             {
-                PropertyNameCaseInsensitive = true
-            };
-
-            //LockResult lockResult = System.Text.Json.JsonSerializer.Deserialize<LockResult>(jsonMsg, options);
-
-            try
-            {
-                var response = JsonConvert.DeserializeObject<dynamic>(jsonMsg);
-
-                // 检查是否为锁付结果回复
-                if (response.reply == 203)
+                string jsonMsg = await _commandService.ExecuteCommand(CommandType.InputScrewData);
+                //jsonMsg = jsonMsg.Replace("\\\"", "\"");
+                var options = new JsonSerializerOptions
                 {
-                    int state = (int)response.state;
-                    int result = (int)response.result;
+                    PropertyNameCaseInsensitive = true
+                };
 
-                    // 如果锁付已停止，进行结果判断
-                    if (state == 0 && result == 0)
+                //LockResult lockResult = System.Text.Json.JsonSerializer.Deserialize<LockResult>(jsonMsg, options);
+
+                try
+                {
+                    var response = JsonConvert.DeserializeObject<dynamic>(jsonMsg);
+
+                    // 检查是否为锁付结果回复
+                    if (response.reply == 203)
                     {
-                        //if (lockResult.Result == 0 && lockResult.State == 0)
-                        //{
-                        //    return true;
-                        //}
-                        //else
-                        //{
-                        //    return false;
-                        //}
-                        return true;
-                    }
-                    else
-                    {
-                        this._commandService.ExecuteCommand(CommandType.Stop);
-                        return false;
+                        int state = (int)response.state;
+                        if ((_state == TestState.Forward && state == 0 && response.result == 0) || (_state == TestState.Reverse && state == 0))
+                        {
+                            break;
+                        }
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    return false;
+                    _logger.Error($"处理消息失败: {ex.Message}", ex);
+                    break;
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"处理消息失败: {ex.Message}", ex);
-                return false;
             }
         }
     }

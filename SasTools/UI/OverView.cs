@@ -131,7 +131,7 @@ namespace SasTools
 
                 case 5:
                     SasTest sasTest = new SasTest(_communicationService, eventBus);
-                    ctrl = new AbnormalAlarmView(sasTest, null);
+                    ctrl = new AbnormalAlarmView(sasTest, null, eventBus);
                     break;
 
                 default:
