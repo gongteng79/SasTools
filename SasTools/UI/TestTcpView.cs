@@ -22,13 +22,12 @@ namespace SasTools.UI
 {
     public partial class TestTcpView : UserControl, IEventHandler<SendDataEvent>
     {
-        private readonly ISasTest _sas;
+        private readonly IDevice _sas;
         private readonly IEventBus _eventBus;
         private RequestData RequestData;
 
-        public TestTcpView(ISasTest sas, IEventBus eventBus)
+        public TestTcpView(IEventBus eventBus)
         {
-            _sas = sas;
             _eventBus = eventBus;
             this._eventBus.Subscribe(this);
             InitializeComponent();

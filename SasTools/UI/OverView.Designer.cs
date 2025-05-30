@@ -69,7 +69,7 @@ namespace SasTools
             // 
             this.btnAddDevice.Dock = System.Windows.Forms.DockStyle.Right;
             this.btnAddDevice.IconSvg = "PlusOutlined";
-            this.btnAddDevice.Location = new System.Drawing.Point(742, 0);
+            this.btnAddDevice.Location = new System.Drawing.Point(850, 0);
             this.btnAddDevice.Name = "btnAddDevice";
             this.btnAddDevice.Size = new System.Drawing.Size(153, 58);
             this.btnAddDevice.TabIndex = 1;
@@ -80,7 +80,7 @@ namespace SasTools
             // 
             this.btnLogin.Dock = System.Windows.Forms.DockStyle.Right;
             this.btnLogin.IconSvg = "UserSwitchOutlined";
-            this.btnLogin.Location = new System.Drawing.Point(895, 0);
+            this.btnLogin.Location = new System.Drawing.Point(1003, 0);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(153, 58);
             this.btnLogin.TabIndex = 0;
@@ -117,7 +117,7 @@ namespace SasTools
             menuItem5.IconSvg = "ToolOutlined";
             menuItem5.Text = "手动设置";
             menuItem6.IconSvg = "AlertOutlined";
-            menuItem6.Text = "报警界面";
+            menuItem6.Text = "疲劳测试界面";
             this.menu1.Items.Add(menuItem1);
             this.menu1.Items.Add(menuItem2);
             this.menu1.Items.Add(menuItem3);
