@@ -113,7 +113,7 @@ namespace SasTools.UI
             if (selectedItem != null)
             {
                 FunctionType selectedFunction = selectedItem.FunctionType;
-                RequestData = DataFactory.CreateData(selectedFunction);
+                RequestData = DataFactory.CreateRequestCommand(selectedFunction, null);
             }
         }
 

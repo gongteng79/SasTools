@@ -8,10 +8,10 @@ namespace SasTools.Common
 {
     public enum FunctionType
     {
-        Subcribe,//订阅
-        InputScrewData,//传入锁付数据
-        IdleRunParameter,//空转运行参数
-        RemoveScrewParameter,//拆螺丝参数
+        Subcribe,//101订阅
+        InputScrewData,//102传入锁付数据
+        IdleRunParameter,//
+        RemoveScrewParameter,
         ScrewParameters,
         ProductParameters,
         ControlIdleRun,

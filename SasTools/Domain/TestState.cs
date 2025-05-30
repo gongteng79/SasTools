@@ -12,28 +12,28 @@ namespace SasTools.Domain
         // 空闲状态
         Idle,
 
-        // 初始化状态(发送101和123指令)
+        // 初始化状态(101订阅)
         Initializing,
 
         // 正转延时
         ForwardDelay,
 
-        // 正转操作
+        // 正转操作(锁付ok后才会获取203)
         Forward,
+
+        //传送锁付数据(获取203指令)
+        InputScrewData,
 
         // 等待正转结果
         ForwardWaiting,
 
-        // 正反转切换间隔
-        RotationInterval,
-
         // 反转延时
         ReverseDelay,
 
-        // 反转操作
+        // 反转操作(反转用时间来控制，可以直接发115指令中Time设置)
         Reverse,
 
-        // 等待反转结果
+        // 等待反转结果 （反转时间结束则为反转结束）
         ReverseWaiting,
 
         // 循环启动间隔

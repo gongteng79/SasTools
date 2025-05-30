@@ -122,8 +122,7 @@ namespace SasTools
 
                 case 3:
                     // 使用共享的通信服务实例
-                    SasTest sasTest = new SasTest(_communicationService, eventBus);
-                    ctrl = new TestTcpView(sasTest, eventBus);
+                    ctrl = new TestTcpView(null, eventBus);
                     break;
 
                 case 4:
@@ -131,7 +130,8 @@ namespace SasTools
                     break;
 
                 case 5:
-                    ctrl = new AbnormalAlarmView();
+                    SasTest sasTest = new SasTest(_communicationService, eventBus);
+                    ctrl = new AbnormalAlarmView(sasTest, null, eventBus);
                     break;
 
                 default:

@@ -80,7 +80,7 @@ namespace SasTools.Models.SasModule
                 result = _tcpCommunication.SendAsync(sendData).Result;
             }
 
-            this._eventBus.Publish(new SendDataEvent(jsonString, result));
+            //this._eventBus.Publish(new SendDataEvent(jsonString, result));
 
             // 返回 JSON 字符串（或根据需要返回字节数组）
             return result;

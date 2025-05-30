@@ -11,20 +11,26 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using AntdUI;
+using System.Runtime.CompilerServices;
+using WpFramework.EventBus;
+using SasTools.Events;
 
 namespace SasTools.UI
 {
-    public partial class AbnormalAlarmView : UserControl
+    public partial class AbnormalAlarmView : UserControl, IEventHandler<SendDataEvent>
     {
         private readonly ILog _logger = LogManager.GetLogger(typeof(AbnormalAlarmView));
         private ITestStateMachine _stateMachine;
         private ISasTest _sasTest;
         private IParameterService _parameterService;
+        private IEventBus _eventBus;
 
         private DataTable dataTable;
 
-        public AbnormalAlarmView()
+        public AbnormalAlarmView(ISasTest sasTest, IParameterService parameterService, IEventBus eventBus)
         {
+            _eventBus = eventBus;
+            _eventBus.Subscribe<SendDataEvent>(this);
             InitializeComponent();
 
             // 初始化表格
@@ -35,6 +41,8 @@ namespace SasTools.UI
 
             // 初始化状态显示
             InitializeStatusDisplay();
+
+            Initialize(sasTest, parameterService);
         }
 
         // 由主窗体调用，传入依赖服务
@@ -44,7 +52,7 @@ namespace SasTools.UI
             _parameterService = parameterService;
 
             // 创建状态机
-            _stateMachine = new TestStateMachine(_sasTest, _parameterService);
+            _stateMachine = new TestStateMachine(_sasTest, _parameterService, _eventBus);
             _stateMachine.StateChanged += StateMachine_StateChanged;
             _stateMachine.TestResultReceived += StateMachine_TestResultReceived;
             //_stateMachine.CounterChanged += AbnormalAlarmView_CounterChanged;
@@ -198,10 +206,6 @@ namespace SasTools.UI
                     badge1.Text = "测试状态: 反转";
                     badge1.State = AntdUI.TState.Processing;
                     break;
-                case TestState.RotationInterval:
-                    badge1.Text = "测试状态: 正反转切换";
-                    badge1.State = AntdUI.TState.Processing;
-                    break;
                 case TestState.StartupInterval:
                     badge1.Text = "测试状态: 循环间隔";
                     badge1.State = AntdUI.TState.Processing;
@@ -262,18 +266,19 @@ namespace SasTools.UI
 
                 // 启动测试
                 bool success = await _stateMachine.StartTestAsync();
+                button2.Enabled = false;
+                button3.Enabled = true; // 启动后允许停止测试
+                //if (!success)
+                //{
+                //    AntdUI.Message.error(this.ParentForm, "启动测试失败");
+                //}
+                //else
+                //{
+                //    AddLogMessage("测试已启动");
+                //    AntdUI.Message.success(this.ParentForm, "测试已启动");
+                //}
 
-                if (!success)
-                {
-                    AntdUI.Message.error(this.ParentForm, "启动测试失败");
-                }
-                else
-                {
-                    AddLogMessage("测试已启动");
-                    AntdUI.Message.success(this.ParentForm, "测试已启动");
-                }
-
-                button2.Loading = false;
+                //button2.Loading = false;
             }
             catch (Exception ex)
             {
@@ -298,18 +303,21 @@ namespace SasTools.UI
 
                 // 停止测试
                 bool success = await _stateMachine.StopTestAsync();
-
-                if (!success)
-                {
-                    AntdUI.Message.error(this.ParentForm, "停止测试失败");
-                }
-                else
-                {
-                    AddLogMessage("测试已停止");
-                    AntdUI.Message.info(this.ParentForm, "测试已停止");
-                }
-
                 button3.Loading = false;
+                button3.Enabled = false;
+                button2.Loading = false;
+                button2.Enabled = true;
+                //if (!success)
+                //{
+                //    AntdUI.Message.error(this.ParentForm, "停止测试失败");
+                //}
+                //else
+                //{
+                //    AddLogMessage("测试已停止");
+                //    AntdUI.Message.info(this.ParentForm, "测试已停止");
+                //}
+
+                //button3.Loading = false;
             }
             catch (Exception ex)
             {
@@ -397,13 +405,15 @@ namespace SasTools.UI
             {
                 if (tableAlarmInfo.DataSource is DataTable dataSource && dataSource.Rows.Count > 0)
                 {
-                    tableAlarmInfo.SelectedIndex = dataSource.Rows.Count - 1;
+                    tableAlarmInfo.SelectedIndex = dataSource.Rows.Count;
                 }
             }
             catch
             {
                 // 忽略滚动异常
             }
+            this.tableAlarmInfo.ScrollLine(tableAlarmInfo.SelectedIndex -1);
+            this.tableAlarmInfo.Refresh();
         }
 
         // 处理接收到的消息
@@ -432,6 +442,11 @@ namespace SasTools.UI
                 dataTable.Rows.Clear();
                 AddLogMessage("日志已清空");
             }));
+        }
+
+        void IEventHandler<SendDataEvent>.Handle(SendDataEvent evt)
+        {
+            this.BeginInvoke(new Action(() => AddLogMessage(evt.RecieveData)));
         }
     }
 }

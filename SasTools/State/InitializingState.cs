@@ -16,9 +16,6 @@ namespace SasTools.States
                 // 发送订阅指令
                 await ExecuteCommandAsync(stateMachine, CommandType.Subscribe);
 
-                // 发送锁付模式指令
-                await ExecuteCommandAsync(stateMachine, CommandType.LockMode);
-
                 // 初始化完成，进入正转延时状态
                 return TestState.ForwardDelay;
             }

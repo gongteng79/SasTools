@@ -29,7 +29,7 @@ namespace SasTools.States
             {
                 _logger.Warn($"正转等待超时: {elapsedSeconds}s");
                 HandleTimeout(stateMachine);
-                return Task.FromResult(TestState.RotationInterval);
+                return Task.FromResult(TestState.ReverseDelay);
             }
 
             // 继续等待消息处理，保持当前状态
@@ -137,7 +137,7 @@ namespace SasTools.States
             stateMachine.GetContext().UpdateStateStartTime();
             stateMachine.GetType()
                         .GetProperty("CurrentState")
-                        ?.SetValue(stateMachine, TestState.RotationInterval);
+                        ?.SetValue(stateMachine, TestState.ReverseDelay);
         }
     }
 }

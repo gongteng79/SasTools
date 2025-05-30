@@ -27,7 +27,7 @@ namespace SasTools.States
             }
 
             // 继续等待
-            return TestState.RotationInterval;
+            return TestState.ReverseDelay;
         }
     }
 }
