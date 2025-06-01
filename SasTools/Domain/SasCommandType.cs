@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace SasTools.Domain
 {
     // 命令类型枚举
-    public enum CommandType
+    public enum SasCommandType
     {
         Subscribe,       // 101订阅
         InputScrewData, // 102传入锁付数据

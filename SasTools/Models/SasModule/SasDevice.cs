@@ -1,26 +1,102 @@
-﻿using log4net;
+﻿using HslCommunication;
+using HslCommunication.Enthernet;
+using Newtonsoft.Json;
 using SasTools.Common;
 using SasTools.Domain;
+using SasTools.Events;
 using SasTools.Interface;
+using SasTools.Models.Communication;
 using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Wp.FzWater.Mqtt;
+using WpFramework.EventBus;
 
-namespace SasTools.Services
+namespace SasTools.Models.SasModule
 {
-    // 命令服务实现 - 基于ISasTest接口
-    public class CommandService : ICommandService
+    public class SasDevice: IDevice
     {
-        private readonly ISasTest _sasTest;
-        private readonly ILog _logger = LogManager.GetLogger(typeof(CommandService));
+        private ICommunication _tcpCommunication;
+        private IEventBus _eventBus;
+        private ICommunicationService _communicationService;
 
-        // 构造函数
-        public CommandService(ISasTest sasTest)
+        public SasDevice(ICommunication tcpCommunication, IEventBus eventBus)
         {
-            _sasTest = sasTest ?? throw new ArgumentNullException(nameof(sasTest));
+           this._tcpCommunication = tcpCommunication;
+           this._eventBus = eventBus;
         }
 
-        // 执行命令
-        public Task<string> ExecuteCommand(CommandType commandType)
+        public SasDevice(ICommunicationService communicationService, IEventBus eventBus)
+        {
+           this._communicationService = communicationService;
+           this._eventBus = eventBus;
+        }
+
+        public bool ConnectServer()
+        {
+            if (_communicationService != null)
+            {
+                var result = _communicationService.ConnectAsync();
+                return result.Result;
+            }
+            else
+            {
+                var result = this._tcpCommunication.ConnectAsync();
+                return result.Result;
+            }
+        }
+
+        public bool DisconnectServer()
+        {
+            if (_communicationService != null)
+            {
+                var result = _communicationService.DisconnectAsync();
+                return result.Result;
+            }
+            else
+            {
+                var result = this._tcpCommunication.DisconnectAsync();
+                return result.Result;
+            }
+        }
+
+        public string ReadData(RequestData data)
+        {
+            string jsonString = JsonConvert.SerializeObject(data, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
+            byte[] sendData = Encoding.ASCII.GetBytes(jsonString);
+
+            string result;
+            if (_communicationService != null)
+            {
+                result = _communicationService.SendMessageAsync(sendData).Result;
+            }
+            else
+            {
+                result = _tcpCommunication.SendAsync(sendData).Result;
+            }
+
+            return result;
+        }
+
+        public string ExecuteCommand(SasCommandType commandType)
+        {
+            var response = ExcuteCommand(commandType);
+            return response;
+        }
+
+        public Task<string> ExecuteCommandAsync(SasCommandType commandType)
+        {
+            var response = ExcuteCommand(commandType);
+            return Task.FromResult(response);
+        }
+
+        private string ExcuteCommand(SasCommandType commandType)
         {
             try
             {
@@ -29,7 +105,7 @@ namespace SasTools.Services
 
                 switch (commandType)
                 {
-                    case CommandType.Subscribe:
+                    case SasCommandType.Subscribe:
                         parameters = new RequestParameter
                         {
                             Request = 101,
@@ -38,7 +114,7 @@ namespace SasTools.Services
                         };
                         requestData = DataFactory.CreateRequestCommand(FunctionType.Subcribe, parameters);
                         break;
-                    case CommandType.InputScrewData:
+                    case SasCommandType.InputScrewData:
                         parameters = new RequestParameter
                         {
                             Request = 102,
@@ -48,7 +124,7 @@ namespace SasTools.Services
                         };
                         requestData = DataFactory.CreateRequestCommand(FunctionType.InputScrewData, parameters);
                         break;
-                    case CommandType.Forward:
+                    case SasCommandType.Forward:
                         parameters = new RequestParameter
                         {
                             Request = 116,
@@ -57,7 +133,7 @@ namespace SasTools.Services
                         };
                         requestData = DataFactory.CreateRequestCommand(FunctionType.LockScrewAction, parameters);
                         break;
-                    case CommandType.Reverse:
+                    case SasCommandType.Reverse:
                         parameters = new RequestParameter
                         {
                             Request = 115,
@@ -69,7 +145,7 @@ namespace SasTools.Services
                         };
                         requestData = DataFactory.CreateRequestCommand(FunctionType.RemoveScrewAction, parameters);
                         break;
-                    case CommandType.Stop:
+                    case SasCommandType.Stop:
                         parameters = new RequestParameter
                         {
                             Request = 118,
@@ -77,7 +153,7 @@ namespace SasTools.Services
                         };
                         requestData = DataFactory.CreateRequestCommand(FunctionType.Stop, parameters);
                         break;
-                    case CommandType.ClearTightenInfo:
+                    case SasCommandType.ClearTightenInfo:
                         parameters = new RequestParameter
                         {
                             Request = 125,
@@ -86,7 +162,7 @@ namespace SasTools.Services
                         };
                         requestData = DataFactory.CreateRequestCommand(FunctionType.TightenInfoControl, parameters);
                         break;
-                    case CommandType.StatusQuery:
+                    case SasCommandType.StatusQuery:
                         parameters = new RequestParameter
                         {
                             Request = 119,
@@ -98,21 +174,17 @@ namespace SasTools.Services
                         throw new ArgumentException($"未知的命令类型: {commandType}");
                 }
 
-                // 应用参数 (如果有)
                 if (parameters == null)
                 {
                     System.Windows.Forms.MessageBox.Show("parameters 为空！");
                 }
 
-                // 发送命令并获取响应
-                string response = _sasTest.ReadData(requestData);
-                _logger.Info($"执行命令 {commandType}，响应: {response}");
+                string response = this.ReadData(requestData);
 
-                return Task.FromResult(response);
+                return response;
             }
             catch (Exception ex)
             {
-                _logger.Error($"执行命令 {commandType} 失败: {ex.Message}", ex);
                 throw;
             }
         }

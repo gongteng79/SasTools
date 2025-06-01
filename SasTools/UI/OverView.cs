@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using AntdUI;
 using log4net;
 using SasTools.Domain;
+using SasTools.Events;
 using SasTools.Interface;
 using SasTools.Models.Communication;
 using SasTools.Models.SasModule;
@@ -22,7 +23,7 @@ namespace SasTools
 {
     public partial class OverView : Window
     {
-        private IEventBus eventBus;
+        private readonly IEventBus _eventBus;
         private readonly ILog _logger = LogManager.GetLogger("OverView");
         private int prevIndex = -1;
         private Dictionary<int, Control> subViews = new Dictionary<int, Control>();
@@ -31,13 +32,21 @@ namespace SasTools
         private string _defaultHost = "192.168.2.12";
         private int _defaultPort = 6062;
 
+        private readonly MainView _mainVeiw;
+        private readonly ManualView _manualView;
+        private readonly ReciepeView _reciepeView;
+        private readonly TestTcpView _testTcpView;
+        private readonly FatigueTestView _fatigueTestView;
+        private IDevice _sasTest;
+
         public OverView()
         {
-            eventBus = new EventBus(false);
-            // 初始化通信服务，使用依赖注入模式
-            _communicationService = new CommunicationService(_defaultHost, _defaultPort);
-            _communicationService.ConnectionStatusChanged += CommunicationService_ConnectionStatusChanged;
-            _communicationService.MessageReceived += CommunicationService_MessageReceived;
+            _eventBus = new EventBus(false);
+            _mainVeiw = new MainView();
+            _manualView = new ManualView();
+            _reciepeView = new ReciepeView();
+            _testTcpView = new TestTcpView(_eventBus);
+            _fatigueTestView = new FatigueTestView(_eventBus);
             InitialCompoent();
         }
 
@@ -55,12 +64,6 @@ namespace SasTools
                 // 可选：更新状态栏或其他 UI 元素
                 windowBar.SubText = isConnected ? $"已连接 {_defaultHost}:{_defaultPort}" : "未连接";
             }));
-        }
-
-        private void CommunicationService_MessageReceived(object sender, string message)
-        {
-            // 处理接收到的消息，例如记录日志
-            _logger.Debug($"收到消息: {message}");
         }
 
         private void InitialCompoent()
@@ -109,29 +112,27 @@ namespace SasTools
             switch (index)
             {
                 case 0:
-                    ctrl = new MainView();
+                    ctrl = _mainVeiw;
                     break;
 
                 case 1:
-                    ctrl = new DataSetView();
+                    ctrl = _manualView;
                     break;
 
                 case 2:
-                    ctrl = new ReciepeView();
+                    ctrl = _reciepeView;
                     break;
 
                 case 3:
-                    // 使用共享的通信服务实例
-                    ctrl = new TestTcpView(null, eventBus);
+                    ctrl = _testTcpView;
                     break;
 
                 case 4:
-                    ctrl = new ManualView();
+                    ctrl = _mainVeiw;
                     break;
 
                 case 5:
-                    SasTest sasTest = new SasTest(_communicationService, eventBus);
-                    ctrl = new AbnormalAlarmView(sasTest, null, eventBus);
+                    ctrl = _fatigueTestView;
                     break;
 
                 default:
@@ -159,52 +160,63 @@ namespace SasTools
             }
         }
 
-        // 实现设备连接/断开功能
         private async void btnAddDevice_Click(object sender, EventArgs e)
         {
             try
             {
                 AntdUI.Button btn = (AntdUI.Button)sender;
-                btn.Loading = true; // 设置按钮为加载状态
+                btn.Loading = true;
 
                 if (!_isConnected)
                 {
-                    // 连接设备
-                    bool result = await _communicationService.ConnectAsync(_defaultHost, _defaultPort);
+                    CreatDevice();
+                    bool result = _sasTest.ConnectServer();
                     string message = result ? "设备连接成功" : "设备连接失败";
                     _logger.Info(message);
 
-                    // 显示消息通知
                     if (result)
                     {
+                        this._eventBus.Publish(new DeviceCreateEvent(_sasTest));
                         AntdUI.Message.success(this, message);
                     }
                     else
                     {
+                        DeleteDevice();
                         AntdUI.Message.error(this, message);
                     }
                 }
                 else
                 {
-                    // 断开设备连接
                     bool result = await _communicationService.DisconnectAsync();
+                    DeleteDevice();
                     string message = result ? "设备断开连接成功" : "设备断开连接失败";
                     _logger.Info(message);
 
-                    // 显示消息通知
                     AntdUI.Message.info(this, message);
                 }
 
-                btn.Loading = false; // 取消按钮加载状态
+                btn.Loading = false;
             }
             catch (Exception ex)
             {
                 _logger.Error($"设备连接操作出错: {ex.Message}", ex);
                 AntdUI.Message.error(this, "设备连接操作出错");
 
-                // 确保按钮恢复正常状态
                 ((AntdUI.Button)sender).Loading = false;
             }
+        }
+
+        private void CreatDevice()
+        {
+            _communicationService = new CommunicationService(_defaultHost, _defaultPort);
+            _communicationService.ConnectionStatusChanged += CommunicationService_ConnectionStatusChanged;
+            _sasTest = new SasDevice(_communicationService, _eventBus);
+        }
+
+        private void DeleteDevice()
+        {
+            _sasTest = null;
+            _communicationService = null;
         }
     }
 }
