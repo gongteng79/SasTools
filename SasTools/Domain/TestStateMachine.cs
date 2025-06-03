@@ -20,8 +20,9 @@ namespace SasTools.Domain
     public class TestStateMachine
     {
         private readonly ILog _logger = LogManager.GetLogger(typeof(TestStateMachine));
-        private readonly IParameterService _parameterService;
+        private readonly FatigueParams _parameter;
         private IEventBus _eventBus;
+        private string _machineMessage;
         private TestState _state = TestState.Idle;
         private CancellationTokenSource _cancellationTokenSource;
         private bool _isRunning = false;
@@ -29,10 +30,10 @@ namespace SasTools.Domain
         private Thread testMachineThread;
         private IDevice device;
 
-        public TestStateMachine(IDevice device, IParameterService parameterService, IEventBus eventBus)
+        public TestStateMachine(IDevice device, FatigueParams parameter, IEventBus eventBus)
         {
+            _parameter = parameter ?? throw new ArgumentNullException(nameof(parameter), "参数服务不能为空");
             this.device = device;
-            //_parameterService = parameterService ?? throw new ArgumentNullException(nameof(parameterService));
             _eventBus = eventBus;
         }
 
@@ -103,48 +104,40 @@ namespace SasTools.Domain
 
                 case TestState.Initializing:
                     SubscribeScriewMode();
-                    _state = TestState.ForwardDelay;
+                    _state = TestState.ForwardDelay; 
+                    _machineMessage = "初始化完成..";
                     break;
 
                 case TestState.ForwardDelay:
-                    await Task.Delay(2000);
+                    await Task.Delay(_parameter.ForwardDelay);
                     _state = TestState.Forward;
+                    _machineMessage = "已启动正转延时..";
                     break;
 
                 case TestState.Forward:
                     var forwardResult = device.ExecuteCommand(SasCommandType.Forward);
                     CheckLockStatusAsync();
-                    _state = TestState.InputScrewData;
-                    break;
-
-                case TestState.InputScrewData:
-                    _state = TestState.ForwardWaiting;
-                    break;
-
-                case TestState.ForwardWaiting:
-                    await Task.Delay(1000);
                     _state = TestState.ReverseDelay;
+                    _machineMessage = "正转OK..";
                     break;
 
                 case TestState.ReverseDelay:
-                    await Task.Delay(1000);
+                    await Task.Delay(_parameter.ReverseDelay);
                     _state = TestState.Reverse;
+                    _machineMessage = "已启动反转延时..";
                     break;
 
                 case TestState.Reverse:
                     var reverseResult = device.ExecuteCommand(SasCommandType.Reverse);
                     CheckLockStatusAsync();
-                    _state = TestState.ReverseWaiting;
-                    break;
-
-                case TestState.ReverseWaiting:
-                    await Task.Delay(1000);
                     _state = TestState.StartupInterval;
+                    _machineMessage = "反转OK..";
                     break;
 
                 case TestState.StartupInterval:
-                    await Task.Delay(1000);
+                    await Task.Delay(_parameter.RotationInterval);
                     _state = TestState.Stopping;
+                    _machineMessage = "已启动循环间隔延时..";
                     break;
 
                 case TestState.Stopping:
@@ -153,11 +146,11 @@ namespace SasTools.Domain
                     break;
 
                 case TestState.Error:
-                    _logger.Error("状态机进入错误状态");
+                    _machineMessage = "状态机进入错误状态";
                     break;
             }
 
-            _eventBus.Publish(new SendDataEvent(string.Empty, _state.ToString()));
+            _eventBus.Publish(new RefreshMachineState(_machineMessage, _state.ToString()));
         }
 
 

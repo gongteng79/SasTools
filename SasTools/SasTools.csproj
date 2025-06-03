@@ -97,6 +97,7 @@
     <Compile Include="Common\FunctionType.cs" />
     <Compile Include="Common\JsonMessageCodec.cs" />
     <Compile Include="Common\LockResult.cs" />
+    <Compile Include="Domain\FatigueParams.cs" />
     <Compile Include="Domain\SasCommandType.cs" />
     <Compile Include="Domain\CommunicationFactory.cs" />
     <Compile Include="Domain\DataFactory.cs" />
@@ -107,10 +108,11 @@
     <Compile Include="Domain\TestStateMachine.cs" />
     <Compile Include="Domain\TestStateMachineContext.cs" />
     <Compile Include="Events\DeviceCreateEvent.cs" />
+    <Compile Include="Events\RefreshMachineState.cs" />
     <Compile Include="Events\SendDataEvent.cs" />
     <Compile Include="Interface\ICommunication.cs" />
     <Compile Include="Interface\ICommunicationService.cs" />
-    <Compile Include="Interface\IParameterService.cs" />
+    <Compile Include="Domain\ParameterBase.cs" />
     <Compile Include="Interface\IDevice.cs" />
     <Compile Include="Models\Communication\CommunicationBase.cs" />
     <Compile Include="Models\Communication\SerialCommunication.cs" />

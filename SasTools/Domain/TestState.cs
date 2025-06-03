@@ -68,17 +68,5 @@ namespace SasTools.Domain
         // 成功次数
         public int SuccessCount { get; set; }
     }
-
-    // 测试状态机扩展方法
-    public static class TestStateMachineExtensions
-    {
-        // 转换到新状态
-        public static void TransitionTo(this TestStateMachine stateMachine, TestState newState)
-        {
-            // 使用反射调用私有的状态转换方法
-            var propertyInfo = typeof(TestStateMachine).GetProperty("CurrentState");
-            propertyInfo?.SetValue(stateMachine, newState);
-        }
-    }
 }
 

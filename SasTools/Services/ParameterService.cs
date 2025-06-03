@@ -1,19 +1,15 @@
 ﻿using log4net;
-using SasTools.Interface;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using AntdUI;
 using SasTools.Domain;
 using Newtonsoft.Json;
 
 namespace SasTools.Services
 {
     //参数实现服务类，负责参数的保存、加载和验证
-    public class ParameterService : IParameterService
+    public class ParameterService
     {
         private readonly ILog _logger = LogManager.GetLogger(typeof(ParameterService));
         private readonly string _configFilePath;

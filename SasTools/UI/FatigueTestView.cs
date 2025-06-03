@@ -2,27 +2,19 @@
 using SasTools.Domain;
 using SasTools.Interface;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using AntdUI;
-using System.Runtime.CompilerServices;
 using WpFramework.EventBus;
 using SasTools.Events;
 
 namespace SasTools.UI
 {
-    public partial class FatigueTestView : UserControl, IEventHandler<SendDataEvent>, IEventHandler<DeviceCreateEvent>
+    public partial class FatigueTestView : UserControl, IEventHandler<RefreshMachineState>, IEventHandler<DeviceCreateEvent>
     {
         private readonly ILog _logger = LogManager.GetLogger(typeof(FatigueTestView));
         private TestStateMachine _stateMachine;
         private IDevice _sasTest;
-        private IParameterService _parameterService;
+        private FatigueParams _parameter;
         private IEventBus _eventBus;
 
         private DataTable dataTable;
@@ -30,9 +22,11 @@ namespace SasTools.UI
         public FatigueTestView(IEventBus eventBus)
         {
             _eventBus = eventBus;
-            _eventBus.Subscribe<SendDataEvent>(this);
+            _eventBus.Subscribe<RefreshMachineState>(this);
             _eventBus.Subscribe<DeviceCreateEvent>(this);
+            _parameter = new FatigueParams();
             InitializeComponent();
+            InitialInput();
         }
 
         private void Start()
@@ -73,11 +67,12 @@ namespace SasTools.UI
             }
         }
 
-        private void AddLogMessage(string message)
+        private void AddLogMessage(string state, string message)
         {
             DataRow row = dataTable.NewRow();
             row["Time"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            row["Info"] = message;
+            row["State"] = state;
+            row["Message"] = message;
             dataTable.Rows.Add(row);
             if (dataTable.Rows.Count > 100)
             {
@@ -85,24 +80,15 @@ namespace SasTools.UI
             }
         }
 
-        public void ClearLog()
+        void IEventHandler<RefreshMachineState>.Handle(RefreshMachineState evt)
         {
-            this.Invoke(new Action(() =>
-            {
-                dataTable.Rows.Clear();
-                AddLogMessage("日志已清空");
-            }));
-        }
-
-        void IEventHandler<SendDataEvent>.Handle(SendDataEvent evt)
-        {
-            this.BeginInvoke(new Action(() => AddLogMessage(evt.RecieveData)));
+            this.BeginInvoke(new Action(() => AddLogMessage(evt.Status, evt.Message)));
         }
 
         void IEventHandler<DeviceCreateEvent>.Handle(DeviceCreateEvent evt)
         {
             _sasTest = evt.SasDevice;
-            _stateMachine = new TestStateMachine(_sasTest, _parameterService, _eventBus);
+            _stateMachine = new TestStateMachine(_sasTest, _parameter, _eventBus);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -113,6 +99,22 @@ namespace SasTools.UI
         private void button2_Click(object sender, EventArgs e)
         {
             this.Stop();
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            this._parameter.ForwardDelay = (int)this.txtForwardDelay.Value;
+            this._parameter.ReverseDelay = (int)this.txtReverseDelay.Value;
+            this._parameter.RotationInterval = (int)this.txtStartupInterval.Value;
+            this._parameter.StartupInterval = (int)this.txtRotationTimes.Value;
+        }
+
+        private void InitialInput()
+        {
+            this.txtForwardDelay.Value = this._parameter.ForwardDelay;
+            this.txtReverseDelay.Value = this._parameter.ReverseDelay;
+            this.txtStartupInterval.Value = this._parameter.RotationInterval;
+            this.txtRotationTimes.Value = this._parameter.StartupInterval;
         }
     }
 }

@@ -8,15 +8,15 @@ using System.Threading.Tasks;
 namespace SasTools.Interface
 {
     //参数服务接口，定义参数保存和加载相关操作
-    public interface IParameterService
+    public abstract class ParameterBase
     {
         //保存测试参数
-        Task<bool> SaveParameterAsync(TestParameters parameters);
+        public abstract Task<bool> SaveParameterAsync(TestParameters parameters);
 
         //加载测试参数
-        Task<TestParameters> LoadParameterAsync();
+        public abstract Task<TestParameters> LoadParameterAsync();
 
         //验证参数是否有效
-        bool ValidateParameters(TestParameters parameters, out string errorMessage);
+        public abstract bool ValidateParameters(TestParameters parameters, out string errorMessage);
     }
 }
