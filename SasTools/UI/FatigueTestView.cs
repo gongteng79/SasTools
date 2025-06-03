@@ -25,8 +25,14 @@ namespace SasTools.UI
             _eventBus.Subscribe<RefreshMachineState>(this);
             _eventBus.Subscribe<DeviceCreateEvent>(this);
             _parameter = new FatigueParams();
+            dataTable = new DataTable();
             InitializeComponent();
             InitialInput();
+
+            dataTable.Columns.Add("Time", typeof(string));
+            dataTable.Columns.Add("State", typeof(string));
+            dataTable.Columns.Add("Message", typeof(string));
+            this.tableAlarmInfo.DataSource = dataTable;
         }
 
         private void Start()
@@ -78,6 +84,9 @@ namespace SasTools.UI
             {
                 dataTable.Rows.RemoveAt(0);
             }
+            this.tableAlarmInfo.SelectedIndex = this.dataTable.Rows.Count - 1;
+            this.tableAlarmInfo.ScrollLine(this.tableAlarmInfo.SelectedIndex);
+            this.tableAlarmInfo.Refresh();
         }
 
         void IEventHandler<RefreshMachineState>.Handle(RefreshMachineState evt)

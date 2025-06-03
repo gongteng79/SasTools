@@ -44,6 +44,7 @@ namespace SasTools.Domain
             _state = TestState.Idle;
             _cancellationTokenSource = new CancellationTokenSource();
             testMachineThread = new Thread(() => RunStateMachineAsync(_cancellationTokenSource.Token));
+            testMachineThread.Start();
 
             return true;
         }
@@ -143,6 +144,7 @@ namespace SasTools.Domain
                 case TestState.Stopping:
                     device.ExecuteCommand(SasCommandType.Stop);
                     _state = TestState.ForwardDelay;
+                    _machineMessage = "运行结束..";
                     break;
 
                 case TestState.Error:
