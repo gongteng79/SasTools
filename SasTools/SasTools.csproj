@@ -119,7 +119,6 @@
     <Compile Include="Models\Communication\TcpCommunication.cs" />
     <Compile Include="Models\SasModule\SasDevice.cs" />
     <Compile Include="Services\CommunicationService.cs" />
-    <Compile Include="Services\ParameterService.cs" />
     <Compile Include="UI\FatigueTestView.cs">
       <SubType>UserControl</SubType>
     </Compile>

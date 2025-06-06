@@ -11,14 +11,13 @@ namespace SasTools.Domain
     //INotifyPropertyChanged是一个接口，允许对象在属性值更改时通知订阅者（通常是 UI）
     public class TestParameters : INotifyPropertyChanged
     {
-        private double _forwardDelay;
-        private double _reverseDelay;
-        private double _rotationInterval;
-        private double _startupInterval;
+        private int _forwardDelay;
+        private int _reverseDelay;
+        private int _startupInterval;
         private int _timeout;
 
-        //正转启动延时(秒)
-        public double ForwardDelay
+        //正转启动延时(毫秒)
+        public int ForwardDelay
         {
             get => _forwardDelay;
             set
@@ -30,8 +29,8 @@ namespace SasTools.Domain
                 }
             }
         }
-        //反转启动延时(秒)
-        public double ReverseDelay
+        //反转启动延时(毫秒)
+        public int ReverseDelay
         {
             get => _reverseDelay;
             set
@@ -43,21 +42,8 @@ namespace SasTools.Domain
                 }
             }
         }
-        //正反转切换间隔(秒)
-        public double RotationInterval
-        {
-            get => _rotationInterval;
-            set
-            {
-                if (_rotationInterval != value)
-                {
-                    _rotationInterval = value;
-                    OnPropertyChanged(nameof(RotationInterval));
-                }
-            }
-        }
-        //循环启动间隔(秒)
-        public double StartupInterval
+        //循环启动间隔(毫秒)
+        public int StartupInterval
         {
             get => _startupInterval;
             set
@@ -69,7 +55,7 @@ namespace SasTools.Domain
                 }
             }
         }
-        //超时设置(秒)
+        //超时设置(毫秒)
         public int Timeout
         {
             get => _timeout;

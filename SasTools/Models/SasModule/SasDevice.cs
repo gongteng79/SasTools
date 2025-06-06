@@ -129,7 +129,7 @@ namespace SasTools.Models.SasModule
                         {
                             Request = 116,
                             SlaveId = 1,
-                            ScrewId = 1
+                            ScrewId = 0
                         };
                         requestData = DataFactory.CreateRequestCommand(FunctionType.LockScrewAction, parameters);
                         break;
@@ -140,7 +140,7 @@ namespace SasTools.Models.SasModule
                             SlaveId = 1,
                             Torque = 0, //最大扭矩
                             Velocity = 500,
-                            Time = 5000,//反转转动的时间(5s)
+                            Time = 0,//反转转动的时间(5s)
                             Angle = 0
                         };
                         requestData = DataFactory.CreateRequestCommand(FunctionType.RemoveScrewAction, parameters);

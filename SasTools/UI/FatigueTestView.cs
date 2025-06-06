@@ -114,16 +114,14 @@ namespace SasTools.UI
         {
             this._parameter.ForwardDelay = (int)this.txtForwardDelay.Value;
             this._parameter.ReverseDelay = (int)this.txtReverseDelay.Value;
-            this._parameter.RotationInterval = (int)this.txtStartupInterval.Value;
-            this._parameter.StartupInterval = (int)this.txtRotationTimes.Value;
+            this._parameter.Timeout = (int)this.txtRotationTimes.Value;
         }
 
         private void InitialInput()
         {
             this.txtForwardDelay.Value = this._parameter.ForwardDelay;
             this.txtReverseDelay.Value = this._parameter.ReverseDelay;
-            this.txtStartupInterval.Value = this._parameter.RotationInterval;
-            this.txtRotationTimes.Value = this._parameter.StartupInterval;
+            this.txtRotationTimes.Value = this._parameter.Timeout;
         }
     }
 }
