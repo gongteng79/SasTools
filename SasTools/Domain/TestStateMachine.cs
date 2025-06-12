@@ -28,7 +28,6 @@ namespace SasTools.Domain
         private CancellationTokenSource _cancellationTokenSource;//取消令牌源，用于控制状态机的运行
         private bool _isRunning = false;//运行标志
         private bool _isPause = false;//暂停标志
-        private Thread testMachineThread;//测试线程
         private IDevice device;//设备接口
         private int _totalCycles = 0; // 总循环次数
         private int _successfulCycles = 0; // 成功循环次数
@@ -197,6 +196,17 @@ namespace SasTools.Domain
                             _machineMessage = $"正转失败: {errorMessage}";
                             PublishStateUpdate(MachineStatusType.Error);
                             device.ExecuteCommand(SasCommandType.Stop);
+
+                            // 在正转失败时也更新计数器
+                            _totalCycles++;
+                            // 不增加成功循环次数，因为失败了
+                            PublishCounterUpdate();
+
+                            // 检查是否达到最大失败次数
+                            if (ShouldStopTest())
+                            {
+                                _isRunning = false;
+                            }
                         }
                         break;
 
@@ -233,10 +243,19 @@ namespace SasTools.Domain
                         break;
 
                     case TestState.Error:
-                        _machineMessage = "错误状态，等待恢复";
+                        _machineMessage = "错误状态，尝试重新正转";
                         PublishStateUpdate(MachineStatusType.Error);
-                        await Task.Delay(5000);
-                        _state = TestState.Idle;
+                        device.ExecuteCommand(SasCommandType.Stop);
+                        await Task.Delay(1000);
+
+                        // 如果测试仍在运行，则重置状态为Idle准备下一次循环
+                        if (_isRunning)
+                        {
+                            //这个正转指令是帮助设备恢复正常
+                            device.ExecuteCommand(SasCommandType.Forward);
+                            await Task.Delay(1000);
+                            _state = TestState.Idle;
+                        }
                         break;
 
                     default:
@@ -358,28 +377,6 @@ namespace SasTools.Domain
             {
                 _logger.Error($"订阅101模式失败: {ex.Message}", ex);
             }
-        }
-
-        public bool PauseTest()
-        {
-            if (!_isRunning || _isPause) return false;
-
-            _isPause = true;
-            _machineMessage = "测试已暂停";
-            PublishStateUpdate(MachineStatusType.Waiting);
-            _logger.Info("测试已暂停");
-            return true;
-        }
-
-        public bool ResumeTest()
-        {
-            if (!_isRunning || !_isPause) return false;
-
-            _isPause = false;
-            _machineMessage = "测试已恢复";
-            PublishStateUpdate(MachineStatusType.Normal);
-            _logger.Info("测试已恢复");
-            return true;
         }
 
         private async Task<(bool success, string errorMessage, int state, int result)> CheckLockStatusAsync()
