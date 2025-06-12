@@ -107,6 +107,7 @@
     <Compile Include="Domain\TestState.cs" />
     <Compile Include="Domain\TestStateMachine.cs" />
     <Compile Include="Domain\TestStateMachineContext.cs" />
+    <Compile Include="Events\CounterUpdateEvent.cs" />
     <Compile Include="Events\DeviceCreateEvent.cs" />
     <Compile Include="Events\RefreshMachineState.cs" />
     <Compile Include="Events\SendDataEvent.cs" />

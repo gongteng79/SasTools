@@ -1,4 +1,7 @@
-﻿namespace SasTools.UI
+﻿using SasTools.Events;
+using System;
+
+namespace SasTools.UI
 {
     partial class FatigueTestView
     {
@@ -13,9 +16,33 @@
         /// <param name="disposing">如果应释放托管资源，为 true；否则为 false。</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
+            if (disposing)
             {
-                components.Dispose();
+                // 取消事件订阅
+                if (_eventBus != null)
+                {
+                    _eventBus.Unsubscribe<RefreshMachineState>(this);
+                    _eventBus.Unsubscribe<DeviceCreateEvent>(this);
+                    _eventBus.Unsubscribe<CounterUpdateEvent>(this);
+                }
+
+                // 停止测试
+                if (_stateMachine != null)
+                {
+                    try
+                    {
+                        _stateMachine.StopTest();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error($"释放资源时停止测试失败: {ex.Message}", ex);
+                    }
+                }
+
+                if (components != null)
+                {
+                    components.Dispose();
+                }
             }
             base.Dispose(disposing);
         }
@@ -51,21 +78,21 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.inputNumber1 = new AntdUI.InputNumber();
+            this.label1 = new AntdUI.Label();
             this.lbReverseDelay = new AntdUI.Label();
             this.lbForwardDelay = new AntdUI.Label();
             this.txtForwardDelay = new AntdUI.InputNumber();
             this.txtReverseDelay = new AntdUI.InputNumber();
-            this.lbRotationInterval = new AntdUI.Label();
             this.lbRotationTimes = new AntdUI.Label();
             this.txtRotationTimes = new AntdUI.InputNumber();
+            this.label2 = new AntdUI.Label();
+            this.lbRotationInterval = new AntdUI.Label();
+            this.inputNumber2 = new AntdUI.InputNumber();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.btnSave = new AntdUI.Button();
             this.button2 = new AntdUI.Button();
             this.button3 = new AntdUI.Button();
-            this.label1 = new AntdUI.Label();
-            this.inputNumber1 = new AntdUI.InputNumber();
-            this.label2 = new AntdUI.Label();
-            this.inputNumber2 = new AntdUI.InputNumber();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -176,7 +203,7 @@
             this.button5.TabIndex = 2;
             this.button5.Text = "启动测试";
             this.button5.Type = AntdUI.TTypeMini.Primary;
-            this.button5.Click += new System.EventHandler(this.button1_Click);
+            this.button5.Click += new System.EventHandler(this.Button5_Click);
             // 
             // button6
             // 
@@ -188,7 +215,7 @@
             this.button6.TabIndex = 3;
             this.button6.Text = "停止测试";
             this.button6.Type = AntdUI.TTypeMini.Primary;
-            this.button6.Click += new System.EventHandler(this.button2_Click);
+            this.button6.Click += new System.EventHandler(this.Button6_Click);
             // 
             // button7
             // 
@@ -200,12 +227,12 @@
             this.button7.TabIndex = 4;
             this.button7.Text = "复位";
             this.button7.Type = AntdUI.TTypeMini.Primary;
+            this.button7.Click += new System.EventHandler(this.Button7_Click);
             // 
             // panel1
             // 
             this.panel1.Controls.Add(this.panel2);
             this.panel1.Controls.Add(this.divider2);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(880, 4);
             this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
@@ -399,6 +426,30 @@
             this.tableLayoutPanel2.Size = new System.Drawing.Size(1387, 857);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
+            // inputNumber1
+            // 
+            this.inputNumber1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.inputNumber1.Font = new System.Drawing.Font("微软雅黑", 12F);
+            this.inputNumber1.Location = new System.Drawing.Point(837, 90);
+            this.inputNumber1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.inputNumber1.Name = "inputNumber1";
+            this.inputNumber1.Size = new System.Drawing.Size(265, 75);
+            this.inputNumber1.TabIndex = 25;
+            this.inputNumber1.Text = "0";
+            this.inputNumber1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // label1
+            // 
+            this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label1.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label1.Location = new System.Drawing.Point(837, 5);
+            this.label1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(265, 75);
+            this.label1.TabIndex = 24;
+            this.label1.Text = "循环次数";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // lbReverseDelay
             // 
             this.lbReverseDelay.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -447,14 +498,6 @@
             this.txtReverseDelay.Text = "0";
             this.txtReverseDelay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // lbRotationInterval
-            // 
-            this.lbRotationInterval.Location = new System.Drawing.Point(4, 174);
-            this.lbRotationInterval.Margin = new System.Windows.Forms.Padding(4);
-            this.lbRotationInterval.Name = "lbRotationInterval";
-            this.lbRotationInterval.Size = new System.Drawing.Size(0, 0);
-            this.lbRotationInterval.TabIndex = 6;
-            // 
             // lbRotationTimes
             // 
             this.lbRotationTimes.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -479,6 +522,38 @@
             this.txtRotationTimes.Text = "0";
             this.txtRotationTimes.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
+            // label2
+            // 
+            this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label2.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label2.Location = new System.Drawing.Point(1114, 5);
+            this.label2.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(267, 75);
+            this.label2.TabIndex = 26;
+            this.label2.Text = "NG次数";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // lbRotationInterval
+            // 
+            this.lbRotationInterval.Location = new System.Drawing.Point(4, 174);
+            this.lbRotationInterval.Margin = new System.Windows.Forms.Padding(4);
+            this.lbRotationInterval.Name = "lbRotationInterval";
+            this.lbRotationInterval.Size = new System.Drawing.Size(0, 0);
+            this.lbRotationInterval.TabIndex = 6;
+            // 
+            // inputNumber2
+            // 
+            this.inputNumber2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.inputNumber2.Font = new System.Drawing.Font("微软雅黑", 12F);
+            this.inputNumber2.Location = new System.Drawing.Point(1114, 90);
+            this.inputNumber2.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.inputNumber2.Name = "inputNumber2";
+            this.inputNumber2.Size = new System.Drawing.Size(267, 75);
+            this.inputNumber2.TabIndex = 27;
+            this.inputNumber2.Text = "0";
+            this.inputNumber2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
             // flowLayoutPanel1
             // 
             this.flowLayoutPanel1.Controls.Add(this.btnSave);
@@ -501,7 +576,7 @@
             this.btnSave.TabIndex = 0;
             this.btnSave.Text = "保存";
             this.btnSave.Type = AntdUI.TTypeMini.Primary;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            this.btnSave.Click += new System.EventHandler(this.BtnSave_Click);
             // 
             // button2
             // 
@@ -513,6 +588,7 @@
             this.button2.TabIndex = 1;
             this.button2.Text = "电批正转";
             this.button2.Type = AntdUI.TTypeMini.Primary;
+            this.button2.Click += new System.EventHandler(this.Button2_Click);
             // 
             // button3
             // 
@@ -524,54 +600,7 @@
             this.button3.TabIndex = 2;
             this.button3.Text = "电批反转";
             this.button3.Type = AntdUI.TTypeMini.Primary;
-            // 
-            // label1
-            // 
-            this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label1.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(837, 5);
-            this.label1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(265, 75);
-            this.label1.TabIndex = 24;
-            this.label1.Text = "循环次数";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // inputNumber1
-            // 
-            this.inputNumber1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.inputNumber1.Font = new System.Drawing.Font("微软雅黑", 12F);
-            this.inputNumber1.Location = new System.Drawing.Point(837, 90);
-            this.inputNumber1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.inputNumber1.Name = "inputNumber1";
-            this.inputNumber1.Size = new System.Drawing.Size(265, 75);
-            this.inputNumber1.TabIndex = 25;
-            this.inputNumber1.Text = "0";
-            this.inputNumber1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // label2
-            // 
-            this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label2.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label2.Location = new System.Drawing.Point(1114, 5);
-            this.label2.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(267, 75);
-            this.label2.TabIndex = 26;
-            this.label2.Text = "NG次数";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // inputNumber2
-            // 
-            this.inputNumber2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.inputNumber2.Font = new System.Drawing.Font("微软雅黑", 12F);
-            this.inputNumber2.Location = new System.Drawing.Point(1114, 90);
-            this.inputNumber2.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.inputNumber2.Name = "inputNumber2";
-            this.inputNumber2.Size = new System.Drawing.Size(267, 75);
-            this.inputNumber2.TabIndex = 27;
-            this.inputNumber2.Text = "0";
-            this.inputNumber2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.button3.Click += new System.EventHandler(this.Button3_Click);
             // 
             // FatigueTestView
             // 

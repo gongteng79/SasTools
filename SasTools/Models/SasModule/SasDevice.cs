@@ -140,7 +140,7 @@ namespace SasTools.Models.SasModule
                             SlaveId = 1,
                             Torque = 0, //最大扭矩
                             Velocity = 500,
-                            Time = 0,//反转转动的时间(5s)
+                            Time = 2000,//反转转动的时间
                             Angle = 0
                         };
                         requestData = DataFactory.CreateRequestCommand(FunctionType.RemoveScrewAction, parameters);

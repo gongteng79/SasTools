@@ -13,8 +13,9 @@ namespace SasTools.Domain
     {
         private int _forwardDelay;
         private int _reverseDelay;
-        private int _startupInterval;
         private int _timeout;
+        private int _maxCycles = 0;
+        private int _maxFailures = 0;
 
         //正转启动延时(毫秒)
         public int ForwardDelay
@@ -42,19 +43,6 @@ namespace SasTools.Domain
                 }
             }
         }
-        //循环启动间隔(毫秒)
-        public int StartupInterval
-        {
-            get => _startupInterval;
-            set
-            {
-                if (_startupInterval != value)
-                {
-                    _startupInterval = value;
-                    OnPropertyChanged(nameof(StartupInterval));
-                }
-            }
-        }
         //超时设置(毫秒)
         public int Timeout
         {
@@ -65,6 +53,31 @@ namespace SasTools.Domain
                 {
                     _timeout = value;
                     OnPropertyChanged(nameof(Timeout));
+                }
+            }
+        }
+        public int MaxCycles
+        {
+            get { return _maxCycles; }
+            set
+            {
+                if (_maxCycles != value)
+                {
+                    _maxCycles = value;
+                    OnPropertyChanged(nameof(MaxCycles));
+                }
+            }
+        }
+
+        public int MaxFailures
+        {
+            get { return _maxFailures; }
+            set
+            {
+                if (_maxFailures != value)
+                {
+                    _maxFailures = value;
+                    OnPropertyChanged(nameof(MaxFailures));
                 }
             }
         }
