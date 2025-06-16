@@ -158,7 +158,7 @@ namespace SasTools.Models.SasModule
                         {
                             Request = 125,
                             SlaveId = 1,
-                            TightenClear = 2
+                            TightenClear = 1
                         };
                         requestData = DataFactory.CreateRequestCommand(FunctionType.TightenInfoControl, parameters);
                         break;

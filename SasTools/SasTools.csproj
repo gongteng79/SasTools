@@ -118,6 +118,7 @@
     <Compile Include="Models\Communication\CommunicationBase.cs" />
     <Compile Include="Models\Communication\SerialCommunication.cs" />
     <Compile Include="Models\Communication\TcpCommunication.cs" />
+    <Compile Include="Models\ErrorRecoveryStrategy.cs" />
     <Compile Include="Models\SasModule\SasDevice.cs" />
     <Compile Include="Services\CommunicationService.cs" />
     <Compile Include="UI\FatigueTestView.cs">

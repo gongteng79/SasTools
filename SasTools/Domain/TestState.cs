@@ -36,9 +36,6 @@ namespace SasTools.Domain
         // 等待反转结果 （反转时间结束则为反转结束）
         ReverseWaiting,
 
-        // 循环启动间隔
-        StartupInterval,
-
         // 停止中
         Stopping,
 

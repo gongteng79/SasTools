@@ -148,26 +148,32 @@ namespace SasTools.UI
                     return;
                 }
 
-                _stateMachine.StopTest();
+                // 使用状态机的完整重置方法
+                _stateMachine.Reset();
                 _isTestRunning = false;
+
+                // 更新UI状态
                 UpdateUIState(false);
 
+                // 清空数据表
                 _dataTable.Clear();
 
+                // 重置UI显示
                 this.badge1.State = AntdUI.TState.Default;
                 this.badge1.Text = "空闲";
                 this.divider2.Text = "系统已复位";
 
-                _stateMachine.ResetCounters();
-
+                // 重置计数器显示
                 this.input1.Text = "0";
                 this.input2.Text = "0";
 
-                AddLogMessage("系统复位", "系统已成功复位", MachineStatusType.Idle);
+                // 添加复位日志
+                AddLogMessage("系统复位", "系统已成功复位，下次启动将从头开始测试", MachineStatusType.Idle);
 
+                // 显示成功消息
                 AntdUI.Message.success(this.ParentForm, "系统已成功复位");
 
-                _logger.Info("用户触发系统复位");
+                _logger.Info("用户触发系统复位 - 状态机已完全重置");
             }
             catch (Exception ex)
             {
