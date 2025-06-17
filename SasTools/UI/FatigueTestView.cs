@@ -49,8 +49,19 @@ namespace SasTools.UI
         {
             _dataTable.Columns.Add("Time", typeof(string));
             _dataTable.Columns.Add("State", typeof(string));
-            _dataTable.Columns.Add("Message", typeof(string));
+            _dataTable.Columns.Add("Message", typeof(object));
             _dataTable.Columns.Add("StatusType", typeof(string));
+
+            // 设置表格列配置
+        var columns = new AntdUI.ColumnCollection
+        {
+            new AntdUI.Column("Time", "时间"),
+            new AntdUI.Column("State", "状态"),
+            new AntdUI.Column("Message", "消息"),
+            new AntdUI.Column("StatusType", "状态类型")
+        };
+
+            this.tableAlarmInfo.Columns = columns;
             this.tableAlarmInfo.DataSource = _dataTable;
         }
 
@@ -166,6 +177,7 @@ namespace SasTools.UI
                 // 重置计数器显示
                 this.input1.Text = "0";
                 this.input2.Text = "0";
+                this.input3.Text = "0";
 
                 // 添加复位日志
                 AddLogMessage("系统复位", "系统已成功复位，下次启动将从头开始测试", MachineStatusType.Idle);
@@ -207,16 +219,33 @@ namespace SasTools.UI
             DataRow row = _dataTable.NewRow();
             row["Time"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             row["State"] = state;
-            row["Message"] = message;
 
-            // 根据状态类型设置状态文本
+            // 根据状态类型设置消息的颜色
             string statusText = GetStatusText(statusType);
             row["StatusType"] = statusText;
+
+            // 使用CellText设置消息颜色
+            if (statusType == MachineStatusType.Error)
+            {
+                // 错误消息使用红色
+                row["Message"] = new AntdUI.CellText(message)
+                {
+                    Fore = Color.Red
+                };
+            }
+            else
+            {
+                // 其他消息使用默认颜色
+                row["Message"] = new AntdUI.CellText(message)
+                {
+                    Fore = Color.Black
+                };
+            }
 
             _dataTable.Rows.Add(row);
 
             // 限制日志条目数量，防止内存占用过大
-            if (_dataTable.Rows.Count > 1000)
+            if (_dataTable.Rows.Count > 100000)
             {
                 _dataTable.Rows.RemoveAt(0);
             }
@@ -317,6 +346,9 @@ namespace SasTools.UI
 
                     // 更新成功次数显示
                     this.input2.Text = evt.SuccessfulCycles.ToString();
+
+                    //更新失败次数显示
+                    this.input3.Text = evt.FailedCycles.ToString();
 
                     // 如果达到最大循环次数且不为0，自动停止测试
                     if (_parameter.MaxCycles > 0 && evt.TotalCycles >= _parameter.MaxCycles && _isTestRunning)
@@ -437,6 +469,7 @@ namespace SasTools.UI
             }
         }
         #endregion
+
     }
 }
 

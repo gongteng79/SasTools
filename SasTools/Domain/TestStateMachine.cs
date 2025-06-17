@@ -56,6 +56,7 @@ namespace SasTools.Domain
         // 计数器相关
         private int _totalCycles = 0;
         private int _successfulCycles = 0;
+        private int _failedCycles = 0;
         private bool _forwardSuccess = false;
         private bool _reverseSuccess = false;
 
@@ -125,6 +126,7 @@ namespace SasTools.Domain
         {
             _totalCycles = 0;
             _successfulCycles = 0;
+            _failedCycles = 0;
             _forwardSuccess = false;
             _reverseSuccess = false;
             _lastErrorMessage = "";
@@ -147,6 +149,7 @@ namespace SasTools.Domain
 
                 _totalCycles = 0;
                 _successfulCycles = 0;
+                _failedCycles = 0;
                 _forwardSuccess = false;
                 _reverseSuccess = false;
                 _lastErrorMessage = "";
@@ -600,8 +603,12 @@ namespace SasTools.Domain
             {
                 _successfulCycles++;
             }
+            else
+            {
+                _failedCycles++;
+            }
 
-            _forwardSuccess = false;
+                _forwardSuccess = false;
             _reverseSuccess = false;
 
             PublishCounterUpdate();
@@ -641,7 +648,7 @@ namespace SasTools.Domain
         {
             if (_eventBus != null)
             {
-                _eventBus.Publish(new CounterUpdateEvent(_totalCycles, _successfulCycles));
+                _eventBus.Publish(new CounterUpdateEvent(_totalCycles, _successfulCycles, _failedCycles));
             }
         }
 
