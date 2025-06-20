@@ -110,6 +110,7 @@
     <Compile Include="Events\CounterUpdateEvent.cs" />
     <Compile Include="Events\DeviceCreateEvent.cs" />
     <Compile Include="Events\MultiDeviceCreateEvent.cs" />
+    <Compile Include="Events\MultiDeviceStateEvent.cs" />
     <Compile Include="Events\RefreshMachineState.cs" />
     <Compile Include="Events\SendDataEvent.cs" />
     <Compile Include="Interface\ICommunication.cs" />
@@ -124,6 +125,30 @@
     <Compile Include="Models\SasModule\SasDevice.cs" />
     <Compile Include="Services\CommunicationService.cs" />
     <Compile Include="Services\DeviceManager.cs" />
+    <Compile Include="UI\AddDeviceDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\AddDeviceDialog.Designer.cs">
+      <DependentUpon>AddDeviceDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\DeviceListControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\DeviceListControl.Designer.cs">
+      <DependentUpon>DeviceListControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\DeviceManagementView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\DeviceManagementView.Designer.cs">
+      <DependentUpon>DeviceManagementView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\DeviceTestPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\DeviceTestPanel.Designer.cs">
+      <DependentUpon>DeviceTestPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\FatigueTestView.cs">
       <SubType>UserControl</SubType>
     </Compile>

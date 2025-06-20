@@ -123,7 +123,7 @@ namespace SasTools.UI
             this.tabControl1.TabIndex = 0;
             // 
             // tabPage1
-            // 
+            //
             this.tabPage1.Controls.Add(this.tableLayoutPanel3);
             this.tabPage1.Font = new System.Drawing.Font("微软雅黑", 14.14286F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.tabPage1.Location = new System.Drawing.Point(4, 45);
@@ -156,7 +156,7 @@ namespace SasTools.UI
             this.tableLayoutPanel3.TabIndex = 1;
             // 
             // divider1
-            // 
+            //
             this.divider1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.divider1.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.divider1.Location = new System.Drawing.Point(3, 3);
@@ -190,7 +190,7 @@ namespace SasTools.UI
             this.flowLayoutPanel2.TabIndex = 2;
             // 
             // button5
-            // 
+            //
             this.button5.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.button5.Location = new System.Drawing.Point(3, 3);
             this.button5.Name = "button5";
@@ -199,9 +199,9 @@ namespace SasTools.UI
             this.button5.Text = "启动测试";
             this.button5.Type = AntdUI.TTypeMini.Primary;
             this.button5.Click += new System.EventHandler(this.Button5_Click);
-            // 
+            //
             // button6
-            // 
+            //
             this.button6.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.button6.Location = new System.Drawing.Point(183, 3);
             this.button6.Name = "button6";
@@ -210,9 +210,9 @@ namespace SasTools.UI
             this.button6.Text = "停止测试";
             this.button6.Type = AntdUI.TTypeMini.Primary;
             this.button6.Click += new System.EventHandler(this.Button6_Click);
-            // 
+            //
             // button7
-            // 
+            //
             this.button7.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.button7.Location = new System.Drawing.Point(363, 3);
             this.button7.Name = "button7";
@@ -559,7 +559,7 @@ namespace SasTools.UI
             this.inputNumber2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // flowLayoutPanel1
-            // 
+            //
             this.flowLayoutPanel1.Controls.Add(this.btnSave);
             this.flowLayoutPanel1.Controls.Add(this.button2);
             this.flowLayoutPanel1.Controls.Add(this.button3);
@@ -581,9 +581,9 @@ namespace SasTools.UI
             this.btnSave.Text = "保存";
             this.btnSave.Type = AntdUI.TTypeMini.Primary;
             this.btnSave.Click += new System.EventHandler(this.BtnSave_Click);
-            // 
+            //
             // button2
-            // 
+            //
             this.button2.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.button2.Location = new System.Drawing.Point(241, 8);
             this.button2.Margin = new System.Windows.Forms.Padding(30, 8, 7, 8);
@@ -593,9 +593,9 @@ namespace SasTools.UI
             this.button2.Text = "电批正转";
             this.button2.Type = AntdUI.TTypeMini.Primary;
             this.button2.Click += new System.EventHandler(this.Button2_Click);
-            // 
+            //
             // button3
-            // 
+            //
             this.button3.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.button3.Location = new System.Drawing.Point(452, 8);
             this.button3.Margin = new System.Windows.Forms.Padding(30, 8, 7, 8);
@@ -605,6 +605,8 @@ namespace SasTools.UI
             this.button3.Text = "电批反转";
             this.button3.Type = AntdUI.TTypeMini.Primary;
             this.button3.Click += new System.EventHandler(this.Button3_Click);
+            // 
+
             // 
             // FatigueTestView
             // 

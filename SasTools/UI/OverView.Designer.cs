@@ -38,6 +38,7 @@ namespace SasTools
             AntdUI.MenuItem menuItem4 = new AntdUI.MenuItem();
             AntdUI.MenuItem menuItem5 = new AntdUI.MenuItem();
             AntdUI.MenuItem menuItem6 = new AntdUI.MenuItem();
+            AntdUI.MenuItem menuItem7 = new AntdUI.MenuItem();
             this.windowBar = new AntdUI.PageHeader();
             this.btnAddDevice = new AntdUI.Button();
             this.btnLogin = new AntdUI.Button();
@@ -118,12 +119,15 @@ namespace SasTools
             menuItem5.Text = "手动设置";
             menuItem6.IconSvg = "AlertOutlined";
             menuItem6.Text = "疲劳测试界面";
+            menuItem7.IconSvg = "DatabaseOutlined";
+            menuItem7.Text = "设备管理";
             this.menu1.Items.Add(menuItem1);
             this.menu1.Items.Add(menuItem2);
             this.menu1.Items.Add(menuItem3);
             this.menu1.Items.Add(menuItem4);
             this.menu1.Items.Add(menuItem5);
             this.menu1.Items.Add(menuItem6);
+            this.menu1.Items.Add(menuItem7);
             this.menu1.Location = new System.Drawing.Point(4, 4);
             this.menu1.Name = "menu1";
             this.menu1.Size = new System.Drawing.Size(194, 654);
@@ -168,4 +172,5 @@ namespace SasTools
         private AntdUI.Button btnAddDevice;
     }
 }
+
 

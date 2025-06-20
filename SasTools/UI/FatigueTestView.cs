@@ -18,9 +18,9 @@ namespace SasTools.UI
         private readonly ILog _logger = LogManager.GetLogger(typeof(FatigueTestView));
         private TestStateMachine _stateMachine;
         private IDevice _sasTest;
-        private FatigueParams _parameter;
-        private IEventBus _eventBus;
-        private DataTable _dataTable;
+        private readonly FatigueParams _parameter;
+        private readonly IEventBus _eventBus;
+        private readonly DataTable _dataTable;
         private bool _isTestRunning = false;
         #endregion
 
@@ -286,32 +286,32 @@ namespace SasTools.UI
             {
                 try
                 {
-                    // 更新状态指示灯状态  
+                    // 更新状态指示灯状态
                     switch (evt.StatusType)
                     {
                         case MachineStatusType.Forward:
                         case MachineStatusType.Reverse:
-                            this.badge1.State = AntdUI.TState.Processing; // 运行中  
+                            this.badge1.State = AntdUI.TState.Processing; // 运行中
                             break;
                         case MachineStatusType.Waiting:
-                            this.badge1.State = AntdUI.TState.Warn; // 等待中  
+                            this.badge1.State = AntdUI.TState.Warn; // 等待中
                             break;
                         case MachineStatusType.Error:
-                            this.badge1.State = AntdUI.TState.Error; // 错误  
+                            this.badge1.State = AntdUI.TState.Error; // 错误
                             break;
                         case MachineStatusType.Idle:
-                            this.badge1.State = AntdUI.TState.Default; // 空闲  
+                            this.badge1.State = AntdUI.TState.Default; // 空闲
                             break;
                         default:
-                            this.badge1.State = AntdUI.TState.Success; // 正常  
+                            this.badge1.State = AntdUI.TState.Success; // 正常
                             break;
                     }
 
-                    // 更新状态文本  
+                    // 更新状态文本
                     this.badge1.Text = GetStatusText(evt.StatusType);
                     this.divider2.Text = evt.Message;
 
-                    // 添加日志条目  
+                    // 添加日志条目
                     AddLogMessage(evt.Status, evt.Message, evt.StatusType);
                 }
                 catch (Exception ex)
@@ -469,6 +469,8 @@ namespace SasTools.UI
             }
         }
         #endregion
+
+
 
     }
 }
