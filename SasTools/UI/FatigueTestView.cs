@@ -12,7 +12,7 @@ using SasTools.Events;
 
 namespace SasTools.UI
 {
-    public partial class FatigueTestView : UserControl, IEventHandler<RefreshMachineState>, IEventHandler<DeviceCreateEvent>, IEventHandler<CounterUpdateEvent>
+    public partial class FatigueTestView : UserControl, IEventHandler<RefreshMachineState>, IEventHandler<DeviceCreateEvent>, IEventHandler<CounterUpdateEvent>, IEventHandler<MultiDeviceCreateEvent>, IEventHandler<MultiDeviceStateEvent>,IEventHandler<MultiDeviceCounterUpdateEvent>,IEventHandler<DeviceSelectionChangedEvent>
     {
         #region 私有字段
         private readonly ILog _logger = LogManager.GetLogger(typeof(FatigueTestView));
@@ -28,9 +28,16 @@ namespace SasTools.UI
         public FatigueTestView(IEventBus eventBus)
         {
             _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+            // 订阅原有事件（保持向后兼容）
             _eventBus.Subscribe<RefreshMachineState>(this);
             _eventBus.Subscribe<DeviceCreateEvent>(this);
             _eventBus.Subscribe<CounterUpdateEvent>(this);
+
+            // 订阅新的多设备事件
+            _eventBus.Subscribe<MultiDeviceCreateEvent>(this);
+            _eventBus.Subscribe<MultiDeviceStateEvent>(this);
+            _eventBus.Subscribe<MultiDeviceCounterUpdateEvent>(this);
+            _eventBus.Subscribe<DeviceSelectionChangedEvent>(this);
 
             _parameter = new FatigueParams();
             _dataTable = new DataTable();
@@ -324,7 +331,8 @@ namespace SasTools.UI
         void IEventHandler<DeviceCreateEvent>.Handle(DeviceCreateEvent evt)
         {
             _sasTest = evt.SasDevice;
-            _stateMachine = new TestStateMachine(_sasTest, _parameter, _eventBus);
+            // 修正构造函数调用，添加deviceId参数
+            _stateMachine = new TestStateMachine("default-device", _sasTest, _parameter, _eventBus);
 
             // 设备创建后添加日志
             this.BeginInvoke(new Action(() => {
@@ -370,7 +378,59 @@ namespace SasTools.UI
                     _logger.Error($"更新计数器显示失败: {ex.Message}", ex);
                 }
             }));
+        }// 处理多设备创建事件
+        void IEventHandler<MultiDeviceCreateEvent>.Handle(MultiDeviceCreateEvent evt)
+        {
+            // 多设备创建事件处理逻辑
+            this.BeginInvoke(new Action(() => {
+                AddLogMessage("多设备初始化", $"设备 {evt.DeviceId} 已成功初始化", MachineStatusType.Idle);
+            }));
         }
+
+        // 处理多设备状态事件
+        void IEventHandler<MultiDeviceStateEvent>.Handle(MultiDeviceStateEvent evt)
+        {
+            if (this.IsDisposed || !this.IsHandleCreated) return;
+
+            this.BeginInvoke(new Action(() =>
+            {
+                AddLogMessage(evt.Status, evt.Message, evt.StatusType);
+            }));
+        }
+
+        // 处理多设备计数器更新事件
+        void IEventHandler<MultiDeviceCounterUpdateEvent>.Handle(MultiDeviceCounterUpdateEvent evt)
+        {
+            if (this.IsDisposed || !this.IsHandleCreated) return;
+
+            this.BeginInvoke(new Action(() =>
+            {
+                // 这里可以根据当前选中的设备ID来决定是否更新UI
+                // 暂时更新所有计数器显示
+                UpdateCounterDisplay(evt.TotalCycles, evt.SuccessfulCycles, evt.FailedCycles);
+            }));
+        }
+
+        // 处理设备选择变更事件
+        void IEventHandler<DeviceSelectionChangedEvent>.Handle(DeviceSelectionChangedEvent evt)
+        {
+            if (this.IsDisposed || !this.IsHandleCreated) return;
+
+            this.BeginInvoke(new Action(() =>
+            {
+                // 设备选择变更时的UI更新逻辑
+                AddLogMessage("设备切换", $"当前选中设备: {evt.SelectedDeviceId}", MachineStatusType.Idle);
+            }));
+        }
+
+        // 辅助方法：更新计数器显示
+        private void UpdateCounterDisplay(int totalCycles, int successfulCycles, int failedCycles)
+        {
+            // 更新UI上的计数器显示
+            // 这里需要根据具体的UI控件来实现
+        }
+
+
         #endregion
 
         #region 按钮事件处理

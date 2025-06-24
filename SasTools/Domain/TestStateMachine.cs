@@ -14,7 +14,7 @@ using SasTools.Models;
 namespace SasTools.Domain
 {
     // 测试状态机实现类
-    public class TestStateMachine
+    public class TestStateMachine:IDisposable
     {
         #region 常量定义
         public static class Constants
@@ -44,11 +44,12 @@ namespace SasTools.Domain
         private readonly FatigueParams _parameter;
         private readonly IEventBus _eventBus;
         private readonly IDevice device;
+        private readonly string _deviceId;
 
         private CancellationTokenSource _cancellationTokenSource;
         private bool _isRunning = false;
         private bool _isPause = false;
-
+            
         // 状态相关
         private TestState _state = TestState.Idle;
         private string _machineMessage = "";
@@ -63,11 +64,14 @@ namespace SasTools.Domain
         // 错误处理相关
         private string _lastErrorMessage = "";
         private int _lastErrorResult = 0;
+
+
         #endregion
 
         #region 构造函数
-        public TestStateMachine(IDevice device, FatigueParams parameter, IEventBus eventBus)
+        public TestStateMachine(string deviceId, IDevice device, FatigueParams parameter, IEventBus eventBus)
         {
+            _deviceId = deviceId ?? throw new ArgumentNullException(nameof(deviceId), "设备ID不能为空");
             _parameter = parameter ?? throw new ArgumentNullException(nameof(parameter), "参数服务不能为空");
             this.device = device ?? throw new ArgumentNullException(nameof(device), "设备接口不能为空");
             _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus), "事件总线不能为空");
@@ -640,6 +644,10 @@ namespace SasTools.Domain
         {
             if (_eventBus != null)
             {
+                // 发布多设备状态事件
+                _eventBus.Publish(new MultiDeviceStateEvent(_deviceId, _state.ToString(), _machineMessage, statusType));
+
+                // 保持向后兼容性，继续发布原有事件
                 _eventBus.Publish(new RefreshMachineState(_machineMessage, _state.ToString(), statusType));
             }
         }
@@ -648,6 +656,10 @@ namespace SasTools.Domain
         {
             if (_eventBus != null)
             {
+                // 发布多设备计数器更新事件
+                _eventBus.Publish(new MultiDeviceCounterUpdateEvent(_deviceId, _totalCycles, _successfulCycles, _failedCycles));
+
+                // 保持向后兼容性，继续发布原有事件
                 _eventBus.Publish(new CounterUpdateEvent(_totalCycles, _successfulCycles, _failedCycles));
             }
         }
@@ -963,6 +975,54 @@ namespace SasTools.Domain
             {
                 _logger.Warn($"验证设备状态失败: {ex.Message}");
             }
+        }
+        #endregion
+
+        #region IDisposable实现
+        private bool _disposed = false;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    // 释放托管资源
+                    try
+                    {
+                        // 停止测试
+                        if (_isRunning)
+                        {
+                            StopTest();
+                        }
+
+                        // 释放CancellationTokenSource
+                        _cancellationTokenSource?.Cancel();
+                        _cancellationTokenSource?.Dispose();
+                        _cancellationTokenSource = null;
+
+                        _logger?.Info($"设备 {_deviceId} 的状态机已释放资源");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.Error($"释放状态机资源时发生异常: {ex.Message}", ex);
+                    }
+                }
+
+                _disposed = true;
+            }
+        }
+
+        // 析构函数
+        ~TestStateMachine()
+        {
+            Dispose(false);
         }
         #endregion
     }

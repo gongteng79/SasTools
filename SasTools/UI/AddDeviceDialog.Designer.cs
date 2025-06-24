@@ -35,12 +35,11 @@ namespace SasTools.UI
             this.lblPort = new AntdUI.Label();
             this.numPort = new AntdUI.InputNumber();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            this.btnOK = new AntdUI.Button();
             this.btnCancel = new AntdUI.Button();
+            this.btnOK = new AntdUI.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
-
             // 
             // tableLayoutPanel1
             // 
@@ -62,19 +61,17 @@ namespace SasTools.UI
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(364, 150);
             this.tableLayoutPanel1.TabIndex = 0;
-
             // 
             // lblDeviceName
             // 
             this.lblDeviceName.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblDeviceName.Font = new System.Drawing.Font("微软雅黑", 12F);
+            this.lblDeviceName.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.lblDeviceName.Location = new System.Drawing.Point(3, 3);
             this.lblDeviceName.Name = "lblDeviceName";
             this.lblDeviceName.Size = new System.Drawing.Size(94, 44);
             this.lblDeviceName.TabIndex = 0;
             this.lblDeviceName.Text = "设备名称:";
             this.lblDeviceName.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-
             // 
             // txtDeviceName
             // 
@@ -84,63 +81,71 @@ namespace SasTools.UI
             this.txtDeviceName.Margin = new System.Windows.Forms.Padding(3, 10, 3, 3);
             this.txtDeviceName.Name = "txtDeviceName";
             this.txtDeviceName.PlaceholderText = "请输入设备名称";
-            this.txtDeviceName.Size = new System.Drawing.Size(258, 30);
+            this.txtDeviceName.Size = new System.Drawing.Size(258, 37);
             this.txtDeviceName.TabIndex = 1;
-
             // 
             // lblHost
             // 
             this.lblHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblHost.Font = new System.Drawing.Font("微软雅黑", 12F);
+            this.lblHost.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.lblHost.Location = new System.Drawing.Point(3, 53);
             this.lblHost.Name = "lblHost";
             this.lblHost.Size = new System.Drawing.Size(94, 44);
             this.lblHost.TabIndex = 2;
             this.lblHost.Text = "主机地址:";
             this.lblHost.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-
-            //
+            // 
             // txtHost
-            //
+            // 
             this.txtHost.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtHost.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.txtHost.Location = new System.Drawing.Point(103, 60);
             this.txtHost.Margin = new System.Windows.Forms.Padding(3, 10, 3, 3);
             this.txtHost.Name = "txtHost";
             this.txtHost.PlaceholderText = "请输入IP地址";
-            this.txtHost.Size = new System.Drawing.Size(258, 30);
+            this.txtHost.Size = new System.Drawing.Size(258, 37);
             this.txtHost.TabIndex = 3;
             this.txtHost.Text = "192.168.2.12";
-
-            //
+            // 
             // lblPort
-            //
+            // 
             this.lblPort.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblPort.Font = new System.Drawing.Font("微软雅黑", 12F);
+            this.lblPort.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.lblPort.Location = new System.Drawing.Point(3, 103);
             this.lblPort.Name = "lblPort";
             this.lblPort.Size = new System.Drawing.Size(94, 44);
             this.lblPort.TabIndex = 4;
             this.lblPort.Text = "端口:";
             this.lblPort.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-
-            //
+            // 
             // numPort
-            //
+            // 
             this.numPort.Dock = System.Windows.Forms.DockStyle.Fill;
             this.numPort.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.numPort.Location = new System.Drawing.Point(103, 110);
             this.numPort.Margin = new System.Windows.Forms.Padding(3, 10, 3, 3);
-            this.numPort.Maximum = new decimal(new int[] { 65535, 0, 0, 0 });
-            this.numPort.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            this.numPort.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+            this.numPort.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.numPort.Name = "numPort";
-            this.numPort.Size = new System.Drawing.Size(258, 30);
+            this.numPort.Size = new System.Drawing.Size(258, 37);
             this.numPort.TabIndex = 5;
-            this.numPort.Value = new decimal(new int[] { 6062, 0, 0, 0 });
-
-            //
+            this.numPort.Text = "6062";
+            this.numPort.Value = new decimal(new int[] {
+            6062,
+            0,
+            0,
+            0});
+            // 
             // flowLayoutPanel1
-            //
+            // 
             this.flowLayoutPanel1.Controls.Add(this.btnCancel);
             this.flowLayoutPanel1.Controls.Add(this.btnOK);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -150,21 +155,19 @@ namespace SasTools.UI
             this.flowLayoutPanel1.Padding = new System.Windows.Forms.Padding(0, 10, 0, 0);
             this.flowLayoutPanel1.Size = new System.Drawing.Size(364, 50);
             this.flowLayoutPanel1.TabIndex = 1;
-
-            //
+            // 
             // btnCancel
-            //
+            // 
             this.btnCancel.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.btnCancel.Location = new System.Drawing.Point(286, 13);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 30);
             this.btnCancel.TabIndex = 7;
             this.btnCancel.Text = "取消";
-            this.btnCancel.Type = AntdUI.TTypeMini.Default;
-
-            //
+            this.btnCancel.Type = AntdUI.TTypeMini.Error;
+            // 
             // btnOK
-            //
+            // 
             this.btnOK.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.btnOK.Location = new System.Drawing.Point(205, 13);
             this.btnOK.Name = "btnOK";
@@ -172,10 +175,9 @@ namespace SasTools.UI
             this.btnOK.TabIndex = 6;
             this.btnOK.Text = "确定";
             this.btnOK.Type = AntdUI.TTypeMini.Primary;
-
-            //
+            // 
             // AddDeviceDialog
-            //
+            // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(384, 220);
@@ -191,6 +193,7 @@ namespace SasTools.UI
             this.tableLayoutPanel1.ResumeLayout(false);
             this.flowLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
+
         }
     }
 }
