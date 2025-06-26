@@ -644,10 +644,6 @@ namespace SasTools.Domain
         {
             if (_eventBus != null)
             {
-                // 发布多设备状态事件
-                _eventBus.Publish(new MultiDeviceStateEvent(_deviceId, _state.ToString(), _machineMessage, statusType));
-
-                // 保持向后兼容性，继续发布原有事件
                 _eventBus.Publish(new RefreshMachineState(_machineMessage, _state.ToString(), statusType));
             }
         }
@@ -656,10 +652,6 @@ namespace SasTools.Domain
         {
             if (_eventBus != null)
             {
-                // 发布多设备计数器更新事件
-                _eventBus.Publish(new MultiDeviceCounterUpdateEvent(_deviceId, _totalCycles, _successfulCycles, _failedCycles));
-
-                // 保持向后兼容性，继续发布原有事件
                 _eventBus.Publish(new CounterUpdateEvent(_totalCycles, _successfulCycles, _failedCycles));
             }
         }

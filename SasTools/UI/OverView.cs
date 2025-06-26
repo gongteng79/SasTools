@@ -46,21 +46,32 @@ namespace SasTools
             //初始化事件总线
             _eventBus = new EventBus(false);
             //初始化各视图
+            //初始化各视图
             _mainVeiw = new MainView();
             _manualView = new ManualView();
             _reciepeView = new ReciepeView();
             _testTcpView = new TestTcpView(_eventBus);
-            _fatigueTestView = new FatigueTestView(_eventBus);
             _deviceManagementView = new SasTools.UI.DeviceManagementView(_eventBus);
+
+            // 先获取DeviceManager实例
+            _deviceManager = _deviceManagementView.GetDeviceManager();
+
+            // 然后创建需要DeviceManager的视图
+            _fatigueTestView = new FatigueTestView(_eventBus, _deviceManager);
 
             // 建立设备管理与主界面的连接(事件订阅)
             _deviceManagementView.DeviceSelectedForConnection += OnDeviceSelectedForConnection;
-            _deviceManager = _deviceManagementView.GetDeviceManager(); // 共享DeviceManager实例
 
             // 订阅设备状态变化事件
             _deviceManager.DeviceStatusChanged += OnDeviceStatusChanged;
 
             InitialCompoent();
+        }
+
+        // 添加获取DeviceManager的方法
+        public DeviceManager GetDeviceManager()
+        {
+            return _deviceManager;
         }
 
         // 当设备管理视图中选择设备进行连接时触发

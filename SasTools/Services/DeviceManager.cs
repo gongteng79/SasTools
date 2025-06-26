@@ -1,9 +1,11 @@
 ﻿using log4net;
+using SasTools.Domain;
 using SasTools.Events;
 using SasTools.Interface;
 using SasTools.Models;
 using SasTools.Models.SasModule;
 using SasTools.Services;
+using SasTools.UI;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -22,6 +24,9 @@ namespace SasTools.Services
         private readonly ConcurrentDictionary<string, ICommunicationService> _communicationServices;
         private readonly List<string> _deviceOrder; // 跟踪设备添加顺序
         private readonly object _orderLock = new object(); // 保护顺序列表的锁
+        private string _selectedDeviceId;
+        private readonly Dictionary<string, bool> _deviceTestStates = new Dictionary<string, bool>();
+        private readonly Dictionary<string, TestStateMachine> _deviceStateMachines = new Dictionary<string, TestStateMachine>();
 
         public DeviceManager(IEventBus eventBus)
         {
@@ -33,6 +38,7 @@ namespace SasTools.Services
         }
 
         public event EventHandler<DeviceStatusChangedEventArgs> DeviceStatusChanged;
+        public event EventHandler<string> DeviceSelectionChanged;
 
         public IEnumerable<DeviceInfo> GetAllDevices()
         {
@@ -226,6 +232,112 @@ namespace SasTools.Services
 
             var results = await Task.WhenAll(tasks);
             return results.All(r => r);
+        }
+
+        // 添加设备选择功能
+        public void SelectDevice(string deviceId)
+        {
+            if (deviceId != null && !_deviceInfos.ContainsKey(deviceId))
+                return;
+
+            var previousId = _selectedDeviceId;
+            _selectedDeviceId = deviceId;
+
+            if (previousId != deviceId)
+            {
+                DeviceSelectionChanged?.Invoke(this, deviceId);
+                _logger.Debug($"设备选择已切换: {previousId} -> {deviceId}");
+            }
+        }
+
+        public string GetSelectedDeviceId() => _selectedDeviceId;
+
+        // 添加疲劳测试状态管理
+        public bool IsDeviceTestRunning(string deviceId)
+        {
+            return _deviceTestStates.TryGetValue(deviceId, out var isRunning) && isRunning;
+        }
+
+        public void SetDeviceTestState(string deviceId, bool isRunning)
+        {
+            _deviceTestStates[deviceId] = isRunning;
+        }
+
+        // 添加状态机管理
+        public void SetDeviceStateMachine(string deviceId, TestStateMachine stateMachine)
+        {
+            _deviceStateMachines[deviceId] = stateMachine;
+        }
+
+        public TestStateMachine GetDeviceStateMachine(string deviceId)
+        {
+            return _deviceStateMachines.TryGetValue(deviceId, out var stateMachine) ? stateMachine : null;
+        }
+
+        // 添加批量测试操作
+        public int StartAllDeviceTests()
+        {
+            int startedCount = 0;
+            foreach (var deviceId in _deviceInfos.Keys.ToList())
+            {
+                if (_deviceInfos[deviceId].IsConnected && !IsDeviceTestRunning(deviceId))
+                {
+                    var stateMachine = GetDeviceStateMachine(deviceId);
+                    if (stateMachine != null)
+                    {
+                        try
+                        {
+                            stateMachine.StartTest();
+                            SetDeviceTestState(deviceId, true);
+                            startedCount++;
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error($"启动设备 {deviceId} 测试失败: {ex.Message}", ex);
+                        }
+                    }
+                }
+            }
+            return startedCount;
+        }
+
+        public int StopAllDeviceTests()
+        {
+            int stoppedCount = 0;
+            foreach (var deviceId in _deviceInfos.Keys.ToList())
+            {
+                if (IsDeviceTestRunning(deviceId))
+                {
+                    var stateMachine = GetDeviceStateMachine(deviceId);
+                    if (stateMachine != null)
+                    {
+                        try
+                        {
+                            stateMachine.StopTest();
+                            SetDeviceTestState(deviceId, false);
+                            stoppedCount++;
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error($"停止设备 {deviceId} 测试失败: {ex.Message}", ex);
+                        }
+                    }
+                }
+            }
+            return stoppedCount;
+        }
+
+        // 添加设备状态栏同步方法
+        public void SyncDeviceToStatusBar(DeviceStatusBar statusBar)
+        {
+            foreach (var deviceInfo in GetAllDevices())
+            {
+                if (deviceInfo.IsConnected)
+                {
+                    statusBar.AddDevice(deviceInfo.Id, deviceInfo.Name);
+                    statusBar.UpdateDeviceStatus(deviceInfo.Id, MachineStatusType.Idle, true);
+                }
+            }
         }
 
 

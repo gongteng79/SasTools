@@ -95,6 +95,9 @@ namespace SasTools.UI
             this.btnSave = new AntdUI.Button();
             this.button2 = new AntdUI.Button();
             this.button3 = new AntdUI.Button();
+            this.deviceStatusBar1 = new SasTools.UI.DeviceStatusBar();
+            this.tableLayoutPanelMain = new System.Windows.Forms.TableLayoutPanel();
+            this.panel4 = new System.Windows.Forms.Panel();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -108,6 +111,8 @@ namespace SasTools.UI
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
+            this.tableLayoutPanelMain.SuspendLayout();
+            this.panel4.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -116,20 +121,20 @@ namespace SasTools.UI
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Font = new System.Drawing.Font("微软雅黑", 14.14286F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.tabControl1.Location = new System.Drawing.Point(0, 0);
+            this.tabControl1.Location = new System.Drawing.Point(3, 63);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1158, 930);
+            this.tabControl1.Size = new System.Drawing.Size(1152, 864);
             this.tabControl1.TabIndex = 0;
             // 
             // tabPage1
-            //
+            // 
             this.tabPage1.Controls.Add(this.tableLayoutPanel3);
             this.tabPage1.Font = new System.Drawing.Font("微软雅黑", 14.14286F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.tabPage1.Location = new System.Drawing.Point(4, 45);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1150, 881);
+            this.tabPage1.Size = new System.Drawing.Size(1144, 815);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "报警显示";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -152,16 +157,16 @@ namespace SasTools.UI
             this.tableLayoutPanel3.RowCount = 2;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 75F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(1144, 875);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(1138, 809);
             this.tableLayoutPanel3.TabIndex = 1;
             // 
             // divider1
-            //
+            // 
             this.divider1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.divider1.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.divider1.Location = new System.Drawing.Point(3, 3);
             this.divider1.Name = "divider1";
-            this.divider1.Size = new System.Drawing.Size(69, 794);
+            this.divider1.Size = new System.Drawing.Size(69, 728);
             this.divider1.TabIndex = 0;
             this.divider1.Text = "报警显示";
             this.divider1.Vertical = true;
@@ -173,7 +178,7 @@ namespace SasTools.UI
             this.tableAlarmInfo.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.tableAlarmInfo.Location = new System.Drawing.Point(78, 3);
             this.tableAlarmInfo.Name = "tableAlarmInfo";
-            this.tableAlarmInfo.Size = new System.Drawing.Size(635, 794);
+            this.tableAlarmInfo.Size = new System.Drawing.Size(631, 728);
             this.tableAlarmInfo.TabIndex = 1;
             this.tableAlarmInfo.Text = "table1";
             // 
@@ -184,13 +189,13 @@ namespace SasTools.UI
             this.flowLayoutPanel2.Controls.Add(this.button6);
             this.flowLayoutPanel2.Controls.Add(this.button7);
             this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel2.Location = new System.Drawing.Point(3, 803);
+            this.flowLayoutPanel2.Location = new System.Drawing.Point(3, 737);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(1138, 69);
+            this.flowLayoutPanel2.Size = new System.Drawing.Size(1132, 69);
             this.flowLayoutPanel2.TabIndex = 2;
             // 
             // button5
-            //
+            // 
             this.button5.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.button5.Location = new System.Drawing.Point(3, 3);
             this.button5.Name = "button5";
@@ -199,9 +204,9 @@ namespace SasTools.UI
             this.button5.Text = "启动测试";
             this.button5.Type = AntdUI.TTypeMini.Primary;
             this.button5.Click += new System.EventHandler(this.Button5_Click);
-            //
+            // 
             // button6
-            //
+            // 
             this.button6.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.button6.Location = new System.Drawing.Point(183, 3);
             this.button6.Name = "button6";
@@ -210,9 +215,9 @@ namespace SasTools.UI
             this.button6.Text = "停止测试";
             this.button6.Type = AntdUI.TTypeMini.Primary;
             this.button6.Click += new System.EventHandler(this.Button6_Click);
-            //
+            // 
             // button7
-            //
+            // 
             this.button7.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.button7.Location = new System.Drawing.Point(363, 3);
             this.button7.Name = "button7";
@@ -226,9 +231,9 @@ namespace SasTools.UI
             // 
             this.panel1.Controls.Add(this.panel2);
             this.panel1.Controls.Add(this.divider2);
-            this.panel1.Location = new System.Drawing.Point(719, 3);
+            this.panel1.Location = new System.Drawing.Point(715, 3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(207, 793);
+            this.panel1.Size = new System.Drawing.Size(16, 1);
             this.panel1.TabIndex = 3;
             // 
             // panel2
@@ -237,7 +242,7 @@ namespace SasTools.UI
             this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel2.Location = new System.Drawing.Point(0, 66);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(207, 75);
+            this.panel2.Size = new System.Drawing.Size(16, 75);
             this.panel2.TabIndex = 1;
             // 
             // badge1
@@ -247,7 +252,7 @@ namespace SasTools.UI
             this.badge1.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.badge1.Location = new System.Drawing.Point(0, 0);
             this.badge1.Name = "badge1";
-            this.badge1.Size = new System.Drawing.Size(207, 75);
+            this.badge1.Size = new System.Drawing.Size(16, 75);
             this.badge1.State = AntdUI.TState.Success;
             this.badge1.TabIndex = 0;
             this.badge1.Text = "运行状态";
@@ -259,7 +264,7 @@ namespace SasTools.UI
             this.divider2.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.divider2.Location = new System.Drawing.Point(0, 0);
             this.divider2.Name = "divider2";
-            this.divider2.Size = new System.Drawing.Size(207, 66);
+            this.divider2.Size = new System.Drawing.Size(16, 66);
             this.divider2.TabIndex = 0;
             this.divider2.Text = "状态显示";
             // 
@@ -270,9 +275,9 @@ namespace SasTools.UI
             this.panel5.Controls.Add(this.panel7);
             this.panel5.Controls.Add(this.panel6);
             this.panel5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel5.Location = new System.Drawing.Point(932, 3);
+            this.panel5.Location = new System.Drawing.Point(927, 3);
             this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(209, 794);
+            this.panel5.Size = new System.Drawing.Size(208, 728);
             this.panel5.TabIndex = 4;
             // 
             // input3
@@ -282,7 +287,7 @@ namespace SasTools.UI
             this.input3.Location = new System.Drawing.Point(0, 242);
             this.input3.Name = "input3";
             this.input3.ReadOnly = true;
-            this.input3.Size = new System.Drawing.Size(209, 52);
+            this.input3.Size = new System.Drawing.Size(208, 52);
             this.input3.TabIndex = 3;
             this.input3.Text = "0";
             this.input3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -293,7 +298,7 @@ namespace SasTools.UI
             this.divider5.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.divider5.Location = new System.Drawing.Point(0, 196);
             this.divider5.Name = "divider5";
-            this.divider5.Size = new System.Drawing.Size(209, 46);
+            this.divider5.Size = new System.Drawing.Size(208, 46);
             this.divider5.TabIndex = 2;
             this.divider5.Text = "失败次数";
             // 
@@ -304,7 +309,7 @@ namespace SasTools.UI
             this.panel7.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel7.Location = new System.Drawing.Point(0, 98);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(209, 98);
+            this.panel7.Size = new System.Drawing.Size(208, 98);
             this.panel7.TabIndex = 1;
             // 
             // input2
@@ -314,7 +319,7 @@ namespace SasTools.UI
             this.input2.Location = new System.Drawing.Point(0, 46);
             this.input2.Name = "input2";
             this.input2.ReadOnly = true;
-            this.input2.Size = new System.Drawing.Size(209, 52);
+            this.input2.Size = new System.Drawing.Size(208, 52);
             this.input2.TabIndex = 2;
             this.input2.Text = "0";
             this.input2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -325,7 +330,7 @@ namespace SasTools.UI
             this.divider4.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.divider4.Location = new System.Drawing.Point(0, 0);
             this.divider4.Name = "divider4";
-            this.divider4.Size = new System.Drawing.Size(209, 46);
+            this.divider4.Size = new System.Drawing.Size(208, 46);
             this.divider4.TabIndex = 1;
             this.divider4.Text = "成功次数";
             // 
@@ -336,7 +341,7 @@ namespace SasTools.UI
             this.panel6.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel6.Location = new System.Drawing.Point(0, 0);
             this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(209, 98);
+            this.panel6.Size = new System.Drawing.Size(208, 98);
             this.panel6.TabIndex = 0;
             // 
             // input1
@@ -346,7 +351,7 @@ namespace SasTools.UI
             this.input1.Location = new System.Drawing.Point(0, 46);
             this.input1.Name = "input1";
             this.input1.ReadOnly = true;
-            this.input1.Size = new System.Drawing.Size(209, 52);
+            this.input1.Size = new System.Drawing.Size(208, 52);
             this.input1.TabIndex = 2;
             this.input1.Text = "0";
             this.input1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -357,7 +362,7 @@ namespace SasTools.UI
             this.divider3.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.divider3.Location = new System.Drawing.Point(0, 0);
             this.divider3.Name = "divider3";
-            this.divider3.Size = new System.Drawing.Size(209, 46);
+            this.divider3.Size = new System.Drawing.Size(208, 46);
             this.divider3.TabIndex = 1;
             this.divider3.Text = "总循环次数";
             // 
@@ -368,7 +373,7 @@ namespace SasTools.UI
             this.tabPage2.Location = new System.Drawing.Point(4, 45);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1150, 881);
+            this.tabPage2.Size = new System.Drawing.Size(1144, 815);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "参数设置";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -386,7 +391,7 @@ namespace SasTools.UI
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 85F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 15F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1144, 875);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1138, 809);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
             // tableLayoutPanel2
@@ -428,17 +433,17 @@ namespace SasTools.UI
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(1134, 735);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(1128, 679);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
             // inputNumber1
             // 
             this.inputNumber1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.inputNumber1.Font = new System.Drawing.Font("微软雅黑", 12F);
-            this.inputNumber1.Location = new System.Drawing.Point(683, 77);
+            this.inputNumber1.Location = new System.Drawing.Point(680, 71);
             this.inputNumber1.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.inputNumber1.Name = "inputNumber1";
-            this.inputNumber1.Size = new System.Drawing.Size(216, 65);
+            this.inputNumber1.Size = new System.Drawing.Size(215, 59);
             this.inputNumber1.TabIndex = 25;
             this.inputNumber1.Text = "0";
             this.inputNumber1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -447,10 +452,10 @@ namespace SasTools.UI
             // 
             this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label1.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(683, 4);
+            this.label1.Location = new System.Drawing.Point(680, 4);
             this.label1.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(216, 65);
+            this.label1.Size = new System.Drawing.Size(215, 59);
             this.label1.TabIndex = 24;
             this.label1.Text = "循环次数";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -459,10 +464,10 @@ namespace SasTools.UI
             // 
             this.lbReverseDelay.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lbReverseDelay.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lbReverseDelay.Location = new System.Drawing.Point(231, 4);
+            this.lbReverseDelay.Location = new System.Drawing.Point(230, 4);
             this.lbReverseDelay.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.lbReverseDelay.Name = "lbReverseDelay";
-            this.lbReverseDelay.Size = new System.Drawing.Size(216, 65);
+            this.lbReverseDelay.Size = new System.Drawing.Size(215, 59);
             this.lbReverseDelay.TabIndex = 2;
             this.lbReverseDelay.Text = "反转启动延时";
             this.lbReverseDelay.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -474,7 +479,7 @@ namespace SasTools.UI
             this.lbForwardDelay.Location = new System.Drawing.Point(5, 4);
             this.lbForwardDelay.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.lbForwardDelay.Name = "lbForwardDelay";
-            this.lbForwardDelay.Size = new System.Drawing.Size(216, 65);
+            this.lbForwardDelay.Size = new System.Drawing.Size(215, 59);
             this.lbForwardDelay.TabIndex = 0;
             this.lbForwardDelay.Text = "正转启动延时";
             this.lbForwardDelay.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -483,10 +488,10 @@ namespace SasTools.UI
             // 
             this.txtForwardDelay.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtForwardDelay.Font = new System.Drawing.Font("微软雅黑", 12F);
-            this.txtForwardDelay.Location = new System.Drawing.Point(5, 77);
+            this.txtForwardDelay.Location = new System.Drawing.Point(5, 71);
             this.txtForwardDelay.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.txtForwardDelay.Name = "txtForwardDelay";
-            this.txtForwardDelay.Size = new System.Drawing.Size(216, 65);
+            this.txtForwardDelay.Size = new System.Drawing.Size(215, 59);
             this.txtForwardDelay.TabIndex = 22;
             this.txtForwardDelay.Text = "0";
             this.txtForwardDelay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -495,10 +500,10 @@ namespace SasTools.UI
             // 
             this.txtReverseDelay.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtReverseDelay.Font = new System.Drawing.Font("微软雅黑", 12F);
-            this.txtReverseDelay.Location = new System.Drawing.Point(231, 77);
+            this.txtReverseDelay.Location = new System.Drawing.Point(230, 71);
             this.txtReverseDelay.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.txtReverseDelay.Name = "txtReverseDelay";
-            this.txtReverseDelay.Size = new System.Drawing.Size(216, 65);
+            this.txtReverseDelay.Size = new System.Drawing.Size(215, 59);
             this.txtReverseDelay.TabIndex = 19;
             this.txtReverseDelay.Text = "0";
             this.txtReverseDelay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -507,10 +512,10 @@ namespace SasTools.UI
             // 
             this.lbRotationTimes.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lbRotationTimes.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lbRotationTimes.Location = new System.Drawing.Point(457, 4);
+            this.lbRotationTimes.Location = new System.Drawing.Point(455, 4);
             this.lbRotationTimes.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.lbRotationTimes.Name = "lbRotationTimes";
-            this.lbRotationTimes.Size = new System.Drawing.Size(216, 65);
+            this.lbRotationTimes.Size = new System.Drawing.Size(215, 59);
             this.lbRotationTimes.TabIndex = 5;
             this.lbRotationTimes.Text = "超时设置";
             this.lbRotationTimes.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -519,10 +524,10 @@ namespace SasTools.UI
             // 
             this.txtRotationTimes.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtRotationTimes.Font = new System.Drawing.Font("微软雅黑", 12F);
-            this.txtRotationTimes.Location = new System.Drawing.Point(457, 77);
+            this.txtRotationTimes.Location = new System.Drawing.Point(455, 71);
             this.txtRotationTimes.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.txtRotationTimes.Name = "txtRotationTimes";
-            this.txtRotationTimes.Size = new System.Drawing.Size(216, 65);
+            this.txtRotationTimes.Size = new System.Drawing.Size(215, 59);
             this.txtRotationTimes.TabIndex = 23;
             this.txtRotationTimes.Text = "0";
             this.txtRotationTimes.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -531,17 +536,17 @@ namespace SasTools.UI
             // 
             this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label2.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label2.Location = new System.Drawing.Point(909, 4);
+            this.label2.Location = new System.Drawing.Point(905, 4);
             this.label2.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(220, 65);
+            this.label2.Size = new System.Drawing.Size(218, 59);
             this.label2.TabIndex = 26;
             this.label2.Text = "NG次数";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lbRotationInterval
             // 
-            this.lbRotationInterval.Location = new System.Drawing.Point(3, 149);
+            this.lbRotationInterval.Location = new System.Drawing.Point(3, 137);
             this.lbRotationInterval.Name = "lbRotationInterval";
             this.lbRotationInterval.Size = new System.Drawing.Size(0, 0);
             this.lbRotationInterval.TabIndex = 6;
@@ -550,24 +555,24 @@ namespace SasTools.UI
             // 
             this.inputNumber2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.inputNumber2.Font = new System.Drawing.Font("微软雅黑", 12F);
-            this.inputNumber2.Location = new System.Drawing.Point(909, 77);
+            this.inputNumber2.Location = new System.Drawing.Point(905, 71);
             this.inputNumber2.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.inputNumber2.Name = "inputNumber2";
-            this.inputNumber2.Size = new System.Drawing.Size(220, 65);
+            this.inputNumber2.Size = new System.Drawing.Size(218, 59);
             this.inputNumber2.TabIndex = 27;
             this.inputNumber2.Text = "0";
             this.inputNumber2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // flowLayoutPanel1
-            //
+            // 
             this.flowLayoutPanel1.Controls.Add(this.btnSave);
             this.flowLayoutPanel1.Controls.Add(this.button2);
             this.flowLayoutPanel1.Controls.Add(this.button3);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(5, 747);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(5, 691);
             this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(1134, 124);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(1128, 114);
             this.flowLayoutPanel1.TabIndex = 1;
             // 
             // btnSave
@@ -581,9 +586,9 @@ namespace SasTools.UI
             this.btnSave.Text = "保存";
             this.btnSave.Type = AntdUI.TTypeMini.Primary;
             this.btnSave.Click += new System.EventHandler(this.BtnSave_Click);
-            //
+            // 
             // button2
-            //
+            // 
             this.button2.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.button2.Location = new System.Drawing.Point(241, 8);
             this.button2.Margin = new System.Windows.Forms.Padding(30, 8, 7, 8);
@@ -593,9 +598,9 @@ namespace SasTools.UI
             this.button2.Text = "电批正转";
             this.button2.Type = AntdUI.TTypeMini.Primary;
             this.button2.Click += new System.EventHandler(this.Button2_Click);
-            //
+            // 
             // button3
-            //
+            // 
             this.button3.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.button3.Location = new System.Drawing.Point(452, 8);
             this.button3.Margin = new System.Windows.Forms.Padding(30, 8, 7, 8);
@@ -606,13 +611,43 @@ namespace SasTools.UI
             this.button3.Type = AntdUI.TTypeMini.Primary;
             this.button3.Click += new System.EventHandler(this.Button3_Click);
             // 
-
+            // deviceStatusBar1
+            // 
+            this.deviceStatusBar1.BackColor = System.Drawing.Color.White;
+            this.deviceStatusBar1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.deviceStatusBar1.Location = new System.Drawing.Point(0, 0);
+            this.deviceStatusBar1.Name = "deviceStatusBar1";
+            this.deviceStatusBar1.Size = new System.Drawing.Size(1152, 54);
+            this.deviceStatusBar1.TabIndex = 0;
+            // 
+            // tableLayoutPanelMain
+            // 
+            this.tableLayoutPanelMain.ColumnCount = 1;
+            this.tableLayoutPanelMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanelMain.Controls.Add(this.panel4, 0, 0);
+            this.tableLayoutPanelMain.Controls.Add(this.tabControl1, 0, 1);
+            this.tableLayoutPanelMain.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanelMain.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanelMain.Name = "tableLayoutPanelMain";
+            this.tableLayoutPanelMain.RowCount = 2;
+            this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 60F));
+            this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanelMain.Size = new System.Drawing.Size(1158, 930);
+            this.tableLayoutPanelMain.TabIndex = 2;
+            // 
+            // panel4
+            // 
+            this.panel4.Controls.Add(this.deviceStatusBar1);
+            this.panel4.Location = new System.Drawing.Point(3, 3);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(1152, 54);
+            this.panel4.TabIndex = 2;
             // 
             // FatigueTestView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.tableLayoutPanelMain);
             this.Name = "FatigueTestView";
             this.Size = new System.Drawing.Size(1158, 930);
             this.tabControl1.ResumeLayout(false);
@@ -628,6 +663,8 @@ namespace SasTools.UI
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.flowLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanelMain.ResumeLayout(false);
+            this.panel4.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -674,5 +711,8 @@ namespace SasTools.UI
         private AntdUI.InputNumber inputNumber2;
         private AntdUI.Input input3;
         private AntdUI.Divider divider5;
+        private DeviceStatusBar deviceStatusBar1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanelMain;
+        private System.Windows.Forms.Panel panel4;
     }
 }
