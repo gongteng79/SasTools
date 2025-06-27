@@ -16,7 +16,6 @@ namespace SasTools.UI
         private IEventBus _eventBus;
 
         public event EventHandler<string> DeviceSelected;//设备选择事件
-        public event EventHandler<string> DeviceSelectedForConnection;//设备连接选择事件
 
         public DeviceManagementView(IEventBus eventBus)
         {
@@ -55,7 +54,6 @@ namespace SasTools.UI
                 // 取消选择
                 AntdUI.Message.info(this.FindForm(), "已取消设备选择");
                 DeviceSelected?.Invoke(this, deviceId);// 触发设备选择事件
-                DeviceSelectedForConnection?.Invoke(this, deviceId);// 触发设备连接选择事件
                 return;
             }
 
@@ -64,9 +62,6 @@ namespace SasTools.UI
             {
                 AntdUI.Message.success(this.FindForm(), $"已选择设备: {deviceInfo.Name}");
                 DeviceSelected?.Invoke(this, deviceId);// 触发设备选择事件
-
-                // 通知主界面更新连接按钮状态
-                DeviceSelectedForConnection?.Invoke(this, deviceId);
             }   
         }
 

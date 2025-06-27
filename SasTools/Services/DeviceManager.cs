@@ -111,7 +111,8 @@ namespace SasTools.Services
             {
                 _deviceOrder.Remove(deviceId);
             }
-
+            // 发布设备移除事件
+            _eventBus.Publish(new MultiDeviceRemoveEvent(deviceId));
             return true;
         }
 

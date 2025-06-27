@@ -22,21 +22,20 @@ namespace SasTools.UI
                 if (_eventBus != null)
                 {
                     _eventBus.Unsubscribe<RefreshMachineState>(this);
-                    _eventBus.Unsubscribe<DeviceCreateEvent>(this);
                     _eventBus.Unsubscribe<CounterUpdateEvent>(this);
                 }
-
-                // 停止测试
-                if (_stateMachine != null)
+                // 停止当前设备测试
+                try
                 {
-                    try
+                    var currentStateMachine = GetCurrentDeviceStateMachine();
+                    if (currentStateMachine != null)
                     {
-                        _stateMachine.StopTest();
+                        currentStateMachine.StopTest();
                     }
-                    catch (Exception ex)
-                    {
-                        _logger.Error($"释放资源时停止测试失败: {ex.Message}", ex);
-                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"释放资源时停止测试失败: {ex.Message}", ex);
                 }
 
                 if (components != null)
@@ -95,9 +94,9 @@ namespace SasTools.UI
             this.btnSave = new AntdUI.Button();
             this.button2 = new AntdUI.Button();
             this.button3 = new AntdUI.Button();
-            this.deviceStatusBar1 = new SasTools.UI.DeviceStatusBar();
             this.tableLayoutPanelMain = new System.Windows.Forms.TableLayoutPanel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.deviceStatusBar1 = new SasTools.UI.DeviceStatusBar();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -231,9 +230,10 @@ namespace SasTools.UI
             // 
             this.panel1.Controls.Add(this.panel2);
             this.panel1.Controls.Add(this.divider2);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(715, 3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(16, 1);
+            this.panel1.Size = new System.Drawing.Size(206, 728);
             this.panel1.TabIndex = 3;
             // 
             // panel2
@@ -242,7 +242,7 @@ namespace SasTools.UI
             this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel2.Location = new System.Drawing.Point(0, 66);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(16, 75);
+            this.panel2.Size = new System.Drawing.Size(206, 75);
             this.panel2.TabIndex = 1;
             // 
             // badge1
@@ -252,7 +252,7 @@ namespace SasTools.UI
             this.badge1.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.badge1.Location = new System.Drawing.Point(0, 0);
             this.badge1.Name = "badge1";
-            this.badge1.Size = new System.Drawing.Size(16, 75);
+            this.badge1.Size = new System.Drawing.Size(206, 75);
             this.badge1.State = AntdUI.TState.Success;
             this.badge1.TabIndex = 0;
             this.badge1.Text = "运行状态";
@@ -264,7 +264,7 @@ namespace SasTools.UI
             this.divider2.Font = new System.Drawing.Font("微软雅黑", 12F);
             this.divider2.Location = new System.Drawing.Point(0, 0);
             this.divider2.Name = "divider2";
-            this.divider2.Size = new System.Drawing.Size(16, 66);
+            this.divider2.Size = new System.Drawing.Size(206, 66);
             this.divider2.TabIndex = 0;
             this.divider2.Text = "状态显示";
             // 
@@ -611,15 +611,6 @@ namespace SasTools.UI
             this.button3.Type = AntdUI.TTypeMini.Primary;
             this.button3.Click += new System.EventHandler(this.Button3_Click);
             // 
-            // deviceStatusBar1
-            // 
-            this.deviceStatusBar1.BackColor = System.Drawing.Color.White;
-            this.deviceStatusBar1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.deviceStatusBar1.Location = new System.Drawing.Point(0, 0);
-            this.deviceStatusBar1.Name = "deviceStatusBar1";
-            this.deviceStatusBar1.Size = new System.Drawing.Size(1152, 54);
-            this.deviceStatusBar1.TabIndex = 0;
-            // 
             // tableLayoutPanelMain
             // 
             this.tableLayoutPanelMain.ColumnCount = 1;
@@ -642,6 +633,15 @@ namespace SasTools.UI
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(1152, 54);
             this.panel4.TabIndex = 2;
+            // 
+            // deviceStatusBar1
+            // 
+            this.deviceStatusBar1.BackColor = System.Drawing.Color.White;
+            this.deviceStatusBar1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.deviceStatusBar1.Location = new System.Drawing.Point(0, 0);
+            this.deviceStatusBar1.Name = "deviceStatusBar1";
+            this.deviceStatusBar1.Size = new System.Drawing.Size(1152, 54);
+            this.deviceStatusBar1.TabIndex = 0;
             // 
             // FatigueTestView
             // 

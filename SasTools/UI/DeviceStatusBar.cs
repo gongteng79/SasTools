@@ -65,20 +65,25 @@ namespace SasTools.UI
             flowPanelDevices.Controls.Add(deviceButton);
         }
 
-        // 移除设备
+        //从状态栏移除设备
         public void RemoveDevice(string deviceId)
         {
             if (_deviceButtons.TryGetValue(deviceId, out var button))
             {
-                flowPanelDevices.Controls.Remove(button);
-                _deviceButtons.Remove(deviceId);
-                button.Dispose();
-
-                // 如果移除的是当前选中设备，清除选择
+                //如果移除的是当前选中的设备，清楚选中状态
                 if (_selectedDeviceId == deviceId)
                 {
                     _selectedDeviceId = null;
                 }
+
+                //从UI容器中移除按钮
+                flowPanelDevices.Controls.Remove(button);
+
+                //从字典移除
+                _deviceButtons.Remove(deviceId);
+
+                //释放按钮资源
+                button.Dispose();
             }
         }
 

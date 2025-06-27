@@ -75,7 +75,6 @@ namespace SasTools
             this.btnAddDevice.Size = new System.Drawing.Size(153, 58);
             this.btnAddDevice.TabIndex = 1;
             this.btnAddDevice.Text = "连接设备";
-            this.btnAddDevice.Click += new System.EventHandler(this.btnAddDevice_Click);
             // 
             // btnLogin
             // 

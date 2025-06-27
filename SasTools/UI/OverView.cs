@@ -29,7 +29,6 @@ namespace SasTools
         private int prevIndex = -1;//记录之前选中的菜单索引
         //设备管理
         private DeviceManager _deviceManager;
-        private string _selectedDeviceId;//当前选中的设备ID
         //视图组件
         private Dictionary<int, Control> subViews = new Dictionary<int, Control>();//存储所有子视图的字典，实现视图缓存
         private readonly MainView _mainVeiw;
@@ -46,7 +45,6 @@ namespace SasTools
             //初始化事件总线
             _eventBus = new EventBus(false);
             //初始化各视图
-            //初始化各视图
             _mainVeiw = new MainView();
             _manualView = new ManualView();
             _reciepeView = new ReciepeView();
@@ -59,12 +57,6 @@ namespace SasTools
             // 然后创建需要DeviceManager的视图
             _fatigueTestView = new FatigueTestView(_eventBus, _deviceManager);
 
-            // 建立设备管理与主界面的连接(事件订阅)
-            _deviceManagementView.DeviceSelectedForConnection += OnDeviceSelectedForConnection;
-
-            // 订阅设备状态变化事件
-            _deviceManager.DeviceStatusChanged += OnDeviceStatusChanged;
-
             InitialCompoent();
         }
 
@@ -74,37 +66,16 @@ namespace SasTools
             return _deviceManager;
         }
 
-        // 当设备管理视图中选择设备进行连接时触发
-        private void OnDeviceSelectedForConnection(object sender, string deviceId)
-        {
-            SetSelectedDevice(deviceId);// 设置当前选中的设备
-        }
-
-        // 当设备状态发生变化时触发
-        private void OnDeviceStatusChanged(object sender, SasTools.Services.DeviceStatusChangedEventArgs e)
-        {
-            // 如果变化的是当前选中的设备，更新主界面按钮
-            if (e.DeviceId == _selectedDeviceId)
-            {
-                // 确保在UI线程上执行
-                if (this.InvokeRequired)
-                {
-                    this.BeginInvoke(new Action(() => UpdateConnectionButtonState()));
-                }
-                else
-                {
-                    UpdateConnectionButtonState();
-                }
-            }
-        }
-
         private void InitialCompoent()
         {
             InitializeComponent();
             this.menu1.SelectIndex(0);// 默认选中第一个菜单项
 
-            // 初始化连接按钮状态
-            UpdateConnectionButtonState();
+            // 禁用连接按钮并更新显示
+            btnAddDevice.Text = "请在设备管理中连接设备";
+            btnAddDevice.Enabled = false;
+            btnAddDevice.Type = AntdUI.TTypeMini.Default;
+            windowBar.SubText = "请使用设备管理功能";
         }
 
         //切换子视图
@@ -195,117 +166,6 @@ namespace SasTools
             if (index >= 0)
             {
                 this.ChangeSubView(index);// 切换视图
-            }
-        }
-
-
-        // 添加/连接设备按钮点击
-        private async void btnAddDevice_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                AntdUI.Button btn = (AntdUI.Button)sender;
-                btn.Loading = true;//显示加载状态
-
-                if (string.IsNullOrEmpty(_selectedDeviceId))
-                {
-                    // 如果没有选中设备，提示用户先添加设备
-                    AntdUI.Message.info(this, "请先在设备管理中添加并选择设备");
-                    // 自动跳转到设备管理页面
-                    this.menu1.SelectIndex(6); // 设备管理页面索引
-                    btn.Loading = false;
-                    return;
-                }
-
-                //获取当前设备选中的信息
-                var deviceInfo = _deviceManager.GetDevice(_selectedDeviceId);
- 
-                if (deviceInfo == null)
-                {
-                    AntdUI.Message.error(this, "设备不存在");
-                    btn.Loading = false;
-                    return;
-                }
-
-                if (!deviceInfo.IsConnected)
-                {
-                    //连接设备
-                    bool result = await _deviceManager.ConnectDevice(_selectedDeviceId);
-                    string message = result ? "设备连接成功" : "设备连接失败";
-                    _logger.Info(message);
-
-                    if (result)
-                    {
-                        var device = _deviceManager.GetDeviceInstance(_selectedDeviceId);
-                        if (device != null)
-                        {
-                            this._eventBus.Publish(new DeviceCreateEvent(device));
-                        }
-                        AntdUI.Message.success(this, message);
-                    }
-                    else
-                    {
-                        AntdUI.Message.error(this, message);
-                    }
-                }
-                else
-                {
-                    //断开设备
-                    bool result = await _deviceManager.DisconnectDevice(_selectedDeviceId);
-                    string message = result ? "设备断开成功" : "设备断开失败";
-                    _logger.Info(message);
-                    AntdUI.Message.info(this, message);
-                }
-
-                UpdateConnectionButtonState();
-                btn.Loading = false;
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"设备连接操作出错: {ex.Message}", ex);
-                AntdUI.Message.error(this, "设备连接操作出错");
-                ((AntdUI.Button)sender).Loading = false;
-            }
-        }
-
-        // 设置当前选中的设备
-        public void SetSelectedDevice(string deviceId)
-        {
-            _selectedDeviceId = deviceId;
-            UpdateConnectionButtonState();//更新按钮状态
-        }
-
-        // 更新连接按钮状态
-        private void UpdateConnectionButtonState()
-        {
-            //如果未连接任何设备
-            if (string.IsNullOrEmpty(_selectedDeviceId))
-            {
-                btnAddDevice.Text = "选择设备"; //按钮显示：选择设备 
-                btnAddDevice.Type = AntdUI.TTypeMini.Default;//默认灰色样式
-                btnAddDevice.Enabled = false;//禁用按钮
-                windowBar.SubText = "未选择设备";//状态栏显示
-                return;
-            }
-
-
-            //设备存在的情况
-            var deviceInfo = _deviceManager?.GetDevice(_selectedDeviceId);
-            if (deviceInfo != null)
-            {
-                //动态文本
-                btnAddDevice.Text = deviceInfo.IsConnected ? "断开设备" : "连接选中设备";
-                btnAddDevice.Type = deviceInfo.IsConnected ? AntdUI.TTypeMini.Error : AntdUI.TTypeMini.Primary;
-                btnAddDevice.Enabled = true;
-                windowBar.SubText = $"当前设备: {deviceInfo.Name} ({deviceInfo.Host}:{deviceInfo.Port})";
-            }
-            //设备不存在的
-            else
-            {
-                btnAddDevice.Text = "设备不存在";
-                btnAddDevice.Type = AntdUI.TTypeMini.Default;//默认恢复演示
-                btnAddDevice.Enabled = false;
-                windowBar.SubText = "设备不存在";    
             }
         }
     }

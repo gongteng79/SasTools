@@ -109,6 +109,7 @@
     <Compile Include="Events\CounterUpdateEvent.cs" />
     <Compile Include="Events\DeviceCreateEvent.cs" />
     <Compile Include="Events\MultiDeviceCreateEvent.cs" />
+    <Compile Include="Events\MultiDeviceRemoveEvent.cs" />
     <Compile Include="Events\RefreshMachineState.cs" />
     <Compile Include="Events\SendDataEvent.cs" />
     <Compile Include="Interface\ICommunication.cs" />

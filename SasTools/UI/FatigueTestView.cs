@@ -14,12 +14,10 @@ using SasTools.Services;
 
 namespace SasTools.UI
 {
-    public partial class FatigueTestView : UserControl, IEventHandler<RefreshMachineState>, IEventHandler<DeviceCreateEvent>, IEventHandler<CounterUpdateEvent>, IEventHandler<MultiDeviceCreateEvent>
+    public partial class FatigueTestView : UserControl, IEventHandler<RefreshMachineState>, IEventHandler<CounterUpdateEvent>, IEventHandler<MultiDeviceCreateEvent>,IEventHandler<MultiDeviceRemoveEvent>
     {
         #region 私有字段
         private readonly ILog _logger = LogManager.GetLogger(typeof(FatigueTestView));
-        private TestStateMachine _stateMachine;
-        private IDevice _sasTest;
         private readonly FatigueParams _parameter;
         private readonly IEventBus _eventBus;
         private readonly DataTable _dataTable;
@@ -36,12 +34,14 @@ namespace SasTools.UI
 
             // 订阅原有事件（保持向后兼容）
             _eventBus.Subscribe<RefreshMachineState>(this);
-            _eventBus.Subscribe<DeviceCreateEvent>(this);
             _eventBus.Subscribe<CounterUpdateEvent>(this);
             _eventBus.Subscribe<MultiDeviceCreateEvent>(this);
+            _eventBus.Subscribe<MultiDeviceRemoveEvent>(this);
 
             // 订阅DeviceManager的设备选择变化事件
             _deviceManager.DeviceSelectionChanged += OnDeviceManagerSelectionChanged;
+            // 订阅设备状态变化事件
+            _deviceManager.DeviceStatusChanged += OnDeviceStatusChanged;
 
             _parameter = new FatigueParams();
             _dataTable = new DataTable();
@@ -115,20 +115,50 @@ namespace SasTools.UI
         #endregion
 
         #region 测试控制方法
+        // 获取当前选中设备的状态机
+        private TestStateMachine GetCurrentDeviceStateMachine()
+        {
+            var selectedDeviceId = _deviceManager.GetSelectedDeviceId();
+            if (string.IsNullOrEmpty(selectedDeviceId))
+                return null;
+
+            return _deviceManager.GetDeviceStateMachine(selectedDeviceId);
+        }
+
+        // 获取当前选中设备的实例
+        private IDevice GetCurrentDeviceInstance()
+        {
+            var selectedDeviceId = _deviceManager.GetSelectedDeviceId();
+            if (string.IsNullOrEmpty(selectedDeviceId))
+                return null;
+
+            return _deviceManager.GetDeviceInstance(selectedDeviceId);
+        }
         private void Start()
         {
             try
             {
-                if (_stateMachine == null)
+                var selectedDeviceId = _deviceManager.GetSelectedDeviceId();
+                var currentStateMachine = GetCurrentDeviceStateMachine();
+
+                if (currentStateMachine == null)
                 {
-                    AntdUI.Message.error(this.ParentForm, "测试系统未初始化");
+                    if (string.IsNullOrEmpty(selectedDeviceId))
+                    {
+                        AntdUI.Message.error(this.ParentForm, "请先选择要测试的设备");
+                    }
+                    else
+                    {
+                        AntdUI.Message.error(this.ParentForm, "选中的设备未连接或未初始化");
+                    }
                     return;
                 }
 
-                _stateMachine.StartTest();
+                currentStateMachine.StartTest();
+                _deviceManager.SetDeviceTestState(selectedDeviceId, true);
                 _isTestRunning = true;
                 UpdateUIState(true);
-                AddLogMessage("系统启动", "测试已开始运行", MachineStatusType.Forward);
+                AddLogMessage("系统启动", $"设备 {selectedDeviceId} 测试已开始运行", MachineStatusType.Forward);
             }
             catch (Exception ex)
             {
@@ -141,16 +171,27 @@ namespace SasTools.UI
         {
             try
             {
-                if (_stateMachine == null)
+                var selectedDeviceId = _deviceManager.GetSelectedDeviceId();
+                var currentStateMachine = GetCurrentDeviceStateMachine();
+
+                if (currentStateMachine == null)
                 {
-                    AntdUI.Message.error(this.ParentForm, "测试系统未初始化");
+                    if (string.IsNullOrEmpty(selectedDeviceId))
+                    {
+                        AntdUI.Message.error(this.ParentForm, "请先选择要测试的设备");
+                    }
+                    else
+                    {
+                        AntdUI.Message.error(this.ParentForm, "选中的设备未连接或未初始化");
+                    }
                     return;
                 }
 
-                _stateMachine.StopTest();
+                currentStateMachine.StopTest();
+                _deviceManager.SetDeviceTestState(selectedDeviceId, false);
                 _isTestRunning = false;
                 UpdateUIState(false);
-                AddLogMessage("系统停止", "测试已停止运行", MachineStatusType.Idle);
+                AddLogMessage("系统停止", $"设备 {selectedDeviceId} 测试已停止运行", MachineStatusType.Idle);
             }
             catch (Exception ex)
             {
@@ -163,14 +204,25 @@ namespace SasTools.UI
         {
             try
             {
-                if (_stateMachine == null)
+                var selectedDeviceId = _deviceManager.GetSelectedDeviceId();
+                var currentStateMachine = GetCurrentDeviceStateMachine();
+
+                if (currentStateMachine == null)
                 {
-                    AntdUI.Message.error(this.ParentForm, "测试系统未初始化");
+                    if (string.IsNullOrEmpty(selectedDeviceId))
+                    {
+                        AntdUI.Message.error(this.ParentForm, "请先选择要测试的设备");
+                    }
+                    else
+                    {
+                        AntdUI.Message.error(this.ParentForm, "选中的设备未连接或未初始化");
+                    }
                     return;
                 }
 
                 // 使用状态机的完整重置方法
-                _stateMachine.Reset();
+                currentStateMachine.Reset();
+                _deviceManager.SetDeviceTestState(selectedDeviceId, false);
                 _isTestRunning = false;
 
                 // 更新UI状态
@@ -190,12 +242,12 @@ namespace SasTools.UI
                 this.input3.Text = "0";
 
                 // 添加复位日志
-                AddLogMessage("系统复位", "系统已成功复位，下次启动将从头开始测试", MachineStatusType.Idle);
+                AddLogMessage("系统复位", $"设备 {selectedDeviceId} 系统已成功复位，下次启动将从头开始测试", MachineStatusType.Idle);
 
                 // 显示成功消息
                 AntdUI.Message.success(this.ParentForm, "系统已成功复位");
 
-                _logger.Info("用户触发系统复位 - 状态机已完全重置");
+                _logger.Info($"用户触发设备 {selectedDeviceId} 系统复位 - 状态机已完全重置");
             }
             catch (Exception ex)
             {
@@ -331,18 +383,6 @@ namespace SasTools.UI
             }));
         }
 
-        void IEventHandler<DeviceCreateEvent>.Handle(DeviceCreateEvent evt)
-        {
-            _sasTest = evt.SasDevice;
-            // 修正构造函数调用，添加deviceId参数
-            _stateMachine = new TestStateMachine("default-device", _sasTest, _parameter, _eventBus);
-
-            // 设备创建后添加日志
-            this.BeginInvoke(new Action(() => {
-                AddLogMessage("设备初始化", "测试设备已成功初始化", MachineStatusType.Idle);
-            }));
-        }
-
         //处理计数器更新事件，更新界面显示
         void IEventHandler<CounterUpdateEvent>.Handle(CounterUpdateEvent evt)
         {
@@ -396,27 +436,47 @@ namespace SasTools.UI
         // 电批正转按钮
         private void Button2_Click(object sender, EventArgs e)
         {
-            if (_sasTest == null)
+            var selectedDeviceId = _deviceManager.GetSelectedDeviceId();
+            var currentDevice = GetCurrentDeviceInstance();
+
+            if (currentDevice == null)
             {
-                AntdUI.Message.error(this.ParentForm, "测试设备未初始化");
+                if (string.IsNullOrEmpty(selectedDeviceId))
+                {
+                    AntdUI.Message.error(this.ParentForm, "请先选择要操作的设备");
+                }
+                else
+                {
+                    AntdUI.Message.error(this.ParentForm, "选中的设备未连接或未初始化");
+                }
                 return;
             }
 
-            _sasTest.ExecuteCommand(SasCommandType.Forward);
-            AddLogMessage("手动操作", "执行电批正转", MachineStatusType.Forward);
+            currentDevice.ExecuteCommand(SasCommandType.Forward);
+            AddLogMessage("手动操作", $"设备 {selectedDeviceId} 执行电批正转", MachineStatusType.Forward);
         }
 
         // 电批反转按钮
         private void Button3_Click(object sender, EventArgs e)
         {
-            if (_sasTest == null)
+            var selectedDeviceId = _deviceManager.GetSelectedDeviceId();
+            var currentDevice = GetCurrentDeviceInstance();
+
+            if (currentDevice == null)
             {
-                AntdUI.Message.error(this.ParentForm, "测试设备未初始化");
+                if (string.IsNullOrEmpty(selectedDeviceId))
+                {
+                    AntdUI.Message.error(this.ParentForm, "请先选择要操作的设备");
+                }
+                else
+                {
+                    AntdUI.Message.error(this.ParentForm, "选中的设备未连接或未初始化");
+                }
                 return;
             }
 
-            _sasTest.ExecuteCommand(SasCommandType.Reverse);
-            AddLogMessage("手动操作", "执行电批反转", MachineStatusType.Reverse);
+            currentDevice.ExecuteCommand(SasCommandType.Reverse);
+            AddLogMessage("手动操作", $"设备 {selectedDeviceId} 执行电批反转", MachineStatusType.Reverse);
         }
 
         private void Button5_Click(object sender, EventArgs e)
@@ -498,7 +558,10 @@ namespace SasTools.UI
             deviceStatusBar1.StopAllClicked += OnStopAllClicked;
 
             // 同步已连接的设备到状态栏
-            _deviceManager.SyncDeviceToStatusBar(deviceStatusBar1);
+            _deviceManager.SyncDeviceToStatusBar(deviceStatusBar1);                                                                                                                                                                                                                     
+            // 初始化当前设备UI状态
+            var currentDeviceId = _deviceManager.GetSelectedDeviceId();
+            UpdateCurrentDeviceUI(currentDeviceId);
         }
 
 
@@ -525,7 +588,87 @@ namespace SasTools.UI
         {
             this.BeginInvoke(new Action(() =>
             {
-                deviceStatusBar1.SelectDevice(deviceId);
+                try
+                {
+                    // 更新状态栏选择
+                    deviceStatusBar1.SelectDevice(deviceId);
+
+                    // 更新UI状态显示
+                    UpdateCurrentDeviceUI(deviceId);
+
+                    _logger.Info($"设备选择切换到: {deviceId}");
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"处理设备选择变化失败: {ex.Message}", ex);
+                }
+            }));
+        }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+
+        // 更新当前设备的UI状态显示
+        private void UpdateCurrentDeviceUI(string deviceId)
+        {
+            if (string.IsNullOrEmpty(deviceId))
+            {
+                // 没有选中设备
+                this.badge1.State = AntdUI.TState.Default;
+                this.badge1.Text = "未选择设备";
+                this.divider2.Text = "请选择要测试的设备";
+                return;
+            }
+
+            var deviceInfo = _deviceManager.GetDevice(deviceId);
+            if (deviceInfo == null || !deviceInfo.IsConnected)
+            {
+                // 设备未连接
+                this.badge1.State = AntdUI.TState.Default;
+                this.badge1.Text = "设备未连接";
+                this.divider2.Text = $"设备 {deviceId} 未连接";
+                return;
+            }
+
+            // 设备已连接，检查测试状态
+            bool isRunning = _deviceManager.IsDeviceTestRunning(deviceId);
+            if (isRunning)
+            {
+                this.badge1.State = AntdUI.TState.Processing;
+                this.badge1.Text = "测试中";
+                this.divider2.Text = $"设备 {deviceId} 正在测试";
+            }
+            else
+            {
+                this.badge1.State = AntdUI.TState.Success;
+                this.badge1.Text = "就绪";
+                this.divider2.Text = $"设备 {deviceId} 已就绪";
+            }
+        }
+
+        // 处理设备状态变化事件
+        private void OnDeviceStatusChanged(object sender, SasTools.Services.DeviceStatusChangedEventArgs e)
+        {
+            this.BeginInvoke(new Action(() =>
+            {
+                try
+                {
+                    // 如果设备在状态栏中，更新其状态
+                    if (deviceStatusBar1.GetAllDeviceIds().Contains(e.DeviceId))
+                    {
+                        if (e.DeviceInfo.IsConnected)
+                        {
+                            // 设备重新连接，更新为空闲状态
+                            deviceStatusBar1.UpdateDeviceStatus(e.DeviceId, MachineStatusType.Idle, true);
+                        }
+                        else
+                        {
+                            // 设备断开连接，更新为灰色状态
+                            deviceStatusBar1.UpdateDeviceStatus(e.DeviceId, MachineStatusType.Idle, false);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"处理设备状态变化失败: {ex.Message}", ex);
+                }
             }));
         }
 
@@ -555,6 +698,28 @@ namespace SasTools.UI
                 {
                     _logger.Error($"处理多设备创建事件失败: {ex.Message}", ex);
                     AddLogMessage("设备初始化错误", $"设备 {evt.DeviceId} 初始化失败: {ex.Message}", MachineStatusType.Error);
+                }
+            }));
+        }
+
+        // 处理设备移除事件
+        void IEventHandler<MultiDeviceRemoveEvent>.Handle(MultiDeviceRemoveEvent evt)
+        {
+            this.BeginInvoke(new Action(() => {
+                try
+                {
+                    // 从状态栏移除设备
+                    deviceStatusBar1.RemoveDevice(evt.DeviceId);
+
+                    // 清理设备相关的状态机
+                    _deviceManager.SetDeviceStateMachine(evt.DeviceId, null);
+
+                    AddLogMessage("设备移除", $"设备 {evt.DeviceId} 已从系统中移除", MachineStatusType.Idle);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"处理设备移除事件失败: {ex.Message}", ex);
+                    AddLogMessage("设备移除错误", $"移除设备 {evt.DeviceId} 时发生错误: {ex.Message}", MachineStatusType.Error);
                 }
             }));
         }
