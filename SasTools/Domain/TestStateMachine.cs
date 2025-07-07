@@ -10,6 +10,7 @@ using SasTools.Services;
 using WpFramework.EventBus;
 using SasTools.Events;
 using SasTools.Models;
+using AntdUI;
 
 namespace SasTools.Domain
 {
@@ -47,6 +48,7 @@ namespace SasTools.Domain
         private readonly string _deviceId;
 
         private CancellationTokenSource _cancellationTokenSource;
+        private CancellationTokenSource _resetCancellationTokenSource;
         private bool _isRunning = false;
         private bool _isPause = false;
             
@@ -64,6 +66,21 @@ namespace SasTools.Domain
         // 错误处理相关
         private string _lastErrorMessage = "";
         private int _lastErrorResult = 0;
+
+        // 事件节流控制
+        private DateTime _lastStatePublishTime = DateTime.MinValue;
+        private DateTime _lastCounterPublishTime = DateTime.MinValue;
+        private readonly TimeSpan _statePublishInterval = TimeSpan.FromMilliseconds(100); // 状态更新间隔
+        private readonly TimeSpan _counterPublishInterval = TimeSpan.FromMilliseconds(200); // 计数器更新间隔
+                                                                                            // 状态变化跟踪
+        private MachineStatusType _lastPublishedStatusType = MachineStatusType.Idle;
+        private string _lastPublishedMessage = string.Empty;
+        // 定义关键状态，这些状态变化需要立即发布
+        private readonly HashSet<MachineStatusType> _criticalStatusTypes = new HashSet<MachineStatusType>
+        {
+            MachineStatusType.Error,    // 错误状态
+            MachineStatusType.Idle      // 空闲状态（测试完成）
+        };
 
 
         #endregion
@@ -97,7 +114,7 @@ namespace SasTools.Domain
                 {
                     _logger.Error($"状态机执行异常: {ex.Message}", ex);
                 }
-            });
+            }, _cancellationTokenSource.Token);
 
             _logger.Info("测试已启动");
             return true;
@@ -144,9 +161,9 @@ namespace SasTools.Domain
             try
             {
                 StopTest();
-                Task.Delay(Constants.CANCELLATION_WAIT_TIME).Wait();
+                Task.Delay(Constants.CANCELLATION_WAIT_TIME).ConfigureAwait(false).GetAwaiter().GetResult();
 
-                _state = TestState.Idle;
+                _state = TestState.Idle;    
                 _machineMessage = "系统已复位";
                 _isRunning = false;
                 _isPause = false;
@@ -159,6 +176,10 @@ namespace SasTools.Domain
                 _lastErrorMessage = "";
                 _lastErrorResult = 0;
 
+                _resetCancellationTokenSource?.Cancel();
+                _resetCancellationTokenSource?.Dispose();
+                _resetCancellationTokenSource = new CancellationTokenSource();
+
                 // 在后台线程执行设备清理操作，避免阻塞UI
                 Task.Run(async () =>
                 {
@@ -166,32 +187,36 @@ namespace SasTools.Domain
                     {
                         // 多次停止命令确保设备完全停止
                         device.ExecuteCommand(SasCommandType.Stop);
-                        await Task.Delay(Constants.DEVICE_STOP_WAIT_TIME);
+                        await Task.Delay(Constants.DEVICE_STOP_WAIT_TIME, _resetCancellationTokenSource.Token);
 
                         device.ExecuteCommand(SasCommandType.Stop);
-                        await Task.Delay(200);
+                        await Task.Delay(200, _resetCancellationTokenSource.Token);
 
                         // 多次清理设备错误信息，确保彻底清除
                         device.ExecuteCommand(SasCommandType.ClearTightenInfo);
-                        await Task.Delay(Constants.DEVICE_CLEAR_WAIT_TIME);
+                        await Task.Delay(Constants.DEVICE_CLEAR_WAIT_TIME, _resetCancellationTokenSource.Token);
 
                         device.ExecuteCommand(SasCommandType.ClearTightenInfo);
-                        await Task.Delay(Constants.DEVICE_CLEAR_WAIT_TIME);
+                        await Task.Delay(Constants.DEVICE_CLEAR_WAIT_TIME, _resetCancellationTokenSource.Token);
 
                         // 重新订阅前再次确保设备状态清洁
                         device.ExecuteCommand(SasCommandType.Subscribe);
-                        await Task.Delay(500); // 增加订阅后的等待时间
+                        await Task.Delay(500, _resetCancellationTokenSource.Token); // 增加订阅后的等待时间
 
                         // 验证设备状态是否已清理干净
                         await VerifyDeviceStateCleared();
 
                         _logger.Info("设备状态已彻底清理并重新初始化");
                     }
+                    catch (OperationCanceledException)
+                    {
+                        _logger.Info("设备重置操作被取消");
+                    }
                     catch (Exception ex)
                     {
                         _logger.Warn($"复位时清理设备状态失败: {ex.Message}");
                     }
-                });
+                }, _resetCancellationTokenSource.Token);
 
                 PublishStateUpdate(MachineStatusType.Idle);
                 PublishCounterUpdate();
@@ -231,7 +256,7 @@ namespace SasTools.Domain
             {
                 _logger.Error($"状态机执行错误: {ex.Message}", ex);
                 _state = TestState.Error;
-                _eventBus.Publish(new RefreshMachineState("执行出错: " + ex.Message, _state.ToString(), MachineStatusType.Error));
+                _eventBus.Publish(new RefreshMachineState(_deviceId, "执行出错: " + ex.Message, _state.ToString(), MachineStatusType.Error));
             }
             finally
             {
@@ -339,21 +364,20 @@ namespace SasTools.Domain
                             PublishStateUpdate(MachineStatusType.Error);
                             device.ExecuteCommand(SasCommandType.Stop);
 
-                            _totalCycles++;
-                            PublishCounterUpdate();
+                            UpdateCounters();
 
                             if (ShouldStopTest())
                             {
                                 _isRunning = false;
                             }
-                            shouldUpdateDisplay = false; // 已经发布了状态更新
+                            shouldUpdateDisplay = false;
                         }
                         break;
 
                     case TestState.ReverseDelay:
                         _machineMessage = "反转延时中...";
                         PublishStateUpdate(MachineStatusType.Waiting);
-                        shouldUpdateDisplay = false; // 已经发布了状态更新
+                        shouldUpdateDisplay = false; 
 
                         try
                         {
@@ -372,16 +396,17 @@ namespace SasTools.Domain
                         _state = TestState.Reverse;
                         break;
 
+                    // 第375-399行的Reverse状态处理
                     case TestState.Reverse:
                         _machineMessage = "执行反转...";
                         PublishStateUpdate(MachineStatusType.Reverse);
-                        shouldUpdateDisplay = false; // 已经发布了状态更新
+                        shouldUpdateDisplay = false;
 
                         device.ExecuteCommand(SasCommandType.Reverse);
 
                         try
                         {
-                            await Task.Delay(2000, _cancellationTokenSource.Token);
+                            await Task.Delay(1000, _cancellationTokenSource.Token);
                         }
                         catch (OperationCanceledException)
                         {
@@ -639,20 +664,65 @@ namespace SasTools.Domain
 
             return false;
         }
-
         private void PublishStateUpdate(MachineStatusType statusType)
         {
-            if (_eventBus != null)
+            try
             {
-                _eventBus.Publish(new RefreshMachineState(_machineMessage, _state.ToString(), statusType));
+                if (_eventBus != null && !_disposed)
+                {
+                    var now = DateTime.Now;
+                    bool isCritical = _criticalStatusTypes.Contains(statusType);
+
+                    // 检查状态是否真正发生变化
+                    bool statusChanged = statusType != _lastPublishedStatusType ||
+                                       _machineMessage != _lastPublishedMessage;
+
+                    // 如果状态未变化且非关键状态，跳过发布
+                    if (!statusChanged && !isCritical)
+                    {
+                        return;
+                    }
+
+                    // 非关键状态进行节流检查
+                    if (!isCritical && now - _lastStatePublishTime < _statePublishInterval)
+                    {
+                        return;
+                    }
+
+                    // 更新时间戳和状态跟踪
+                    _lastStatePublishTime = now;
+                    _lastPublishedStatusType = statusType;
+                    _lastPublishedMessage = _machineMessage;
+
+                    // 发布事件
+                    _eventBus.Publish(new RefreshMachineState(_deviceId, _machineMessage, _state.ToString(), statusType));
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.Warn($"发布状态更新事件失败: {ex.Message}");
             }
         }
-
         private void PublishCounterUpdate()
         {
-            if (_eventBus != null)
+            try
             {
-                _eventBus.Publish(new CounterUpdateEvent(_totalCycles, _successfulCycles, _failedCycles));
+                if (_eventBus != null && !_disposed)
+                {
+                    var now = DateTime.Now;
+
+                    //节流检查：计数器更新频率控制
+                    if (now - _lastCounterPublishTime < _counterPublishInterval)
+                    {
+                        return;
+                    }
+                    _lastCounterPublishTime = now;
+                    _eventBus.Publish(new CounterUpdateEvent(_deviceId, _totalCycles, _successfulCycles, _failedCycles));
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.Warn($"发布计数器更新事件失败:{ex.Message}");
             }
         }
 
@@ -994,10 +1064,15 @@ namespace SasTools.Domain
                             StopTest();
                         }
 
-                        // 释放CancellationTokenSource
+                        // 释放主要的CancellationTokenSource
                         _cancellationTokenSource?.Cancel();
                         _cancellationTokenSource?.Dispose();
                         _cancellationTokenSource = null;
+
+                        // 释放Reset操作的CancellationTokenSource
+                        _resetCancellationTokenSource?.Cancel();
+                        _resetCancellationTokenSource?.Dispose();
+                        _resetCancellationTokenSource = null;
 
                         _logger?.Info($"设备 {_deviceId} 的状态机已释放资源");
                     }

@@ -5,25 +5,26 @@ namespace SasTools.Events
 {
     public class CounterUpdateEvent : IEvent
     {
-        //总循环次数  
-        public int TotalCycles { get; private set; }
- 
-        //成功循环次数  
-        public int SuccessfulCycles { get; private set; }
+        // 添加设备ID属性
+        public string DeviceId { get; set; }
 
-        //失败循环次数
-        public int FailedCycles { get; private set; }
+        public int TotalCycles { get; set; }
+        public int SuccessfulCycles { get; set; }
+        public int FailedCycles { get; set; }
+        public DateTime TimeStamp => DateTime.Now;
 
-        //时间戳  
-        public DateTime TimeStamp { get; private set; }
-
-        
-        public CounterUpdateEvent(int totalCycles, int successfulCycles,int failedCycles)
+        public CounterUpdateEvent(string deviceId, int totalCycles, int successfulCycles, int failedCycles)
         {
+            DeviceId = deviceId;
             TotalCycles = totalCycles;
             SuccessfulCycles = successfulCycles;
             FailedCycles = failedCycles;
-            TimeStamp = DateTime.UtcNow;
+        }
+
+        // 保持向后兼容的构造函数（可选）
+        public CounterUpdateEvent(int totalCycles, int successfulCycles, int failedCycles)
+            : this(null, totalCycles, successfulCycles, failedCycles)
+        {
         }
     }
 }

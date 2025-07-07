@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using AntdUI;
 using log4net;
@@ -84,6 +79,7 @@ namespace SasTools
             if (index >= 0)
             {
                 Control ctrl;
+                //视图获取/创建
                 bool succ = this.subViews.TryGetValue(index, out ctrl);
                 if (!succ)// 如果视图不存在于缓存中
                 {
@@ -96,19 +92,21 @@ namespace SasTools
                 succ = this.subViews.TryGetValue(prevIndex, out prev);
                 if (succ && prev != null && prevIndex != index)
                 {
-                    prev.Hide();
+                    prev.Hide();//只隐藏不销毁
                 }
 
-                ctrl.Dock = DockStyle.Fill;
-                this.pnlView.Controls.Clear();
-                this.pnlView.Controls.Add(ctrl);
+                //视图切换
+                ctrl.Dock = DockStyle.Fill;//Fill模式确保视图已填满
+                this.pnlView.Controls.Clear();//清理容器
+                this.pnlView.Controls.Add(ctrl);//添加新视图
 
-                ctrl.Show();
+                ctrl.Show();//显示触发显示
             }
 
             prevIndex = index;
         }
 
+        //工厂方法模式 创建视图
         private Control CreateSubView(int index)
         {
             Control ctrl = null;

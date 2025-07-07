@@ -39,29 +39,29 @@ namespace SasTools.Models.SasModule
         {
             if (_communicationService != null)
             {
-                var result = _communicationService.ConnectAsync();
-                return result.Result;
+                return _communicationService.ConnectAsync().Result;
             }
             else
             {
-                var result = this._tcpCommunication.ConnectAsync();
-                return result.Result;
+                return this._tcpCommunication.ConnectAsync().Result;
             }
         }
+
+
 
         public bool DisconnectServer()
         {
             if (_communicationService != null)
             {
-                var result = _communicationService.DisconnectAsync();
-                return result.Result;
+                return _communicationService.DisconnectAsync().Result;
             }
             else
             {
-                var result = this._tcpCommunication.DisconnectAsync();
-                return result.Result;
+                return this._tcpCommunication.DisconnectAsync().Result;
             }
         }
+
+
 
         public string ReadData(RequestData data)
         {
@@ -83,6 +83,8 @@ namespace SasTools.Models.SasModule
 
             return result;
         }
+
+
 
         public string ExecuteCommand(SasCommandType commandType)
         {
@@ -140,7 +142,7 @@ namespace SasTools.Models.SasModule
                             SlaveId = 1,
                             Torque = 0, //最大扭矩
                             Velocity = 500,
-                            Time = 2000,//反转转动的时间
+                            Time = 1000,//反转转动的时间
                             Angle = 0
                         };
                         requestData = DataFactory.CreateRequestCommand(FunctionType.RemoveScrewAction, parameters);

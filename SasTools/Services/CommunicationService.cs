@@ -9,6 +9,7 @@ using SasTools.Domain;
 using SasTools.Interface;
 using SasTools.Models.Communication;
 using System.Threading;
+using Newtonsoft.Json;
 
 namespace SasTools.Services
 {
@@ -164,16 +165,16 @@ namespace SasTools.Services
             try
             {
                 //序列化对象为JSON字符串
-                string jsonRequest = JsonMessageCodec.Serialize(requestObj);
+                string jsonRequest = JsonConvert.SerializeObject(requestObj);
                 _logger.Debug($"发送JSON消息:{jsonRequest}");
 
                 //发送JSON消息
                 var jsonResponse = await SendMessageAsync(jsonRequest);
 
                 //反序列化响应
-                if (jsonRequest != null)
+                if (jsonResponse != null)
                 {
-                    return JsonMessageCodec.Deserialize<T>(jsonRequest);
+                    return JsonConvert.DeserializeObject<T>(jsonResponse);
                 }
                 return null;
             }
