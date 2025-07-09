@@ -33,10 +33,12 @@ namespace SasTools.Services
             _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
             _deviceInfos = new ConcurrentDictionary<string, DeviceInfo>();
             _devices = new ConcurrentDictionary<string, IDevice>();
+            //可供外部订阅的事件
             _communicationServices = new ConcurrentDictionary<string, ICommunicationService>();
             _deviceOrder = new List<string>();
         }
 
+        
         public event EventHandler<DeviceStatusChangedEventArgs> DeviceStatusChanged;
         public event EventHandler<string> DeviceSelectionChanged;
 
@@ -161,11 +163,7 @@ namespace SasTools.Services
 
                     _logger.Info($"设备连接成功: {deviceInfo.Name} ({deviceInfo.Host}:{deviceInfo.Port})");
                 }
-                else
-                {
-                    deviceInfo.Status = "连接失败";
-                    _logger.Error($"设备连接失败: {deviceInfo.Name} ({deviceInfo.Host}:{deviceInfo.Port})");
-                }
+
 
                 // 触发设备状态变化事件
                 OnDeviceStatusChanged(deviceId, deviceInfo);

@@ -20,11 +20,5 @@ namespace SasTools.Events
             SuccessfulCycles = successfulCycles;
             FailedCycles = failedCycles;
         }
-
-        // 保持向后兼容的构造函数（可选）
-        public CounterUpdateEvent(int totalCycles, int successfulCycles, int failedCycles)
-            : this(null, totalCycles, successfulCycles, failedCycles)
-        {
-        }
     }
 }
