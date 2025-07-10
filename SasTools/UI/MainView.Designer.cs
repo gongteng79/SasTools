@@ -53,8 +53,8 @@
             this.badge1 = new AntdUI.Badge();
             this.panel4 = new AntdUI.Panel();
             this.divider1 = new AntdUI.Divider();
-            this.divider4 = new AntdUI.Divider();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.divider4 = new AntdUI.Divider();
             ((System.ComponentModel.ISupportInitialize)(this.splitter1)).BeginInit();
             this.splitter1.Panel1.SuspendLayout();
             this.splitter1.Panel2.SuspendLayout();
@@ -76,6 +76,7 @@
             this.splitter1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitter1.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F);
             this.splitter1.Location = new System.Drawing.Point(0, 0);
+            this.splitter1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.splitter1.Name = "splitter1";
             this.splitter1.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
@@ -90,9 +91,10 @@
             // 
             this.splitter1.Panel2.Controls.Add(this.textBox1);
             this.splitter1.Panel2.Controls.Add(this.divider4);
-            this.splitter1.Size = new System.Drawing.Size(963, 703);
-            this.splitter1.SplitterDistance = 506;
+            this.splitter1.Size = new System.Drawing.Size(1006, 653);
+            this.splitter1.SplitterDistance = 470;
             this.splitter1.SplitterSize = 60;
+            this.splitter1.SplitterWidth = 3;
             this.splitter1.TabIndex = 0;
             // 
             // panel3
@@ -100,18 +102,20 @@
             this.panel3.Controls.Add(this.table1);
             this.panel3.Controls.Add(this.divider3);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel3.Location = new System.Drawing.Point(0, 277);
+            this.panel3.Location = new System.Drawing.Point(0, 208);
+            this.panel3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(929, 538);
+            this.panel3.Size = new System.Drawing.Size(980, 404);
             this.panel3.TabIndex = 2;
             this.panel3.Text = "panel3";
             // 
             // table1
             // 
             this.table1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.table1.Location = new System.Drawing.Point(0, 69);
+            this.table1.Location = new System.Drawing.Point(0, 52);
+            this.table1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.table1.Name = "table1";
-            this.table1.Size = new System.Drawing.Size(929, 469);
+            this.table1.Size = new System.Drawing.Size(980, 352);
             this.table1.TabIndex = 4;
             this.table1.Text = "table1";
             // 
@@ -120,9 +124,10 @@
             this.divider3.Dock = System.Windows.Forms.DockStyle.Top;
             this.divider3.Font = new System.Drawing.Font("Microsoft YaHei UI", 10.5F);
             this.divider3.Location = new System.Drawing.Point(0, 0);
+            this.divider3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.divider3.Name = "divider3";
             this.divider3.Orientation = AntdUI.TOrientation.Left;
-            this.divider3.Size = new System.Drawing.Size(929, 69);
+            this.divider3.Size = new System.Drawing.Size(980, 52);
             this.divider3.TabIndex = 3;
             this.divider3.Text = "实时数据";
             // 
@@ -131,9 +136,10 @@
             this.panel2.Controls.Add(this.flowPanel2);
             this.panel2.Controls.Add(this.divider2);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel2.Location = new System.Drawing.Point(0, 121);
+            this.panel2.Location = new System.Drawing.Point(0, 91);
+            this.panel2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(929, 156);
+            this.panel2.Size = new System.Drawing.Size(980, 117);
             this.panel2.TabIndex = 1;
             this.panel2.Text = "panel2";
             // 
@@ -144,10 +150,11 @@
             this.flowPanel2.Controls.Add(this.panel6);
             this.flowPanel2.Controls.Add(this.panel5);
             this.flowPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowPanel2.Location = new System.Drawing.Point(0, 69);
+            this.flowPanel2.Location = new System.Drawing.Point(0, 52);
+            this.flowPanel2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.flowPanel2.Name = "flowPanel2";
-            this.flowPanel2.Padding = new System.Windows.Forms.Padding(100, 0, 0, 0);
-            this.flowPanel2.Size = new System.Drawing.Size(929, 87);
+            this.flowPanel2.Padding = new System.Windows.Forms.Padding(75, 0, 0, 0);
+            this.flowPanel2.Size = new System.Drawing.Size(980, 65);
             this.flowPanel2.TabIndex = 3;
             this.flowPanel2.Text = "flowPanel2";
             // 
@@ -155,18 +162,20 @@
             // 
             this.panel8.Controls.Add(this.input4);
             this.panel8.Controls.Add(this.label4);
-            this.panel8.Location = new System.Drawing.Point(122, 87);
+            this.panel8.Location = new System.Drawing.Point(669, 2);
+            this.panel8.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.panel8.Name = "panel8";
-            this.panel8.Size = new System.Drawing.Size(240, 78);
+            this.panel8.Size = new System.Drawing.Size(180, 58);
             this.panel8.TabIndex = 3;
             // 
             // input4
             // 
             this.input4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.input4.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F);
-            this.input4.Location = new System.Drawing.Point(73, 0);
+            this.input4.Location = new System.Drawing.Point(55, 0);
+            this.input4.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.input4.Name = "input4";
-            this.input4.Size = new System.Drawing.Size(167, 78);
+            this.input4.Size = new System.Drawing.Size(125, 58);
             this.input4.TabIndex = 1;
             this.input4.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -175,8 +184,9 @@
             this.label4.Dock = System.Windows.Forms.DockStyle.Left;
             this.label4.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label4.Location = new System.Drawing.Point(0, 0);
+            this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(73, 78);
+            this.label4.Size = new System.Drawing.Size(55, 58);
             this.label4.TabIndex = 0;
             this.label4.Text = "工位：";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -185,18 +195,20 @@
             // 
             this.panel7.Controls.Add(this.input3);
             this.panel7.Controls.Add(this.label3);
-            this.panel7.Location = new System.Drawing.Point(690, 3);
+            this.panel7.Location = new System.Drawing.Point(502, 2);
+            this.panel7.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(217, 78);
+            this.panel7.Size = new System.Drawing.Size(163, 58);
             this.panel7.TabIndex = 2;
             // 
             // input3
             // 
             this.input3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.input3.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F);
-            this.input3.Location = new System.Drawing.Point(73, 0);
+            this.input3.Location = new System.Drawing.Point(55, 0);
+            this.input3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.input3.Name = "input3";
-            this.input3.Size = new System.Drawing.Size(144, 78);
+            this.input3.Size = new System.Drawing.Size(108, 58);
             this.input3.TabIndex = 1;
             this.input3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -205,8 +217,9 @@
             this.label3.Dock = System.Windows.Forms.DockStyle.Left;
             this.label3.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label3.Location = new System.Drawing.Point(0, 0);
+            this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(73, 78);
+            this.label3.Size = new System.Drawing.Size(55, 58);
             this.label3.TabIndex = 0;
             this.label3.Text = "产线：";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -215,18 +228,20 @@
             // 
             this.panel6.Controls.Add(this.input2);
             this.panel6.Controls.Add(this.label2);
-            this.panel6.Location = new System.Drawing.Point(467, 3);
+            this.panel6.Location = new System.Drawing.Point(335, 2);
+            this.panel6.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(217, 78);
+            this.panel6.Size = new System.Drawing.Size(163, 58);
             this.panel6.TabIndex = 1;
             // 
             // input2
             // 
             this.input2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.input2.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F);
-            this.input2.Location = new System.Drawing.Point(73, 0);
+            this.input2.Location = new System.Drawing.Point(55, 0);
+            this.input2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.input2.Name = "input2";
-            this.input2.Size = new System.Drawing.Size(144, 78);
+            this.input2.Size = new System.Drawing.Size(108, 58);
             this.input2.TabIndex = 1;
             this.input2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -235,8 +250,9 @@
             this.label2.Dock = System.Windows.Forms.DockStyle.Left;
             this.label2.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label2.Location = new System.Drawing.Point(0, 0);
+            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(73, 78);
+            this.label2.Size = new System.Drawing.Size(55, 58);
             this.label2.TabIndex = 0;
             this.label2.Text = "机种：";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -245,18 +261,20 @@
             // 
             this.panel5.Controls.Add(this.input1);
             this.panel5.Controls.Add(this.label1);
-            this.panel5.Location = new System.Drawing.Point(122, 3);
+            this.panel5.Location = new System.Drawing.Point(77, 2);
+            this.panel5.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(339, 78);
+            this.panel5.Size = new System.Drawing.Size(254, 58);
             this.panel5.TabIndex = 0;
             // 
             // input1
             // 
             this.input1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.input1.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F);
-            this.input1.Location = new System.Drawing.Point(73, 0);
+            this.input1.Location = new System.Drawing.Point(55, 0);
+            this.input1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.input1.Name = "input1";
-            this.input1.Size = new System.Drawing.Size(266, 78);
+            this.input1.Size = new System.Drawing.Size(199, 58);
             this.input1.TabIndex = 1;
             this.input1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -265,8 +283,9 @@
             this.label1.Dock = System.Windows.Forms.DockStyle.Left;
             this.label1.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label1.Location = new System.Drawing.Point(0, 0);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(73, 78);
+            this.label1.Size = new System.Drawing.Size(55, 58);
             this.label1.TabIndex = 0;
             this.label1.Text = "SN：";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -276,9 +295,10 @@
             this.divider2.Dock = System.Windows.Forms.DockStyle.Top;
             this.divider2.Font = new System.Drawing.Font("Microsoft YaHei UI", 10.5F);
             this.divider2.Location = new System.Drawing.Point(0, 0);
+            this.divider2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.divider2.Name = "divider2";
             this.divider2.Orientation = AntdUI.TOrientation.Left;
-            this.divider2.Size = new System.Drawing.Size(929, 69);
+            this.divider2.Size = new System.Drawing.Size(980, 52);
             this.divider2.TabIndex = 2;
             this.divider2.Text = "设备信息";
             // 
@@ -288,8 +308,9 @@
             this.panel1.Controls.Add(this.panel4);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(929, 121);
+            this.panel1.Size = new System.Drawing.Size(980, 91);
             this.panel1.TabIndex = 0;
             this.panel1.Text = "panel1";
             // 
@@ -298,27 +319,30 @@
             this.flowPanel1.Controls.Add(this.badge2);
             this.flowPanel1.Controls.Add(this.badge1);
             this.flowPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowPanel1.Location = new System.Drawing.Point(0, 64);
+            this.flowPanel1.Location = new System.Drawing.Point(0, 48);
+            this.flowPanel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.flowPanel1.Name = "flowPanel1";
-            this.flowPanel1.Padding = new System.Windows.Forms.Padding(200, 0, 0, 0);
-            this.flowPanel1.Size = new System.Drawing.Size(929, 57);
+            this.flowPanel1.Padding = new System.Windows.Forms.Padding(150, 0, 0, 0);
+            this.flowPanel1.Size = new System.Drawing.Size(980, 43);
             this.flowPanel1.TabIndex = 1;
             this.flowPanel1.Text = "flowPanel1";
             // 
             // badge2
             // 
-            this.badge2.Location = new System.Drawing.Point(410, 3);
+            this.badge2.Location = new System.Drawing.Point(307, 2);
+            this.badge2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.badge2.Name = "badge2";
-            this.badge2.Size = new System.Drawing.Size(201, 48);
+            this.badge2.Size = new System.Drawing.Size(170, 36);
             this.badge2.State = AntdUI.TState.Error;
             this.badge2.TabIndex = 1;
             this.badge2.Text = "Mes未连接";
             // 
             // badge1
             // 
-            this.badge1.Location = new System.Drawing.Point(203, 3);
+            this.badge1.Location = new System.Drawing.Point(152, 2);
+            this.badge1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.badge1.Name = "badge1";
-            this.badge1.Size = new System.Drawing.Size(201, 48);
+            this.badge1.Size = new System.Drawing.Size(151, 36);
             this.badge1.State = AntdUI.TState.Error;
             this.badge1.TabIndex = 0;
             this.badge1.Text = "工具未连接";
@@ -328,8 +352,9 @@
             this.panel4.Controls.Add(this.divider1);
             this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel4.Location = new System.Drawing.Point(0, 0);
+            this.panel4.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(929, 64);
+            this.panel4.Size = new System.Drawing.Size(980, 48);
             this.panel4.TabIndex = 0;
             this.panel4.Text = "panel4";
             // 
@@ -338,40 +363,44 @@
             this.divider1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.divider1.Font = new System.Drawing.Font("Microsoft YaHei UI", 10.5F);
             this.divider1.Location = new System.Drawing.Point(0, 0);
+            this.divider1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.divider1.Name = "divider1";
             this.divider1.Orientation = AntdUI.TOrientation.Left;
-            this.divider1.Size = new System.Drawing.Size(929, 64);
+            this.divider1.Size = new System.Drawing.Size(980, 48);
             this.divider1.TabIndex = 0;
             this.divider1.Text = "状态显示";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBox1.Location = new System.Drawing.Point(0, 46);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(1006, 134);
+            this.textBox1.TabIndex = 7;
+            this.textBox1.Text = "测试中...";
             // 
             // divider4
             // 
             this.divider4.Dock = System.Windows.Forms.DockStyle.Top;
             this.divider4.Font = new System.Drawing.Font("Microsoft YaHei UI", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.divider4.Location = new System.Drawing.Point(0, 0);
+            this.divider4.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.divider4.Name = "divider4";
             this.divider4.Orientation = AntdUI.TOrientation.Left;
-            this.divider4.Size = new System.Drawing.Size(963, 61);
+            this.divider4.Size = new System.Drawing.Size(1006, 46);
             this.divider4.TabIndex = 6;
             this.divider4.Text = "日志";
             // 
-            // textBox1
-            // 
-            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox1.Location = new System.Drawing.Point(0, 61);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(963, 132);
-            this.textBox1.TabIndex = 7;
-            this.textBox1.Text = "测试中...";
-            // 
             // MainView
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 24F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.splitter1);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "MainView";
-            this.Size = new System.Drawing.Size(963, 703);
+            this.Size = new System.Drawing.Size(1006, 653);
             this.splitter1.Panel1.ResumeLayout(false);
             this.splitter1.Panel2.ResumeLayout(false);
             this.splitter1.Panel2.PerformLayout();

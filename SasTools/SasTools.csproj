@@ -152,23 +152,11 @@
     <Compile Include="UI\DeviceStatusBar.Designer.cs">
       <DependentUpon>DeviceStatusBar.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\DeviceTestPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UI\DeviceTestPanel.Designer.cs">
-      <DependentUpon>DeviceTestPanel.cs</DependentUpon>
-    </Compile>
     <Compile Include="UI\FatigueTestView.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="UI\FatigueTestView.Designer.cs">
       <DependentUpon>FatigueTestView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\CreateDeviceView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UI\CreateDeviceView.Designer.cs">
-      <DependentUpon>CreateDeviceView.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\LoginView.cs">
       <SubType>UserControl</SubType>
@@ -225,9 +213,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\FatigueTestView.resx">
       <DependentUpon>FatigueTestView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\CreateDeviceView.resx">
-      <DependentUpon>CreateDeviceView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\LoginView.resx">
       <DependentUpon>LoginView.cs</DependentUpon>
