@@ -16,6 +16,8 @@ namespace SasTools.Domain
         private int _timeout;
         private int _maxCycles = 0;
         private int _maxFailures = 0;
+        private int _reverseVelocity = 500;  // 默认反转转速
+        private int _reverseTime = 1000;     // 默认反转时间
 
         //正转启动延时(毫秒)
         public int ForwardDelay
@@ -78,6 +80,34 @@ namespace SasTools.Domain
                 {
                     _maxFailures = value;
                     OnPropertyChanged(nameof(MaxFailures));
+                }
+            }
+        }
+
+        //反转速度
+        public int ReverseVelocity
+        {
+            get => _reverseVelocity;
+            set
+            {
+                if (_reverseVelocity != value)
+                {
+                    _reverseVelocity = value;
+                    OnPropertyChanged(nameof(ReverseVelocity));
+                }
+            }
+        }
+
+        //反转时间(毫秒)
+        public int ReverseTime
+        {
+            get => _reverseTime;
+            set
+            {
+                if (_reverseTime != value)
+                {
+                    _reverseTime = value;
+                    OnPropertyChanged(nameof(ReverseTime));
                 }
             }
         }

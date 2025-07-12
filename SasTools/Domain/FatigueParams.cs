@@ -21,6 +21,8 @@ namespace SasTools.Domain
         private int _timeout = DEFAULT_TIMEOUT;
         private int _maxCycles = 0; // 0表示无限循环
         private int _maxFailures = 0; // 0表示不限制失败次数
+        private int _reverseVelocity = 500;  // 默认反转转速
+        private int _reverseTime = 1000;     // 默认反转时间
         private readonly ILog _logger;
         private readonly string _configFilePath;
 
@@ -80,6 +82,20 @@ namespace SasTools.Domain
             set { if (_maxFailures != value) _maxFailures = value; }
         }
 
+        //反转转速(rpm)
+        public int ReverseVelocity
+        {
+            get => _reverseVelocity;
+            set => _reverseVelocity = value;
+        }
+
+        //反转时间(毫秒)  
+        public int ReverseTime
+        {
+            get => _reverseTime;
+            set => _reverseTime = value;
+        }
+
         public override async Task<TestParameters> LoadParameterAsync()
         {
             try
@@ -121,7 +137,9 @@ namespace SasTools.Domain
                 ReverseDelay = _reverseDelay,
                 Timeout = _timeout,
                 MaxCycles = _maxCycles,
-                MaxFailures = _maxFailures
+                MaxFailures = _maxFailures,
+                ReverseVelocity = _reverseVelocity,
+                ReverseTime = _reverseTime
             };
         }
 
@@ -168,6 +186,19 @@ namespace SasTools.Domain
 
             if (paramDict.TryGetValue("MaxFailures", out int maxFailures))
                 parameters.MaxFailures = maxFailures;
+
+            if (paramDict.TryGetValue("ReverseVelocity", out int reverseVelocity))
+            {
+                parameters.ReverseVelocity = reverseVelocity;
+                _reverseVelocity = reverseVelocity;
+            }
+
+            if (paramDict.TryGetValue("ReverseTime", out int reverseTime))
+            {
+                parameters.ReverseTime = reverseTime;
+                _reverseTime = reverseTime;
+            }
+
         }
 
         public override async Task<bool> SaveParameterAsync(TestParameters parameters)
@@ -184,6 +215,8 @@ namespace SasTools.Domain
                 sb.AppendLine($"Timeout={parameters.Timeout}");
                 sb.AppendLine($"MaxCycles={parameters.MaxCycles}");
                 sb.AppendLine($"MaxFailures={parameters.MaxFailures}");
+                sb.AppendLine($"ReverseVelocity={parameters.ReverseVelocity}");
+                sb.AppendLine($"ReverseTime={parameters.ReverseTime}");
 
                 // 使用异步文件流写入文本到文件
                 using (var stream = new FileStream(_configFilePath, FileMode.Create, FileAccess.Write, FileShare.None,
@@ -237,6 +270,16 @@ namespace SasTools.Domain
             if (parameters.MaxFailures < 0)
             {
                 errorMessage = $"最大失败次数必须大于等于0(当前值：{parameters.MaxFailures})";
+                return false;
+            }
+            if (parameters.ReverseVelocity < 100 || parameters.ReverseVelocity > 3000)
+            {
+                errorMessage = $"反转转速必须在 100-3000 rpm 之间(当前值：{parameters.ReverseVelocity})";
+                return false;
+            }
+            if (parameters.ReverseTime < 100 || parameters.ReverseTime > 10000)
+            {
+                errorMessage = $"反转时间必须在 0.1-10 秒之间(当前值：{parameters.ReverseTime})";
                 return false;
             }
 

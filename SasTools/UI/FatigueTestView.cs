@@ -441,7 +441,9 @@ namespace SasTools.UI
                 ReverseDelay = _parameter.ReverseDelay,
                 Timeout = _parameter.Timeout,
                 MaxCycles = _parameter.MaxCycles,
-                MaxFailures = _parameter.MaxFailures
+                MaxFailures = _parameter.MaxFailures,
+                ReverseVelocity = _parameter.ReverseVelocity,
+                ReverseTime = _parameter.ReverseTime
             };
 
             UpdateUIParameters(defaultParameters);
@@ -494,6 +496,9 @@ namespace SasTools.UI
             this.txtRotationTimes.Value = parameters.Timeout;
             this.inputNumber1.Value = parameters.MaxCycles;
             this.inputNumber2.Value = parameters.MaxFailures;
+            this.txtReserveSpeed.Value = parameters.ReverseVelocity;
+            this.txtReserveTime.Value = parameters.ReverseTime;
+
         }
 
         //统一更新内存中的参数值
@@ -504,6 +509,8 @@ namespace SasTools.UI
             _parameter.Timeout = parameters.Timeout;
             _parameter.MaxCycles = parameters.MaxCycles;
             _parameter.MaxFailures = parameters.MaxFailures;
+            _parameter.ReverseVelocity = parameters.ReverseVelocity;
+            _parameter.ReverseTime = parameters.ReverseTime;
         }
 
         //更新设备的测试状态
@@ -1411,7 +1418,9 @@ namespace SasTools.UI
                 ReverseDelay = (int)this.txtReverseDelay.Value,
                 Timeout = (int)this.txtRotationTimes.Value,
                 MaxCycles = (int)this.inputNumber1.Value,
-                MaxFailures = (int)this.inputNumber2.Value
+                MaxFailures = (int)this.inputNumber2.Value,
+                ReverseVelocity = (int)this.txtReserveSpeed.Value,
+                ReverseTime = (int)this.txtReserveTime.Value
             };
         }
 

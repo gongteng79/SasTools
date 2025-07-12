@@ -18,5 +18,9 @@ namespace SasTools.Interface
         string ExecuteCommand(SasCommandType commandType);
 
         Task<string> ExecuteCommandAsync(SasCommandType commandType);
+
+        string ExecuteCommandWithParameters(SasCommandType commandType, int? velocity = null, int? time = null);
+
+        Task<string> ExecuteCommandWithParametersAsync(SasCommandType commandType, int? velocity = null, int? time = null);
     }
 }

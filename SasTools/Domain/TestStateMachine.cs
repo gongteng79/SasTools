@@ -402,7 +402,8 @@ namespace SasTools.Domain
                         PublishStateUpdate(MachineStatusType.Reverse);
                         shouldUpdateDisplay = false;
 
-                        device.ExecuteCommand(SasCommandType.Reverse);
+                        // 使用动态参数执行反转命令
+                        device.ExecuteCommandWithParameters(SasCommandType.Reverse, _parameter.ReverseVelocity, _parameter.ReverseTime);
 
                         try
                         {

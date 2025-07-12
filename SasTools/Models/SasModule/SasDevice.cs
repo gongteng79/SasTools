@@ -98,6 +98,8 @@ namespace SasTools.Models.SasModule
             return Task.FromResult(response);
         }
 
+
+
         private string ExcuteCommand(SasCommandType commandType)
         {
             try
@@ -190,5 +192,60 @@ namespace SasTools.Models.SasModule
                 throw;
             }
         }
+
+        // 添加支持动态参数的ExecuteCommand重载方法
+        public string ExecuteCommandWithParameters(SasCommandType commandType, int? velocity = null, int? time = null)
+        {
+            var response = ExcuteCommandWithParameters(commandType, velocity, time);
+            return response;
+        }
+
+        public Task<string> ExecuteCommandWithParametersAsync(SasCommandType commandType, int? velocity = null, int? time = null)
+        {
+            var response = ExcuteCommandWithParameters(commandType, velocity, time);
+            return Task.FromResult(response);
+        }
+
+        private string ExcuteCommandWithParameters(SasCommandType commandType, int? velocity = null, int? time = null)
+        {
+            try
+            {
+                RequestData requestData;
+                RequestParameter parameters = null;
+
+                switch (commandType)
+                {
+                    case SasCommandType.Reverse:
+                        parameters = new RequestParameter
+                        {
+                            Request = 115,
+                            SlaveId = 1,
+                            Torque = 0, //最大扭矩
+                            Velocity = velocity ?? 500,      // 使用传入的参数或默认值
+                            Time = time ?? 1000,             // 使用传入的参数或默认值
+                            Angle = 0
+                        };
+                        requestData = DataFactory.CreateRequestCommand(FunctionType.RemoveScrewAction, parameters);
+                        break;
+
+                    // 其他命令类型可以复用原有的ExcuteCommand方法
+                    default:
+                        return ExcuteCommand(commandType);
+                }
+
+                if (parameters == null)
+                {
+                    System.Windows.Forms.MessageBox.Show("parameters 为空！");
+                }
+
+                string response = this.ReadData(requestData);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
     }
 }
