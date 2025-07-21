@@ -6,6 +6,7 @@ using SasTools.Domain;
 using SasTools.Events;
 using SasTools.Interface;
 using SasTools.Models.Communication;
+using SasTools.Models.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -17,27 +18,37 @@ using WpFramework.EventBus;
 
 namespace SasTools.Models.SasModule
 {
-    public class SasDevice: IDevice
+    public class SasDevice : IDevice
     {
         private ICommunication _tcpCommunication;
         private IEventBus _eventBus;
         private ICommunicationService _communicationService;
-
+        private IProtocolHandler _protocolHandler;
         public SasDevice(ICommunication tcpCommunication, IEventBus eventBus)
         {
-           this._tcpCommunication = tcpCommunication;
-           this._eventBus = eventBus;
+            this._tcpCommunication = tcpCommunication;
+            this._eventBus = eventBus;
         }
 
         public SasDevice(ICommunicationService communicationService, IEventBus eventBus)
         {
-           this._communicationService = communicationService;
-           this._eventBus = eventBus;
+            this._communicationService = communicationService;
+            this._eventBus = eventBus;
+        }
+
+        public SasDevice(IProtocolHandler protocolHandler, IEventBus eventBus)
+        {
+            _protocolHandler = protocolHandler ?? throw new ArgumentNullException(nameof(protocolHandler));
+            _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         }
 
         public bool ConnectServer()
         {
-            if (_communicationService != null)
+            if (_protocolHandler != null)
+            {
+                return _protocolHandler.IsConnected;
+            }
+            else if (_communicationService != null)
             {
                 return _communicationService.ConnectAsync().Result;
             }
@@ -47,11 +58,13 @@ namespace SasTools.Models.SasModule
             }
         }
 
-
-
         public bool DisconnectServer()
         {
-            if (_communicationService != null)
+            if (_protocolHandler != null)
+            {
+                return _protocolHandler.DisconnectAsync().Result;
+            }
+            else if (_communicationService != null)
             {
                 return _communicationService.DisconnectAsync().Result;
             }
@@ -60,8 +73,6 @@ namespace SasTools.Models.SasModule
                 return this._tcpCommunication.DisconnectAsync().Result;
             }
         }
-
-
 
         public string ReadData(RequestData data)
         {
@@ -72,33 +83,122 @@ namespace SasTools.Models.SasModule
             byte[] sendData = Encoding.ASCII.GetBytes(jsonString);
 
             string result;
-            if (_communicationService != null)
+
+            // 优先使用协议处理器
+            if (_protocolHandler != null)
+            {
+                var task = _protocolHandler.ReadDataAsync();
+                task.Wait();
+                var response = task.Result;
+                result = response.Success ? response.Message : $"Error: {response.Message}";
+            }
+            else if (_communicationService != null)
             {
                 result = _communicationService.SendMessageAsync(sendData).Result;
             }
-            else
+            else if (_tcpCommunication != null)
             {
                 result = _tcpCommunication.SendAsync(sendData).Result;
+            }
+            else
+            {
+                throw new InvalidOperationException("没有可用的通信方式");
             }
 
             return result;
         }
 
-
-
         public string ExecuteCommand(SasCommandType commandType)
         {
-            var response = ExcuteCommand(commandType);
-            return response;
+            // 如果使用协议处理器，优先使用协议处理器
+            if (_protocolHandler != null)
+            {
+                var protocolResponse = _protocolHandler.ExecuteCommandAsync(commandType).Result;
+                return protocolResponse.Success ? protocolResponse.Message : $"Error: {protocolResponse.Message}";
+            }
+
+            var legacyResponse = ExcuteCommand(commandType);
+            return legacyResponse;
         }
 
         public Task<string> ExecuteCommandAsync(SasCommandType commandType)
         {
-            var response = ExcuteCommand(commandType);
-            return Task.FromResult(response);
+            if (_protocolHandler != null)
+            {
+                return ExecuteCommandAsync(commandType, null, null);
+            }
+
+            var legacyResponse = ExcuteCommand(commandType);
+            return Task.FromResult(legacyResponse);
         }
 
+        public async Task<string> ExecuteCommandAsync(SasCommandType commandType, int? velocity = null, int? time = null)
+        {
+            if (_protocolHandler != null)
+            {
+                var parameters = new CommandParameters
+                {
+                    Velocity = velocity,
+                    Time = time
+                };
 
+                var response = await _protocolHandler.ExecuteCommandAsync(commandType, parameters);
+                return response.Success ? response.Message : $"Error: {response.Message}";
+            }
+
+            return ExecuteCommandWithParameters(commandType, velocity, time);
+        }
+
+        public async Task<DeviceResponse> GetDeviceStatusAsync()
+        {
+            if (_protocolHandler != null)
+            {
+                return await _protocolHandler.ReadDataAsync();
+            }
+
+            try
+            {
+                string jsonMsg = ExecuteCommand(SasCommandType.InputScrewData);
+
+                if (string.IsNullOrEmpty(jsonMsg))
+                {
+                    return new DeviceResponse
+                    {
+                        Success = false,
+                        Message = "设备返回空数据"
+                    };
+                }
+
+                var response = JsonConvert.DeserializeObject<dynamic>(jsonMsg);
+                if (response != null && response.reply == 203 &&
+                    response.state != null && response.result != null)
+                {
+                    return new DeviceResponse
+                    {
+                        Success = true,
+                        State = (int)response.state,
+                        Result = (int)response.result,
+                        Reply = (int)response.reply,
+                        Data = new Dictionary<string, object> { ["raw_json"] = jsonMsg }
+                    };
+                }
+
+                return new DeviceResponse
+                {
+                    Success = false,
+                    Message = "JSON响应格式错误",
+                    Data = new Dictionary<string, object> { ["raw_json"] = jsonMsg }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new DeviceResponse
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
+            }
+        }
 
         private string ExcuteCommand(SasCommandType commandType)
         {
@@ -118,6 +218,7 @@ namespace SasTools.Models.SasModule
                         };
                         requestData = DataFactory.CreateRequestCommand(FunctionType.Subcribe, parameters);
                         break;
+
                     case SasCommandType.InputScrewData:
                         parameters = new RequestParameter
                         {
@@ -163,7 +264,7 @@ namespace SasTools.Models.SasModule
                             Request = 125,
                             SlaveId = 1,
                             TightenClear = 1
-                        };
+                        };              
                         requestData = DataFactory.CreateRequestCommand(FunctionType.TightenInfoControl, parameters);
                         break;
                     case SasCommandType.StatusQuery:
@@ -196,14 +297,34 @@ namespace SasTools.Models.SasModule
         // 添加支持动态参数的ExecuteCommand重载方法
         public string ExecuteCommandWithParameters(SasCommandType commandType, int? velocity = null, int? time = null)
         {
+            // 如果使用协议处理器，优先使用协议处理器
+            if (_protocolHandler != null)
+            {
+                var parameters = new CommandParameters
+                {
+                    Velocity = velocity,
+                    Time = time
+                };
+
+                var protocolResponse = _protocolHandler.ExecuteCommandAsync(commandType, parameters).Result;
+
+                return protocolResponse.Success ? "OK" : $"Error: {protocolResponse.Message}";
+            }
+
             var response = ExcuteCommandWithParameters(commandType, velocity, time);
             return response;
         }
 
         public Task<string> ExecuteCommandWithParametersAsync(SasCommandType commandType, int? velocity = null, int? time = null)
         {
-            var response = ExcuteCommandWithParameters(commandType, velocity, time);
-            return Task.FromResult(response);
+            // 如果使用协议处理器，优先使用协议处理器
+            if (_protocolHandler != null)
+            {
+                return ExecuteCommandAsync(commandType, velocity, time);
+            }
+
+            var legacyResponse = ExcuteCommandWithParameters(commandType, velocity, time);
+            return Task.FromResult(legacyResponse);
         }
 
         private string ExcuteCommandWithParameters(SasCommandType commandType, int? velocity = null, int? time = null)
@@ -221,14 +342,13 @@ namespace SasTools.Models.SasModule
                             Request = 115,
                             SlaveId = 1,
                             Torque = 0, //最大扭矩
-                            Velocity = velocity ?? 500,      // 使用传入的参数或默认值
-                            Time = time ?? 1000,             // 使用传入的参数或默认值
+                            Velocity = velocity ?? 500,
+                            Time = time ?? 1000,
                             Angle = 0
                         };
                         requestData = DataFactory.CreateRequestCommand(FunctionType.RemoveScrewAction, parameters);
                         break;
 
-                    // 其他命令类型可以复用原有的ExcuteCommand方法
                     default:
                         return ExcuteCommand(commandType);
                 }
@@ -246,6 +366,5 @@ namespace SasTools.Models.SasModule
                 throw;
             }
         }
-
     }
 }

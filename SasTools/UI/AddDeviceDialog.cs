@@ -2,6 +2,7 @@
 using SasTools.Models;
 using System;
 using System.Windows.Forms;
+using SasTools.Models.Protocol;
 
 namespace SasTools.UI
 {
@@ -19,6 +20,7 @@ namespace SasTools.UI
         {
             this.btnOK.Click += BtnOK_Click;
             this.btnCancel.Click += BtnCancel_Click;
+            this.cmbProtocolType.SelectedIndexChanged += CmbProtocolType_SelectedIndexChanged;
         }
 
         private void BtnOK_Click(object sender, EventArgs e)
@@ -33,6 +35,16 @@ namespace SasTools.UI
                 Port = (int)this.numPort.Value
             };
 
+            // 根据协议类型设置协议配置
+            if (this.cmbProtocolType.SelectedIndex == 0) // JSON协议
+            {
+                DeviceInfo.SetJsonProtocol(DeviceInfo.Host, DeviceInfo.Port);
+            }
+            else if (this.cmbProtocolType.SelectedIndex == 1) // Modbus TCP
+            {
+                DeviceInfo.SetModbusProtocol(DeviceInfo.Host, DeviceInfo.Port, (byte)this.numSlaveId.Value);
+            }
+
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
@@ -41,6 +53,29 @@ namespace SasTools.UI
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();
+        }
+
+        private void CmbProtocolType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // 根据协议类型显示/隐藏SlaveId控件
+            bool isModbus = this.cmbProtocolType.SelectedIndex == 1; // 1表示Modbus TCP
+
+            this.lblSlaveId.Visible = isModbus;
+            this.numSlaveId.Visible = isModbus;
+
+            // 自动切换默认端口
+            if (isModbus)
+            {
+                // Modbus TCP默认端口1502
+                this.numPort.Value = 1502;
+                this.txtHost.Text = "192.168.2.12"; // 同时更新默认IP
+            }
+            else
+            {
+                // JSON协议默认端口6062
+                this.numPort.Value = 6062;
+                this.txtHost.Text = "192.168.2.12"; // JSON默认IP
+            }
         }
 
         private bool ValidateInput()
@@ -59,6 +94,19 @@ namespace SasTools.UI
                 return false;
             }
 
+            if (this.cmbProtocolType.SelectedIndex < 0)
+            {
+                AntdUI.Message.error(this, "请选择通信协议");
+                this.cmbProtocolType.Focus();
+                return false;
+            }
+            // 如果选择Modbus协议，验证SlaveId
+            if (this.cmbProtocolType.SelectedIndex == 1 && this.numSlaveId.Value < 1)
+            {
+                AntdUI.Message.error(this, "请输入有效的从站ID (1-255)");
+                this.numSlaveId.Focus();
+                return false;
+            }
             return true;
         }
 

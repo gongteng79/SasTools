@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SasTools.Models.Protocol;
+using System;
 
 namespace SasTools.Models
 {
@@ -11,6 +12,18 @@ namespace SasTools.Models
         public bool IsConnected { get; set; }
         public DateTime? LastConnectedTime { get; set; }
         public string Status { get; set; } = "未连接";
+        public ProtocolType ProtocolType { get; set; } = ProtocolType.Json;
+        public ProtocolConfig ProtocolConfig { get; set; }
+        public void SetJsonProtocol(string host, int port)
+        {
+            ProtocolType = ProtocolType.Json;
+            ProtocolConfig = new JsonProtocolConfig { Host = host, Port = port };
+        }
+        public void SetModbusProtocol(string host, int port, byte slaveId = 1)
+        {
+            ProtocolType = ProtocolType.ModbusTcp;
+            ProtocolConfig = new ModbusProtocolConfig { Host = host, Port = port, SlaveId = slaveId };
+        }
 
         public DeviceInfo()
         {

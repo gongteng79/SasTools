@@ -4,6 +4,7 @@ using SasTools.Events;
 using SasTools.Interface;
 using SasTools.Models;
 using SasTools.Models.SasModule;
+using SasTools.Models.Protocol;
 using SasTools.Services;
 using SasTools.UI;
 using System;
@@ -22,6 +23,7 @@ namespace SasTools.Services
         private readonly ConcurrentDictionary<string, DeviceInfo> _deviceInfos;
         private readonly ConcurrentDictionary<string, IDevice> _devices;
         private readonly ConcurrentDictionary<string, ICommunicationService> _communicationServices;
+        private readonly ConcurrentDictionary<string, IProtocolHandler> _protocolHandlers; //协议处理器管理
         private readonly List<string> _deviceOrder; // 跟踪设备添加顺序
         private readonly object _orderLock = new object(); // 保护顺序列表的锁
         private string _selectedDeviceId;
@@ -35,10 +37,11 @@ namespace SasTools.Services
             _devices = new ConcurrentDictionary<string, IDevice>();
             //可供外部订阅的事件
             _communicationServices = new ConcurrentDictionary<string, ICommunicationService>();
+            _protocolHandlers = new ConcurrentDictionary<string, IProtocolHandler>();
             _deviceOrder = new List<string>();
         }
 
-        
+
         public event EventHandler<DeviceStatusChangedEventArgs> DeviceStatusChanged;
         public event EventHandler<string> DeviceSelectionChanged;
 
@@ -76,6 +79,16 @@ namespace SasTools.Services
             return device;
         }
 
+        //获取设备协议处理器
+        public IProtocolHandler GetDeviceProtocolHandler(string deviceId)
+        {
+            if (string.IsNullOrEmpty(deviceId))
+                return null;
+
+            _protocolHandlers.TryGetValue(deviceId, out var handler);
+            return handler;
+        }
+
         public bool AddDevice(DeviceInfo deviceInfo)
         {
             if (deviceInfo == null || string.IsNullOrEmpty(deviceInfo.Id))
@@ -108,6 +121,12 @@ namespace SasTools.Services
             _devices.TryRemove(deviceId, out _);
             _communicationServices.TryRemove(deviceId, out _);
 
+            // 新增：释放协议处理器
+            if (_protocolHandlers.TryRemove(deviceId, out var handler))
+            {
+                handler?.Dispose();
+            }
+
             // 从顺序列表中移除
             lock (_orderLock)
             {
@@ -118,6 +137,7 @@ namespace SasTools.Services
             return true;
         }
 
+        //支持协议选择的连接方法
         public async Task<bool> ConnectDevice(string deviceId)
         {
             try
@@ -134,23 +154,55 @@ namespace SasTools.Services
                     return true;
                 }
 
-                // 创建通信服务
-                var communicationService = new CommunicationService(deviceInfo.Host, deviceInfo.Port);
-                communicationService.ConnectionStatusChanged += (sender, isConnected) =>
+                // 根据协议类型创建处理器或通信服务
+                bool connected = false;
+                IDevice device = null;
+
+                if (deviceInfo.ProtocolConfig != null)
                 {
-                    OnDeviceConnectionStatusChanged(deviceId, isConnected);
-                };
+                    // 使用新的协议处理器
+                    var protocolHandler = ProtocolFactory.CreateProtocolHandler(deviceInfo.ProtocolType);
 
-                // 尝试真实连接
-                bool connected = await communicationService.ConnectAsync();
+                    // 连接设备
+                    connected = await protocolHandler.ConnectAsync(deviceInfo.ProtocolConfig);
 
-                if (connected)
+                    if (connected)
+                    {
+                        // 创建设备实例
+                        device = new SasDevice(protocolHandler, _eventBus);
+
+                        // 保存协议处理器
+                        _protocolHandlers.TryAdd(deviceId, protocolHandler);
+
+                        _logger.Info($"设备连接成功 ({deviceInfo.ProtocolType}): {deviceInfo.Name} ({deviceInfo.ProtocolConfig.ConnectionString})");
+                    }
+                }
+                else
                 {
-                    // 创建设备实例
-                    var device = new SasDevice(communicationService, _eventBus);
+                    var communicationService = new CommunicationService(deviceInfo.Host, deviceInfo.Port);
+                    communicationService.ConnectionStatusChanged += (sender, isConnected) =>
+                    {
+                        OnDeviceConnectionStatusChanged(deviceId, isConnected);
+                    };
 
-                    // 保存实例
-                    _communicationServices.TryAdd(deviceId, communicationService);
+                    // 尝试真实连接
+                    connected = await communicationService.ConnectAsync();
+
+                    if (connected)
+                    {
+                        // 创建设备实例
+                        device = new SasDevice(communicationService, _eventBus);
+
+                        // 保存通信服务
+                        _communicationServices.TryAdd(deviceId, communicationService);
+
+                        _logger.Info($"设备连接成功 (Legacy JSON): {deviceInfo.Name} ({deviceInfo.Host}:{deviceInfo.Port})");
+                    }
+                }
+
+                if (connected && device != null)
+                {
+                    // 保存设备实例
                     _devices.TryAdd(deviceId, device);
 
                     // 更新设备信息
@@ -160,10 +212,7 @@ namespace SasTools.Services
 
                     // 发布设备创建事件
                     _eventBus.Publish(new MultiDeviceCreateEvent(deviceId, device));
-
-                    _logger.Info($"设备连接成功: {deviceInfo.Name} ({deviceInfo.Host}:{deviceInfo.Port})");
                 }
-
 
                 // 触发设备状态变化事件
                 OnDeviceStatusChanged(deviceId, deviceInfo);
@@ -186,14 +235,23 @@ namespace SasTools.Services
                 if (!deviceInfo.IsConnected)
                     return true;
 
-                // 模拟断开延迟
-                await Task.Delay(500);
-
-                // 模拟断开成功
                 bool result = true;
 
-                // 清理资源（如果有真实连接的话）
-                _communicationServices.TryRemove(deviceId, out _);
+                // 断开协议处理器连接
+                if (_protocolHandlers.TryGetValue(deviceId, out var protocolHandler))
+                {
+                    result = await protocolHandler.DisconnectAsync();
+                    _protocolHandlers.TryRemove(deviceId, out _);
+                    protocolHandler?.Dispose();
+                }
+                // 或者断开传统通信服务连接
+                else if (_communicationServices.TryGetValue(deviceId, out var communicationService))
+                {
+                    result = await communicationService.DisconnectAsync();
+                    _communicationServices.TryRemove(deviceId, out _);
+                }
+
+                // 清理设备实例
                 _devices.TryRemove(deviceId, out _);
 
                 // 更新设备信息
@@ -339,7 +397,84 @@ namespace SasTools.Services
             }
         }
 
+        // 新增：获取设备协议信息
+        public string GetDeviceProtocolInfo(string deviceId)
+        {
+            if (_deviceInfos.TryGetValue(deviceId, out var deviceInfo))
+            {
+                if (deviceInfo.ProtocolConfig != null)
+                {
+                    return $"{deviceInfo.ProtocolType} - {deviceInfo.ProtocolConfig.ConnectionString}";
+                }
+                else
+                {
+                    return $"Legacy JSON - {deviceInfo.Host}:{deviceInfo.Port}";
+                }
+            }
+            return "未知协议";
+        }
 
+        // 新增：切换设备协议
+        public async Task<bool> SwitchDeviceProtocol(string deviceId, ProtocolType newProtocolType, ProtocolConfig newConfig)
+        {
+            if (!_deviceInfos.TryGetValue(deviceId, out var deviceInfo))
+                return false;
+
+            // 如果设备已连接，先断开
+            bool wasConnected = deviceInfo.IsConnected;
+            if (wasConnected)
+            {
+                await DisconnectDevice(deviceId);
+            }
+
+            // 更新协议配置
+            deviceInfo.ProtocolType = newProtocolType;
+            deviceInfo.ProtocolConfig = newConfig;
+
+            _logger.Info($"设备 {deviceInfo.Name} 协议已切换到: {newProtocolType}");
+
+            // 如果之前已连接，尝试重新连接
+            if (wasConnected)
+            {
+                return await ConnectDevice(deviceId);
+            }
+
+            return true;
+        }
+
+        public void Dispose()
+        {
+            // 释放所有协议处理器
+            foreach (var handler in _protocolHandlers.Values)
+            {
+                try
+                {
+                    handler?.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"释放协议处理器时发生异常: {ex.Message}", ex);
+                }
+            }
+            _protocolHandlers.Clear();
+
+            // 释放通信服务
+            foreach (var service in _communicationServices.Values)
+            {
+                try
+                {
+                    service?.DisconnectAsync();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"释放通信服务时发生异常: {ex.Message}", ex);
+                }
+            }
+            _communicationServices.Clear();
+
+            _devices.Clear();
+            _deviceInfos.Clear();
+        }
 
         private void OnDeviceConnectionStatusChanged(string deviceId, bool connected)
         {
@@ -368,8 +503,6 @@ namespace SasTools.Services
             DeviceInfo = deviceInfo;
         }
     }
-
-
 }
 
 

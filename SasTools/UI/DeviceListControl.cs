@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using SasTools.Models.Protocol;
 
 namespace SasTools.UI.Controls
 {
@@ -97,7 +98,7 @@ namespace SasTools.UI.Controls
         {
             var panel = new System.Windows.Forms.Panel
             {
-                Size = new Size(750, 50),
+                Size = new Size(850, 50),
                 BorderStyle = BorderStyle.FixedSingle,
                 Margin = new Padding(5)
             };
@@ -130,12 +131,21 @@ namespace SasTools.UI.Controls
                 ForeColor = device.IsConnected ? Color.Green : Color.Gray
             };
 
+            // 协议类型
+            var lblProtocol = new AntdUI.Label
+            {
+                Text = GetProtocolDisplayText(device),
+                Location = new Point(530, 15),
+                Size = new Size(100, 20),
+                ForeColor = GetProtocolColor(device.ProtocolType)
+            };
+
             // 连接按钮
             var btnConnect = new AntdUI.Button
             {
                 Text = device.IsConnected ? "断开" : "连接",
                 Location = new Point(420, 10),
-                Size = new Size(60, 30),
+                Size = new Size(50, 30),
                 Type = device.IsConnected ? TTypeMini.Warn : TTypeMini.Primary,
                 Tag = device.Id
             };
@@ -151,11 +161,22 @@ namespace SasTools.UI.Controls
             var btnSelect = new AntdUI.Button
             {
                 Text = isSelected ? "取消" : "选择",
-                Location = new Point(490, 10),
+                Location = new Point(620, 10),
                 Size = new Size(60, 30),
                 Type = isSelected ? TTypeMini.Success : TTypeMini.Default,
                 Tag = device.Id
             };
+            // 切换协议按钮
+            var btnSwitchProtocol = new AntdUI.Button
+            {
+                Text = "切换协议",
+                Location = new Point(700, 10),
+                Size = new Size(70, 30),
+                Type = TTypeMini.Default,
+                Tag = device.Id
+            };
+            btnSwitchProtocol.Click += (s, e) => ShowProtocolSwitchDialog(device);
+
             btnSelect.Click += (s, e) =>
             {
                 if (isSelected)
@@ -172,12 +193,167 @@ namespace SasTools.UI.Controls
                 }
                 RefreshDeviceList(); // 刷新以显示选中状态
             };
-
-            panel.Controls.AddRange(new Control[] { lblName, lblAddress, lblStatus, btnConnect, btnSelect });
+            panel.Controls.AddRange(new Control[] { lblName, lblAddress, lblStatus, lblProtocol, btnConnect, btnSelect, btnSwitchProtocol });
             return panel;
         }
 
+        private async void ShowProtocolSwitchDialog(DeviceInfo device)
+        {
+            // 创建简单的协议切换对话框
+            using (var dialog = new Form())
+            {
+                dialog.Text = $"切换设备协议 - {device.Name}";
+                dialog.Size = new Size(400, 200);
+                dialog.StartPosition = FormStartPosition.CenterParent;
+                dialog.FormBorderStyle = FormBorderStyle.FixedDialog;
+                dialog.MaximizeBox = false;
+                dialog.MinimizeBox = false;
 
+                var lblCurrent = new AntdUI.Label
+                {
+                    Text = $"当前协议: {GetProtocolDisplayText(device)}",
+                    Location = new Point(20, 20),
+                    Size = new Size(300, 25)
+                };
+
+                var lblNew = new AntdUI.Label
+                {
+                    Text = "切换到:",
+                    Location = new Point(20, 60),
+                    Size = new Size(80, 25)
+                };
+
+                var cmbNewProtocol = new AntdUI.Select
+                {
+                    Location = new Point(100, 55),
+                    Size = new Size(150, 30)
+                };
+                cmbNewProtocol.Items.Add("JSON协议");
+                cmbNewProtocol.Items.Add("Modbus TCP");
+                cmbNewProtocol.SelectedIndex = device.ProtocolType == Models.Protocol.ProtocolType.Json ? 1 : 0; // 选择相反的协议
+
+                var lblSlaveId = new AntdUI.Label
+                {
+                    Text = "从站ID:",
+                    Location = new Point(270, 60),
+                    Size = new Size(60, 25),
+                    Visible = cmbNewProtocol.SelectedIndex == 1
+                };
+
+                var numSlaveId = new AntdUI.InputNumber
+                {
+                    Location = new Point(330, 55),
+                    Size = new Size(50, 30),
+                    Minimum = 1,
+                    Maximum = 255,
+                    Value = 1,
+                    Visible = cmbNewProtocol.SelectedIndex == 1
+                };
+
+                // 协议选择变化事件
+                cmbNewProtocol.SelectedIndexChanged += (s, e) =>
+                {
+                    bool isModbus = cmbNewProtocol.SelectedIndex == 1;
+                    lblSlaveId.Visible = isModbus;
+                    numSlaveId.Visible = isModbus;
+                };
+
+                var btnOK = new AntdUI.Button
+                {
+                    Text = "确定",
+                    Location = new Point(200, 120),
+                    Size = new Size(75, 30),
+                    Type = TTypeMini.Primary
+                };
+
+                var btnCancel = new AntdUI.Button
+                {
+                    Text = "取消",
+                    Location = new Point(285, 120),
+                    Size = new Size(75, 30),
+                    Type = TTypeMini.Default
+                };
+
+                btnOK.Click += async (s, e) =>
+                {
+                    try
+                    {
+                        Models.Protocol.ProtocolType newProtocolType;
+                        Models.Protocol.ProtocolConfig newConfig;
+
+                        if (cmbNewProtocol.SelectedIndex == 0) // JSON
+                        {
+                            newProtocolType = Models.Protocol.ProtocolType.Json;
+                            newConfig = new Models.Protocol.JsonProtocolConfig
+                            {
+                                Host = device.Host,
+                                Port = device.Port
+                            };
+                        }
+                        else // Modbus
+                        {
+                            newProtocolType = Models.Protocol.ProtocolType.ModbusTcp;
+                            newConfig = new Models.Protocol.ModbusProtocolConfig
+                            {
+                                Host = device.Host,
+                                Port = device.Port,
+                                SlaveId = (byte)numSlaveId.Value
+                            };
+                        }
+
+                        bool success = await _deviceManager.SwitchDeviceProtocol(device.Id, newProtocolType, newConfig);
+                        if (success)
+                        {
+                            AntdUI.Message.success(this.FindForm(), "协议切换成功");
+                            RefreshDeviceList();
+                            dialog.DialogResult = DialogResult.OK;
+                        }
+                        else
+                        {
+                            AntdUI.Message.error(this.FindForm(), "协议切换失败");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        AntdUI.Message.error(this.FindForm(), $"协议切换出错: {ex.Message}");
+                    }
+                };
+
+                btnCancel.Click += (s, e) => dialog.DialogResult = DialogResult.Cancel;
+
+                dialog.Controls.AddRange(new Control[] { lblCurrent, lblNew, cmbNewProtocol, lblSlaveId, numSlaveId, btnOK, btnCancel });
+                dialog.ShowDialog(this.FindForm());
+            }
+        }
+        private string GetProtocolDisplayText(DeviceInfo device)
+        {
+            if (device.ProtocolConfig != null)
+            {
+                switch (device.ProtocolType)
+                {
+                    case Models.Protocol.ProtocolType.Json:
+                        return "JSON";
+                    case Models.Protocol.ProtocolType.ModbusTcp:
+                        return $"Modbus({((Models.Protocol.ModbusProtocolConfig)device.ProtocolConfig).SlaveId})";
+                    default:
+                        return "未知";
+                }
+            }
+            return "JSON(旧)";
+        }
+
+        private Color GetProtocolColor(Models.Protocol.ProtocolType protocolType)
+        {
+            switch (protocolType)
+            {
+                case Models.Protocol.ProtocolType.Json:
+                    return Color.Blue;
+                case Models.Protocol.ProtocolType.ModbusTcp:
+                    return Color.Orange;
+                default:
+                    return Color.Gray;
+            }
+        }
 
         public string GetSelectedDeviceId()
         {

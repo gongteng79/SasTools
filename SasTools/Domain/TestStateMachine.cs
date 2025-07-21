@@ -76,10 +76,13 @@ namespace SasTools.Domain
         private MachineStatusType _lastPublishedStatusType = MachineStatusType.Idle;
         private string _lastPublishedMessage = string.Empty;
         // 定义关键状态，这些状态变化需要立即发布
+        // 定义关键状态，这些状态变化需要立即发布
         private readonly HashSet<MachineStatusType> _criticalStatusTypes = new HashSet<MachineStatusType>
         {
             MachineStatusType.Error,    // 错误状态
-            MachineStatusType.Idle      // 空闲状态（测试完成）
+            MachineStatusType.Idle,     // 空闲状态（测试完成）
+            MachineStatusType.Forward,  // 正转状态（包含正转OK）
+            MachineStatusType.Reverse   // 反转状态（包含反转OK）
         };
 
 
@@ -131,15 +134,20 @@ namespace SasTools.Domain
                 _cancellationTokenSource.Cancel();
             }
 
-            try
+            // 异步执行停止命令，避免阻塞UI线程
+            Task.Run(async () =>
             {
-                device.ExecuteCommand(SasCommandType.Stop);
-                _logger.Info("测试已停止");
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"停止设备时出错: {ex.Message}", ex);
-            }
+                try
+                {
+                    await device.ExecuteCommandAsync(SasCommandType.Stop);
+                    _logger.Info("测试已停止");
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"停止设备时出错: {ex.Message}", ex);
+                }
+            });
+
             return true;
         }
 
@@ -201,7 +209,7 @@ namespace SasTools.Domain
 
                         // 重新订阅前再次确保设备状态清洁
                         device.ExecuteCommand(SasCommandType.Subscribe);
-                        await Task.Delay(500, _resetCancellationTokenSource.Token); // 增加订阅后的等待时间
+                        await Task.Delay(500, _resetCancellationTokenSource.Token);
 
                         // 验证设备状态是否已清理干净
                         await VerifyDeviceStateCleared();
@@ -329,7 +337,9 @@ namespace SasTools.Domain
                         // 在执行正转前，先清理可能的残留状态
                         await ClearDeviceStateBeforeForward();
 
-                        device.ExecuteCommand(SasCommandType.Forward);
+                        _logger.Info("发送正转命令到设备");
+                        var forwardResponse = device.ExecuteCommand(SasCommandType.Forward);
+                        _logger.Info($"正转命令执行结果: {forwardResponse}");
                         var result = await CheckLockStatusAsync();
 
                         if (!_isRunning || _cancellationTokenSource.Token.IsCancellationRequested)
@@ -341,10 +351,18 @@ namespace SasTools.Domain
                         {
                             _logger.Info("正转锁付成功");
                             _forwardSuccess = true;
-                            _state = TestState.ReverseDelay;
                             _machineMessage = "正转OK";
+
+                            // 强制重置状态跟踪，确保正转OK能够发布
+                            _lastPublishedMessage = ""; // 重置消息跟踪
+
+                            // 发布正转OK状态
                             PublishStateUpdate(MachineStatusType.Forward);
-                            shouldUpdateDisplay = false; // 已经发布了状态更新，避免重复
+                            _logger.Info("已发布正转OK状态更新");
+
+                            // 然后转换到下一个状态
+                            _state = TestState.ReverseDelay;
+                            shouldUpdateDisplay = false;
                         }
                         else
                         {
@@ -355,17 +373,15 @@ namespace SasTools.Domain
                             }
 
                             _logger.Error($"正转锁付失败: state={result.state}, result={result.result}, 错误: {result.errorMessage}");
-
                             _lastErrorMessage = result.errorMessage;
                             _lastErrorResult = result.result;
-
+                            _forwardSuccess = false;
                             _state = TestState.Error;
-                            _machineMessage = $"正转失败: {result.errorMessage}";
+                            _machineMessage = "正转NG";
+                            // 只发布一次状态更新
                             PublishStateUpdate(MachineStatusType.Error);
                             device.ExecuteCommand(SasCommandType.Stop);
-
                             UpdateCounters();
-
                             if (ShouldStopTest())
                             {
                                 _isRunning = false;
@@ -402,12 +418,18 @@ namespace SasTools.Domain
                         PublishStateUpdate(MachineStatusType.Reverse);
                         shouldUpdateDisplay = false;
 
+                        // 添加参数日志
+                        _logger.Info($"执行反转命令 - 速度: {_parameter.ReverseVelocity}, 时间: {_parameter.ReverseTime}");
+
                         // 使用动态参数执行反转命令
-                        device.ExecuteCommandWithParameters(SasCommandType.Reverse, _parameter.ReverseVelocity, _parameter.ReverseTime);
+                        var reverseResult = device.ExecuteCommandWithParameters(SasCommandType.Reverse, _parameter.ReverseVelocity, _parameter.ReverseTime);
+                        _logger.Info($"反转命令执行结果: {reverseResult}");
 
                         try
                         {
-                            await Task.Delay(1000, _cancellationTokenSource.Token);
+                            int waitTime = _parameter.ReverseTime + 500;
+                            _logger.Info($"等待反转完成，等待时间: {waitTime}ms");
+                            await Task.Delay(waitTime, _cancellationTokenSource.Token);
                         }
                         catch (OperationCanceledException)
                         {
@@ -419,9 +441,15 @@ namespace SasTools.Domain
                             return;
                         }
 
+                        // 验证反转是否真正执行
+                        _logger.Info("验证反转执行状态");
+
                         _reverseSuccess = true;
                         _state = TestState.Stopping;
                         _machineMessage = "反转OK";
+                        PublishStateUpdate(MachineStatusType.Reverse);
+                        _logger.Info("反转状态完成");
+                        shouldUpdateDisplay = false;
                         break;
 
                     case TestState.Stopping:
@@ -465,26 +493,47 @@ namespace SasTools.Domain
 
         private async Task HandleErrorStateAsync()
         {
-            _machineMessage = "错误状态，分析处理中";
-            PublishStateUpdate(MachineStatusType.Error);
-            device.ExecuteCommand(SasCommandType.Stop);
-
-            if (ShouldStopTest())
+            try
             {
-                _logger.Info("已达到NG次数限制，停止测试");
-                _isRunning = false;
-                return;
-            }
+                // 检查是否应该停止测试
+                if (!_isRunning || _cancellationTokenSource.Token.IsCancellationRequested)
+                {
+                    _logger.Info("测试已停止，退出错误处理");
+                    return;
+                }
 
-            var strategy = DetermineRecoveryStrategy(_lastErrorResult, _lastErrorMessage);
-            _logger.Info($"错误类型: {_lastErrorMessage}, 采用恢复策略: {strategy.Name}");
+                var strategy = DetermineRecoveryStrategy(_lastErrorResult, _lastErrorMessage);
 
-            await ExecuteRecoveryStrategyAsync(strategy);
+                _logger.Info($"错误类型: {_lastErrorMessage}, 采用恢复策略: {strategy.Name}");
 
-            if (_isRunning && !_cancellationTokenSource.Token.IsCancellationRequested)
-            {
+                // 不要重复发布Error状态，因为在Forward状态中已经发布过了
+                _machineMessage = "错误状态，分析处理中";
+                PublishStateUpdate(MachineStatusType.Error);
+
+                await ExecuteRecoveryStrategyAsync(strategy);
+
+                // 检查恢复后是否应该继续
+                if (!_isRunning || _cancellationTokenSource.Token.IsCancellationRequested)
+                {
+                    _logger.Info("恢复策略执行后检测到停止请求");
+                    return;
+                }
+
+                // 恢复成功，重新开始循环
                 _state = TestState.ForwardDelay;
-                _machineMessage = $"错误恢复完成，准备重试 - {strategy.Name}";
+                _machineMessage = "错误恢复完成，准备重试";
+                PublishStateUpdate(MachineStatusType.Waiting);
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.Info("错误处理被取消");
+                // 不重新抛出，让状态机正常退出
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"错误处理失败: {ex.Message}", ex);
+                _state = TestState.Error;
+                throw;
             }
         }
 
@@ -558,10 +607,20 @@ namespace SasTools.Domain
             try
             {
                 _machineMessage = $"执行{strategy.Name}，等待{strategy.WaitTime}ms";
+
+                // 检查取消状态
+                if (_cancellationTokenSource.Token.IsCancellationRequested)
+                {
+                    _logger.Info("恢复策略执行前检测到取消请求");
+                    return;
+                }
+
                 await Task.Delay(strategy.WaitTime, _cancellationTokenSource.Token);
 
                 if (strategy.RequiresClearTightenInfo)
                 {
+                    if (_cancellationTokenSource.Token.IsCancellationRequested) return;
+
                     device.ExecuteCommand(SasCommandType.ClearTightenInfo);
                     _logger.Info("已清理设备错误状态");
                     await Task.Delay(Constants.DEVICE_CLEAR_WAIT_TIME, _cancellationTokenSource.Token);
@@ -569,6 +628,8 @@ namespace SasTools.Domain
 
                 if (strategy.RequiresResubscribe)
                 {
+                    if (_cancellationTokenSource.Token.IsCancellationRequested) return;
+
                     device.ExecuteCommand(SasCommandType.Subscribe);
                     _logger.Info("已重新订阅设备");
                     await Task.Delay(300, _cancellationTokenSource.Token);
@@ -576,6 +637,8 @@ namespace SasTools.Domain
 
                 if (strategy.RequiresExtraDelay)
                 {
+                    if (_cancellationTokenSource.Token.IsCancellationRequested) return;
+
                     _machineMessage = "额外稳定延时中...";
                     await Task.Delay(RecoveryTimes.EXTRA_STABILITY_DELAY, _cancellationTokenSource.Token);
                 }
@@ -585,11 +648,11 @@ namespace SasTools.Domain
             catch (OperationCanceledException)
             {
                 _logger.Info("恢复策略执行被取消");
-                throw;
             }
             catch (Exception ex)
             {
-                _logger.Warn($"执行恢复策略失败: {ex.Message}");
+                _logger.Error($"执行恢复策略失败: {ex.Message}", ex);
+                throw;
             }
         }
 
@@ -675,8 +738,9 @@ namespace SasTools.Domain
                     bool isCritical = _criticalStatusTypes.Contains(statusType);
 
                     // 检查状态是否真正发生变化
-                    bool statusChanged = statusType != _lastPublishedStatusType ||
-                                       _machineMessage != _lastPublishedMessage;
+                    bool statusChanged = statusType != _lastPublishedStatusType ||_machineMessage != _lastPublishedMessage;
+
+                    _logger.Debug($"状态发布检查 - 类型:{statusType}, 消息:{_machineMessage}, 状态变化:{statusChanged}, 关键状态:{isCritical}");
 
                     // 如果状态未变化且非关键状态，跳过发布
                     if (!statusChanged && !isCritical)
@@ -695,7 +759,6 @@ namespace SasTools.Domain
                     _lastPublishedStatusType = statusType;
                     _lastPublishedMessage = _machineMessage;
 
-                    // 发布事件
                     _eventBus.Publish(new RefreshMachineState(_deviceId, _machineMessage, _state.ToString(), statusType));
                 }
             }
@@ -712,7 +775,6 @@ namespace SasTools.Domain
                 {
                     var now = DateTime.Now;
 
-                    //节流检查：计数器更新频率控制
                     if (now - _lastCounterPublishTime < _counterPublishInterval)
                     {
                         return;
@@ -742,6 +804,7 @@ namespace SasTools.Domain
 
         private async Task<(bool success, string errorMessage, int state, int result)> CheckLockStatusAsync()
         {
+            bool lockingStarted = false; // 标记是否检测到锁付开始
             if (_state == TestState.Reverse)
             {
                 return (true, null, 0, 0);
@@ -780,13 +843,16 @@ namespace SasTools.Domain
                                 int state = (int)response.state;
                                 int result = (int)response.result;
 
-                                if (state == 0 && result == 0)
+                                // 修改成功判断逻辑
+                                if (result == 0) // 主要看result，result=0表示成功
                                 {
+                                    _logger.Debug($"设备状态检查: state={state}, result={result} - 判断为成功");
                                     return (true, null, state, result);
                                 }
                                 else
                                 {
                                     string errorDesc = GetLockErrorDescription(result);
+                                    _logger.Debug($"设备状态检查: state={state}, result={result} - 判断为失败，错误: {errorDesc}");
                                     return (false, errorDesc, state, result);
                                 }
                             }

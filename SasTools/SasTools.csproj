@@ -35,11 +35,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AntdUI, Version=2.0.6.0, Culture=neutral, PublicKeyToken=0e24e5118ea3d6af, processorArchitecture=MSIL">
-      <HintPath>packages\AntdUI.2.0.6\lib\net48\AntdUI.dll</HintPath>
+    <Reference Include="AntdUI, Version=2.0.11.0, Culture=neutral, PublicKeyToken=0e24e5118ea3d6af, processorArchitecture=MSIL">
+      <HintPath>packages\AntdUI.2.0.11\lib\net48\AntdUI.dll</HintPath>
     </Reference>
-    <Reference Include="HslCommunication">
-      <HintPath>Libs\HslCommunication.dll</HintPath>
+    <Reference Include="HslCommunication, Version=12.3.2.0, Culture=neutral, PublicKeyToken=3d72ad3b6b5ec0e3, processorArchitecture=MSIL">
+      <HintPath>packages\HslCommunication.12.3.2\lib\net451\HslCommunication.dll</HintPath>
     </Reference>
     <Reference Include="log4net">
       <HintPath>Libs\log4net.dll</HintPath>
@@ -120,14 +120,23 @@
     <Compile Include="Interface\ICommunicationService.cs" />
     <Compile Include="Domain\ParameterBase.cs" />
     <Compile Include="Interface\IDevice.cs" />
+    <Compile Include="Interface\IProtocolHandler.cs" />
     <Compile Include="Models\Communication\CommunicationBase.cs" />
+    <Compile Include="Models\Communication\JsonProtocolHandler.cs" />
+    <Compile Include="Models\Communication\ModbusProtocolHandler.cs" />
+    <Compile Include="Models\Communication\ModbusRegisterMap.cs" />
     <Compile Include="Models\Communication\SerialCommunication.cs" />
     <Compile Include="Models\Communication\TcpCommunication.cs" />
     <Compile Include="Models\DeviceInfo.cs" />
     <Compile Include="Models\ErrorRecoveryStrategy.cs" />
+    <Compile Include="Models\Protocol\CommandParameters.cs" />
+    <Compile Include="Models\Protocol\DeviceResponse.cs" />
+    <Compile Include="Models\Protocol\ProtocolConfig.cs" />
+    <Compile Include="Models\Protocol\ProtocolType.cs" />
     <Compile Include="Models\SasModule\SasDevice.cs" />
     <Compile Include="Services\CommunicationService.cs" />
     <Compile Include="Services\DeviceManager.cs" />
+    <Compile Include="Services\ProtocolFactory.cs" />
     <Compile Include="UI\AddDeviceDialog.cs">
       <SubType>Form</SubType>
     </Compile>
