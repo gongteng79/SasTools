@@ -1,7 +1,6 @@
-﻿using HslCommunication.ModBus;
-using HslCommunication.Core;
+﻿using HslCommunication.Core;
+using HslCommunication.ModBus;
 using log4net;
-using log4net.Repository.Hierarchy;
 using Newtonsoft.Json;
 using SasTools.Domain;
 using SasTools.Interface;
@@ -10,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using WpFramework.LogFactory;
 
 namespace SasTools.Models.Communication
 {
@@ -168,7 +166,7 @@ namespace SasTools.Models.Communication
                 _logger.Info("开始协议地址偏移和字节序验证");
 
                 // 1. 检测地址偏移
-                var offsetResult = _modbusClient.Read(ModbusRegisterMap.PROTOCOL_OFFSET, 1);
+                var offsetResult = await _modbusClient.ReadAsync(ModbusRegisterMap.PROTOCOL_OFFSET, 1);
                 if (!offsetResult.IsSuccess)
                 {
                     _logger.Warn($"无法读取协议偏移地址: {offsetResult.Message}，使用默认偏移0");
@@ -226,7 +224,7 @@ namespace SasTools.Models.Communication
             }
         }
 
-        // 新增字节序验证方法
+        //字节序验证方法
         private async Task VerifyByteOrderAsync()
         {
             try
@@ -234,7 +232,7 @@ namespace SasTools.Models.Communication
                 _logger.Info("开始字节序验证");
 
                 // 验证16位整数 (期望值: 258/0x0102)
-                var test16Result = _modbusClient.Read(ModbusRegisterMap.TEST_16BIT, 1);
+                var test16Result = await _modbusClient.ReadAsync(ModbusRegisterMap.TEST_16BIT, 1);
                 if (test16Result.IsSuccess)
                 {
                     int value16_default = _byteTransform.TransUInt16(test16Result.Content, 0);
@@ -262,7 +260,7 @@ namespace SasTools.Models.Communication
 
                 // 验证32位整数 - 使用直接地址测试
                 _logger.Info("尝试直接读取32位测试地址");
-                var directTest32Result = _modbusClient.Read(AdjustAddress("8"), 2);
+                var directTest32Result = await _modbusClient.ReadAsync(AdjustAddress("8"), 2);
                 if (directTest32Result.IsSuccess)
                 {
                     _logger.Info($"32位测试地址原始数据: {BitConverter.ToString(directTest32Result.Content)}");
@@ -286,7 +284,7 @@ namespace SasTools.Models.Communication
 
                 // 验证32位浮点数 - 使用直接地址测试
                 _logger.Info("尝试直接读取32位浮点测试地址");
-                var directTestFloatResult = _modbusClient.Read(AdjustAddress("10"), 2);
+                var directTestFloatResult = await _modbusClient.ReadAsync(AdjustAddress("10"), 2);
                 if (directTestFloatResult.IsSuccess)
                 {
                     _logger.Info($"32位浮点测试地址原始数据: {BitConverter.ToString(directTestFloatResult.Content)}");
@@ -313,7 +311,7 @@ namespace SasTools.Models.Communication
                 _logger.Error($"字节序验证异常: {ex.Message}", ex);
             }
         }
-        // 添加地址调整方法
+        // 地址调整方法
         private string AdjustAddress(string address)
         {
             if (int.TryParse(address, out int addr))
@@ -334,7 +332,7 @@ namespace SasTools.Models.Communication
                 await Task.Delay(1000);
 
                 // 读取电批通电控制状态
-                var powerStatusResult = _modbusClient.Read(AdjustAddress(ModbusRegisterMap.POWER_ENABLE), 1);
+                var powerStatusResult = await _modbusClient.ReadAsync(AdjustAddress(ModbusRegisterMap.POWER_ENABLE), 1);
                 if (!powerStatusResult.IsSuccess)
                 {
                     return new DeviceResponse
@@ -359,7 +357,7 @@ namespace SasTools.Models.Communication
                         await Task.Delay(1000);
 
                         // 重新验证
-                        var retryStatusResult = _modbusClient.Read(AdjustAddress(ModbusRegisterMap.POWER_ENABLE), 1);
+                        var retryStatusResult = await _modbusClient.ReadAsync(AdjustAddress(ModbusRegisterMap.POWER_ENABLE), 1);
                         if (retryStatusResult.IsSuccess)
                         {
                             int retryStatus = _byteTransform.TransUInt16(retryStatusResult.Content, 0);
@@ -382,7 +380,7 @@ namespace SasTools.Models.Communication
                 }
 
                 // 验证产品编号设置
-                var productResult = _modbusClient.Read(AdjustAddress(ModbusRegisterMap.CURRENT_PRODUCT_NUMBER), 1);
+                var productResult = await _modbusClient.ReadAsync(AdjustAddress(ModbusRegisterMap.CURRENT_PRODUCT_NUMBER), 1);
                 if (productResult.IsSuccess)
                 {
                     int productNumber = _byteTransform.TransUInt16(productResult.Content, 0);
@@ -390,7 +388,7 @@ namespace SasTools.Models.Communication
                 }
 
                 // 验证螺丝规格编号设置
-                var screwSpecResult = _modbusClient.Read(AdjustAddress(ModbusRegisterMap.CURRENT_SCREW_SPEC), 1);
+                var screwSpecResult = await _modbusClient.ReadAsync(AdjustAddress(ModbusRegisterMap.CURRENT_SCREW_SPEC), 1);
                 if (screwSpecResult.IsSuccess)
                 {
                     int screwSpec = _byteTransform.TransUInt16(screwSpecResult.Content, 0);
@@ -519,54 +517,65 @@ namespace SasTools.Models.Communication
                         _logger.Info($"Forward命令执行结果: {forwardResult.Success}, 消息: {forwardResult.Message}");
                         return forwardResult;
 
-                    case SasCommandType.Reverse:
-                        _logger.Info($"执行Reverse命令 - 时间: {parameters?.Time}, 速度: {parameters?.Velocity}");
 
-                        // 先设置参数
-                        if (parameters?.Time > 0)
+                    case SasCommandType.Reverse:
+                        _logger.Info($"执行Reverse命令 - 使用松螺丝寄存器");
+
+                        if (parameters?.ExtendedParams?.ContainsKey("ReverseDelay") == true)
                         {
-                            var timeResult = await WriteRegisterWithTimeout(ModbusRegisterMap.LOOSE_AUTO_STOP_TIME, (short)parameters.Time.Value);
-                            if (!timeResult.Success)
-                            {
-                                return new DeviceResponse
-                                {
-                                    Success = false,
-                                    Message = $"设置松螺丝时间失败: {timeResult.Message}"
-                                };
-                            }
-                            _logger.Debug($"松螺丝时间设置成功: {parameters.Time.Value}ms");
+                            int reverseDelay = (int)parameters.ExtendedParams["ReverseDelay"];
+                            _logger.Info($"执行反转启动延时: {reverseDelay}ms");
+                            await Task.Delay(reverseDelay);
                         }
 
+                        //设置松螺丝速度(902)
                         if (parameters?.Velocity > 0)
                         {
-                            var velocityResult = await WriteRegisterWithTimeout(ModbusRegisterMap.LOOSE_SPEED, (short)parameters.Velocity.Value);
-                            if (!velocityResult.Success)
+                            int velocityValue = parameters.Velocity.Value;
+                            if (velocityValue > short.MaxValue || velocityValue < 0)
                             {
+                                _logger.Error($"反转速度参数超出范围: {velocityValue}");
                                 return new DeviceResponse
                                 {
                                     Success = false,
-                                    Message = $"设置松螺丝速度失败: {velocityResult.Message}"
+                                    Message = $"反转速度参数超出范围: {velocityValue}"
                                 };
                             }
-                            _logger.Debug($"松螺丝速度设置成功: {parameters.Velocity.Value}");
+
+                            short reverseSpeed = (short)velocityValue;
+                            var speedResult = await WriteRegisterWithTimeout(ModbusRegisterMap.LOOSE_SPEED, reverseSpeed);
+                            if (!speedResult.Success)
+                            {
+                                _logger.Error($"设置松螺丝速度失败: {speedResult.Message}");
+                                return speedResult;
+                            }
+                            _logger.Info($"松螺丝速度设置为: {reverseSpeed} rpm");
+                            await Task.Delay(500);
                         }
 
-                        // 启动松螺丝
-                        var reverseResult = await WriteRegisterWithTimeout(ModbusRegisterMap.START_LOOSE, (short)1);
-                        if (reverseResult.Success)
+                        if (parameters?.Time > 0)
                         {
-                            _logger.Info("反转命令发送成功");
-                            return new DeviceResponse
+                            short reverseTime = (short)(parameters.Time.Value);
+                            var timeResult = await WriteRegisterWithTimeout(ModbusRegisterMap.LOOSE_AUTO_STOP_TIME, reverseTime);
+                            if (!timeResult.Success)
                             {
-                                Success = true,
-                                Message = "反转命令执行成功"
-                            };
+                                _logger.Error($"设置松螺丝停止时间失败: {timeResult.Message}");
+                                return new DeviceResponse
+                                {
+                                    Success = false,
+                                    Message = $"设置松螺丝停止时间失败: {timeResult.Message}"
+                                };
+                            }
+                            _logger.Info($"松螺丝停止时间设置为: {reverseTime} ms，设备将自动启动并停止");
+                            await Task.Delay(500);
                         }
-                        else
+
+                        _logger.Info("松螺丝(反转)命令执行成功");
+                        return new DeviceResponse
                         {
-                            _logger.Error($"反转命令发送失败: {reverseResult.Message}");
-                            return reverseResult;
-                        }
+                            Success = true,
+                            Message = "松螺丝(反转)命令执行成功"
+                        };
 
                     case SasCommandType.Stop:
                         _logger.Info("执行Stop命令");
@@ -688,10 +697,8 @@ namespace SasTools.Models.Communication
 
                 using (var cts = new CancellationTokenSource(timeoutMs))
                 {
-                    var writeTask = Task.Run(() => _modbusClient.Write(adjustedAddress, value), cts.Token);
-                    var result = await writeTask;
-
-                    _logger.Debug($"寄存器写入完成 - 原地址: {address}, 调整后: {adjustedAddress}, 值: {value}, 结果: {result.IsSuccess}");
+                    // 如果 HslCommunication 支持异步方法，使用它
+                    var result = await _modbusClient.WriteAsync(adjustedAddress, value);
 
                     return new DeviceResponse
                     {
@@ -700,13 +707,12 @@ namespace SasTools.Models.Communication
                     };
                 }
             }
-            catch (Exception ex)
+            catch (OperationCanceledException)
             {
-                _logger.Error($"寄存器写入异常 - 地址: {address}, 值: {value}, 异常: {ex.Message}", ex);
                 return new DeviceResponse
                 {
                     Success = false,
-                    Message = $"寄存器写入异常: {ex.Message}"
+                    Message = "写入操作超时"
                 };
             }
         }
@@ -719,17 +725,18 @@ namespace SasTools.Models.Communication
 
                 using (var cts = new CancellationTokenSource(timeoutMs))
                 {
-                    var readTask = Task.Run(() => _modbusClient.Read(adjustedAddress, length), cts.Token);
-                    var result = await readTask;
-
-                    _logger.Debug($"寄存器读取完成 - 原地址: {address}, 调整后: {adjustedAddress}, 长度: {length}, 结果: {result.IsSuccess}");
+                    // 使用真正的异步方法
+                    var result = await _modbusClient.ReadAsync(adjustedAddress, length);
 
                     return (result.IsSuccess, result.Content, result.Message);
                 }
             }
+            catch (OperationCanceledException)
+            {
+                return (false, null, $"寄存器读取超时({timeoutMs}ms)");
+            }
             catch (Exception ex)
             {
-                _logger.Error($"寄存器读取异常 - 地址: {address}, 长度: {length}, 异常: {ex.Message}", ex);
                 return (false, null, $"寄存器读取异常: {ex.Message}");
             }
         }

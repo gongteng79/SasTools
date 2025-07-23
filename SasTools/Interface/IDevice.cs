@@ -1,4 +1,5 @@
 ﻿using SasTools.Domain;
+using SasTools.Models.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,5 +23,10 @@ namespace SasTools.Interface
         string ExecuteCommandWithParameters(SasCommandType commandType, int? velocity = null, int? time = null);
 
         Task<string> ExecuteCommandWithParametersAsync(SasCommandType commandType, int? velocity = null, int? time = null);
+
+        //添加协议处理器访问方法
+        IProtocolHandler GetProtocolHandler();
+
+        bool HasProtocolHandler();
     }
 }

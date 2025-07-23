@@ -68,13 +68,13 @@ namespace SasTools.UI
             {
                 // Modbus TCP默认端口1502
                 this.numPort.Value = 1502;
-                this.txtHost.Text = "192.168.2.12"; // 同时更新默认IP
+                this.txtHost.Text = "192.168.1.12";
             }
             else
             {
                 // JSON协议默认端口6062
                 this.numPort.Value = 6062;
-                this.txtHost.Text = "192.168.2.12"; // JSON默认IP
+                this.txtHost.Text = "192.168.1.12";
             }
         }
 

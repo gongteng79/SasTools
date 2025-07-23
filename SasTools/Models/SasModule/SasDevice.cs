@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Wp.FzWater.Mqtt;
@@ -42,6 +43,16 @@ namespace SasTools.Models.SasModule
             _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         }
 
+
+        public IProtocolHandler GetProtocolHandler()
+        {
+            return _protocolHandler;
+        }
+
+        public bool HasProtocolHandler()
+        {
+            return _protocolHandler != null;
+        }
         public bool ConnectServer()
         {
             if (_protocolHandler != null)

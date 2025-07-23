@@ -100,6 +100,13 @@ namespace SasTools.Models.Communication
         public const string LOOSE_SPEED = "902";
         #endregion
 
+        //锁付步骤目标速度(可以通过正负来控制正反转)
+        public const string LOCK_STEP_TARGET_SPEED = "742";
+        //锁付步骤目标时间
+        public const string LOCK_STEP_TARGET_TIME = "752";
+        //锁付步骤电机转动方向
+        public const string LOCK_STEP_MOTOR_DIRECTION = "766";
+
         #region 错误码定义
         //锁付结果错误码位定义
         public static class LockResultBits

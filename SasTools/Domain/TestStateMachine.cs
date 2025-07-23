@@ -1,16 +1,17 @@
-﻿using log4net;
+﻿using AntdUI;
+using log4net;
 using Newtonsoft.Json;
 using SasTools.Common;
+using SasTools.Events;
 using SasTools.Interface;
+using SasTools.Models;
+using SasTools.Models.Protocol;
+using SasTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using SasTools.Services;
 using WpFramework.EventBus;
-using SasTools.Events;
-using SasTools.Models;
-using AntdUI;
 
 namespace SasTools.Domain
 {
@@ -418,12 +419,31 @@ namespace SasTools.Domain
                         PublishStateUpdate(MachineStatusType.Reverse);
                         shouldUpdateDisplay = false;
 
-                        // 添加参数日志
-                        _logger.Info($"执行反转命令 - 速度: {_parameter.ReverseVelocity}, 时间: {_parameter.ReverseTime}");
+                        _logger.Info($"执行反转命令 - 速度: {_parameter.ReverseVelocity}, 时间: {_parameter.ReverseTime}, 延时: {_parameter.ReverseDelay}");
 
-                        // 使用动态参数执行反转命令
-                        var reverseResult = device.ExecuteCommandWithParameters(SasCommandType.Reverse, _parameter.ReverseVelocity, _parameter.ReverseTime);
-                        _logger.Info($"反转命令执行结果: {reverseResult}");
+                        // 创建包含完整参数的CommandParameters
+                        var commandParams = new CommandParameters
+                        {
+                            Velocity = _parameter.ReverseVelocity,
+                            Time = _parameter.ReverseTime,
+                            ExtendedParams = new Dictionary<string, object>
+                            {
+                                ["ReverseDelay"] = _parameter.ReverseDelay
+                            }
+                        };
+
+                        // 使用协议处理器直接执行命令
+                        if (device.HasProtocolHandler())
+                        {
+                            var protocolHandler = device.GetProtocolHandler();
+                            var reverseResponse = await protocolHandler.ExecuteCommandAsync(SasCommandType.Reverse, commandParams);
+                            _logger.Info($"反转命令执行结果: {reverseResponse.Success}, 消息: {reverseResponse.Message}");
+                        }
+                        else
+                        {
+                            var reverseResult = await device.ExecuteCommandWithParametersAsync(SasCommandType.Reverse, _parameter.ReverseVelocity, _parameter.ReverseTime);
+                            _logger.Info($"反转命令执行结果: {reverseResult}");
+                        }
 
                         try
                         {
