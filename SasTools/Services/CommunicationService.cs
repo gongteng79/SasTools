@@ -21,8 +21,6 @@ namespace SasTools.Services
         private readonly string _defaultHost;
         private readonly int _defaultPort;
         private bool _isConnected = false;
-        private Timer _heartbeatTimer;
-        private readonly int _heartbeatInterval; // 心跳间隔时间,单位:毫秒
 
         // 消息接收事件
         public event EventHandler<string> MessageReceived;

@@ -19,17 +19,16 @@ namespace SasTools
         private int prevIndex = -1;//记录之前选中的菜单选项
 
         //设备管理
-        private DeviceManager _deviceManager;
+        private readonly DeviceManager _deviceManager;
 
         //视图组件
-        private Dictionary<int, Control> subView = new Dictionary<int, Control>();//存储
+        private readonly Dictionary<int, Control> subView = new Dictionary<int, Control>();//存储
         private readonly ManualView _manualView;
         private readonly MainView _mainView;
         private readonly TestTcpView _testTcpview;
         private readonly ReciepeView _reciepeView;
         private readonly FatigueTestView _fatigueTestView;
-        private SasTools.UI.DeviceManagementView _deviceManagermentView;
-        private IDevice sasTest;//测试设备接口
+        private readonly SasTools.UI.DeviceManagementView _deviceManagermentView;
 
         //初始化构造函数
         public OverView()

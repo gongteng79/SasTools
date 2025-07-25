@@ -21,10 +21,10 @@ namespace SasTools.Models.SasModule
 {
     public class SasDevice : IDevice
     {
-        private ICommunication _tcpCommunication;
-        private IEventBus _eventBus;
-        private ICommunicationService _communicationService;
-        private IProtocolHandler _protocolHandler;
+        private readonly ICommunication _tcpCommunication;
+        private readonly IEventBus _eventBus;
+        private readonly ICommunicationService _communicationService;
+        private readonly IProtocolHandler _protocolHandler;
         public SasDevice(ICommunication tcpCommunication, IEventBus eventBus)
         {
             this._tcpCommunication = tcpCommunication;
@@ -299,7 +299,7 @@ namespace SasTools.Models.SasModule
 
                 return response;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
@@ -372,7 +372,7 @@ namespace SasTools.Models.SasModule
                 string response = this.ReadData(requestData);
                 return response;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }

@@ -9,7 +9,7 @@ namespace SasTools.Models.Communication
 {
     public class SerialCommunication : CommunicationBase
     {
-        private SerialPort _serialPort;
+        private readonly SerialPort _serialPort;
         private readonly string _portName;
         private readonly int _baudRate;
         public override bool IsConnected => _serialPort?.IsOpen ?? false;

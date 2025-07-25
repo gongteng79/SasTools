@@ -96,6 +96,8 @@
     <Compile Include="Common\FunctionType.cs" />
     <Compile Include="Common\JsonMessageCodec.cs" />
     <Compile Include="Common\LockResult.cs" />
+    <Compile Include="Domain\DeviceResponseParser.cs" />
+    <Compile Include="Domain\DeviceStateManager.cs" />
     <Compile Include="Domain\DeviceTableInfo.cs" />
     <Compile Include="Domain\FatigueParams.cs" />
     <Compile Include="Domain\MemoryMonitor.cs" />
@@ -116,6 +118,7 @@
     <Compile Include="Events\MultiDeviceRemoveEvent.cs" />
     <Compile Include="Events\RefreshMachineState.cs" />
     <Compile Include="Events\SendDataEvent.cs" />
+    <Compile Include="Infrastructure\EventSubscriptionManager.cs" />
     <Compile Include="Interface\ICommunication.cs" />
     <Compile Include="Interface\ICommunicationService.cs" />
     <Compile Include="Domain\ParameterBase.cs" />

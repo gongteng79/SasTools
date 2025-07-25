@@ -21,7 +21,7 @@ namespace SasTools.Models.Communication
         private bool _isDeviceInitialized = false;
         private bool _isConnected = false;
         private int _addressOffset = 0;
-        private IByteTransform _byteTransform; // 添加字节序转换器
+        private readonly IByteTransform _byteTransform; // 添加字节序转换器
 
         public ProtocolType ProtocolType => ProtocolType.ModbusTcp;
         public bool IsConnected => _isConnected;

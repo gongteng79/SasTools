@@ -13,12 +13,13 @@ namespace SasTools.Domain
 
         public class CleanupConfig
         {
-            public int MaxRows { get; set; } = 50;        // 增加到50行触发清理
-            public int TargetRows { get; set; } = 30;     // 清理后保留30行
-            public int CleanupRowSize { get; set; } = 20; // 每次清理20行
+            public int MaxRows { get; set; } = 25;
+            public int TargetRows { get; set; } = 15;
+            public int CleanupRowSize { get; set; } = 10;
             public string ErrorStatusText { get; set; } = "ERROR";
-            public TimeSpan MaxRowAge { get; set; } = TimeSpan.FromMinutes(30); //数据最大保留时间
-            public int MinErrorRows { get; set; } = 5;    //最少保留的错误记录数
+            public TimeSpan MaxRowAge { get; set; } = TimeSpan.FromMinutes(15);
+            public int MinErrorRows { get; set; } = 3;
+            public long MaxMemoryUsage { get; set; } = 50 * 1024 * 1024;
         }
 
         public SmartDataCleanup(CleanupConfig config = null)
@@ -27,8 +28,30 @@ namespace SasTools.Domain
         }
 
         public bool NeedsCleanup(DataTable dataTable)
-        { 
+        {
             return dataTable.Rows.Count > _config.MaxRows;
+        }
+
+        // 新增基于内存的清理策略
+        public bool NeedsMemoryBasedCleanup(DataTable dataTable)
+        {
+            try
+            {
+                // 估算DataTable内存占用
+                long estimatedMemory = EstimateDataTableMemory(dataTable);
+                return estimatedMemory > _config.MaxMemoryUsage;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"内存检查失败: {ex.Message}", ex);
+                return false;
+            }
+        }
+
+        private long EstimateDataTableMemory(DataTable dataTable)
+        {
+            //行数 × 列数 × 平均字符长度 × 2(Unicode)
+            return dataTable.Rows.Count * dataTable.Columns.Count * 50 * 2;
         }
 
         //基于行数数量的清理策略
@@ -59,7 +82,7 @@ namespace SasTools.Domain
                     {
                         var row = rows[i];
 
-                        // 检查行是否仍然有效（没有被删除）
+                        // 检查行是否仍然有效
                         if (row.Table == dataTable && row.RowState != DataRowState.Deleted)
                         {
                             string statusType = row["类型"]?.ToString() ?? "";

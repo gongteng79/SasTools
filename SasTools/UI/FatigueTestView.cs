@@ -24,8 +24,8 @@ namespace SasTools.UI
         private readonly FatigueParams _parameter;
         private readonly IEventBus _eventBus;
         private readonly DataTable _dataTable;
-        private bool _isTestRunning = false;
-        private DeviceManager _deviceManager;
+        private readonly bool _isTestRunning = false;
+        private readonly DeviceManager _deviceManager;
         private Dictionary<string, DeviceTableInfo> _deviceTables;
         private SmartDataCleanup _smartDataCleanup;
         private string _currentSelectedDevice;
@@ -70,7 +70,7 @@ namespace SasTools.UI
         private Dictionary<string, DateTime> lastCleanupTime = new Dictionary<string, DateTime>();
         private readonly TimeSpan cleanupInterval = TimeSpan.FromSeconds(DATA_CLEANUP_CHECK_INTERVAL_SECONDS);
         private UIUpdateBatcher _uiUpdateBatcher;// UI更新批处理器
-        private MemoryMonitor _memoryMonitor;
+        private readonly MemoryMonitor _memoryMonitor;
         private CancellationTokenSource _backgroundTasksCancellationTokenSource;// 添加取消令牌源用于管理后台任务
 
         #endregion
