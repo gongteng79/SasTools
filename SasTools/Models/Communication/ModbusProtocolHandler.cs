@@ -73,7 +73,7 @@ namespace SasTools.Models.Communication
                 // 步骤2: 设置基础配置参数
                 _logger.Debug("步骤2: 设置基础配置参数");
 
-                // 设置当前产品编号 (地址120, CURRENT_PRODUCT_NUMBER)
+                // 设置当前产品编号
                 var productNumberResult = await WriteRegisterWithTimeout(ModbusRegisterMap.CURRENT_PRODUCT_NUMBER, (short)0);
                 if (!productNumberResult.Success)
                 {
@@ -87,7 +87,7 @@ namespace SasTools.Models.Communication
                 _logger.Debug("产品编号已设置为0");
                 await Task.Delay(200);
 
-                // 设置当前螺丝规格编号 (地址122, CURRENT_SCREW_SPEC)
+                // 设置当前螺丝规格编号
                 var screwSpecResult = await WriteRegisterWithTimeout(ModbusRegisterMap.CURRENT_SCREW_SPEC, (short)0);
                 if (!screwSpecResult.Success)
                 {
@@ -101,7 +101,7 @@ namespace SasTools.Models.Communication
                 _logger.Debug("螺丝规格编号已设置为0");
                 await Task.Delay(200);
 
-                // 步骤3: 启用电批通电控制 (地址180, POWER_ENABLE)
+                // 步骤3: 启用电批通电控制
                 _logger.Debug("步骤3: 启用电批通电控制");
                 var powerEnableResult = await WriteRegisterWithTimeout(ModbusRegisterMap.POWER_ENABLE, (short)1);
                 if (!powerEnableResult.Success)
@@ -114,9 +114,9 @@ namespace SasTools.Models.Communication
                     };
                 }
                 _logger.Debug("电批通电控制已启用");
-                await Task.Delay(1000); // 增加等待时间确保生效
+                await Task.Delay(1000);
 
-                // 步骤4: 最终清理确保数据清洁 (地址107, CLEAR_LOCK_DATA)
+                // 步骤4: 最终清理确保数据清洁
                 _logger.Debug("步骤4: 执行最终清理");
                 var finalClearResult = await WriteRegisterWithTimeout(ModbusRegisterMap.CLEAR_LOCK_DATA, (short)1);
                 if (!finalClearResult.Success)
@@ -131,7 +131,7 @@ namespace SasTools.Models.Communication
                 _logger.Debug("最终清理完成");
                 await Task.Delay(200);
 
-                // 步骤5: 验证初始化结果 - 读取设备状态确认初始化成功
+                // 步骤5: 验证初始化结果
                 var verifyResult = await VerifyInitializationAsync();
                 if (!verifyResult.Success)
                 {
@@ -265,7 +265,7 @@ namespace SasTools.Models.Communication
                 {
                     _logger.Info($"32位测试地址原始数据: {BitConverter.ToString(directTest32Result.Content)}");
 
-                    // 尝试不同字节序
+                    // 尝試不同字节序
                     var formats = new[] { DataFormat.ABCD, DataFormat.BADC, DataFormat.CDAB, DataFormat.DCBA };
                     foreach (var format in formats)
                     {
@@ -419,7 +419,7 @@ namespace SasTools.Models.Communication
                 _config = modbusConfig;
                 _modbusClient = new ModbusTcpNet(_config.Host, _config.Port, _config.SlaveId);
 
-                var result = _modbusClient.ConnectServer();
+                var result = await Task.Run(() => _modbusClient.ConnectServer());
 
                 if (result.IsSuccess)
                 {
@@ -454,7 +454,7 @@ namespace SasTools.Models.Communication
             {
                 if (_modbusClient != null)
                 {
-                    var result = _modbusClient.ConnectClose();
+                    var result = await Task.Run(() => _modbusClient.ConnectClose());
                     _logger.Info($"Modbus断开连接: {result.Message}");
 
                     // 重置连接和初始化状态
@@ -521,6 +521,44 @@ namespace SasTools.Models.Communication
                     case SasCommandType.Reverse:
                         _logger.Info($"执行Reverse命令 - 使用松螺丝寄存器");
 
+                        // **步骤1：检查设备当前状态**
+                        var deviceStateResult = await ReadRegisterWithTimeout(ModbusRegisterMap.LOOSE_STATE, 1);
+                        if (deviceStateResult.Success)
+                        {
+                            int currentLooseState = _byteTransform.TransUInt16(deviceStateResult.Data, 0);
+                            _logger.Info($"当前松螺丝状态: {currentLooseState} (0:停止, 1:进行中)");
+
+                            if (currentLooseState == 1)
+                            {
+                                _logger.Warn("设备正在执行松螺丝操作，先停止当前操作");
+                                await WriteRegisterWithTimeout(ModbusRegisterMap.STOP_LOOSE, (short)1);
+                                await Task.Delay(1000); // 等待停止完成
+                            }
+                        }
+
+                        // **步骤2：检查电批通电状态**
+                        var powerStateResult = await ReadRegisterWithTimeout(ModbusRegisterMap.POWER_ENABLE, 1);
+                        if (powerStateResult.Success)
+                        {
+                            int powerState = _byteTransform.TransUInt16(powerStateResult.Data, 0);
+                            _logger.Info($"电批通电状态: {powerState} (0:禁止, 1:允许)");
+
+                            if (powerState != 1)
+                            {
+                                _logger.Warn("电批未通电，重新启用电批通电控制");
+                                var enableResult = await WriteRegisterWithTimeout(ModbusRegisterMap.POWER_ENABLE, (short)1);
+                                if (!enableResult.Success)
+                                {
+                                    return new DeviceResponse
+                                    {
+                                        Success = false,
+                                        Message = $"启用电批通电失败: {enableResult.Message}"
+                                    };
+                                }
+                                await Task.Delay(500);
+                            }
+                        }
+
                         if (parameters?.ExtendedParams?.ContainsKey("ReverseDelay") == true)
                         {
                             int reverseDelay = (int)parameters.ExtendedParams["ReverseDelay"];
@@ -551,8 +589,31 @@ namespace SasTools.Models.Communication
                             }
                             _logger.Info($"松螺丝速度设置为: {reverseSpeed} rpm");
                             await Task.Delay(500);
+
+                            // **验证设备是否正确接收了速度设置**
+                            var verifyResult = await ReadRegisterWithTimeout(ModbusRegisterMap.LOOSE_SPEED, 1);
+                            if (verifyResult.Success)
+                            {
+                                int actualSpeed = _byteTransform.TransUInt16(verifyResult.Data, 0);
+                                _logger.Info($"验证设备接收的松螺丝速度: {actualSpeed} rpm，设置值: {reverseSpeed} rpm");
+
+                                if (actualSpeed != reverseSpeed)
+                                {
+                                    _logger.Error($"设备速度设置验证失败！设置: {reverseSpeed}, 实际: {actualSpeed}");
+                                    return new DeviceResponse
+                                    {
+                                        Success = false,
+                                        Message = $"设备速度设置验证失败！设置: {reverseSpeed}, 实际: {actualSpeed}"
+                                    };
+                                }
+                            }
+                            else
+                            {
+                                _logger.Warn($"无法验证设备速度设置: {verifyResult.Message}");
+                            }
                         }
 
+                        // 设置反转时间
                         if (parameters?.Time > 0)
                         {
                             short reverseTime = (short)(parameters.Time.Value);
@@ -566,11 +627,77 @@ namespace SasTools.Models.Communication
                                     Message = $"设置松螺丝停止时间失败: {timeResult.Message}"
                                 };
                             }
-                            _logger.Info($"松螺丝停止时间设置为: {reverseTime} ms，设备将自动启动并停止");
+                            _logger.Info($"松螺丝停止时间设置为: {reverseTime} ms");
                             await Task.Delay(500);
+
+                            // **验证时间设置**
+                            var verifyTimeResult = await ReadRegisterWithTimeout(ModbusRegisterMap.LOOSE_AUTO_STOP_TIME, 1);
+                            if (verifyTimeResult.Success)
+                            {
+                                int actualTime = _byteTransform.TransUInt16(verifyTimeResult.Data, 0);
+                                _logger.Info($"验证设备接收的松螺丝时间: {actualTime} ms，设置值: {reverseTime} ms");
+                            }
                         }
 
-                        _logger.Info("松螺丝(反转)命令执行成功");
+                        // **步骤3：检查设备是否准备好执行松螺丝操作**
+                        _logger.Info("检查设备是否准备好执行松螺丝操作");
+
+                        // 检查锁付状态，确保不在锁付过程中
+                        var lockStateResult = await ReadRegisterWithTimeout(ModbusRegisterMap.LOCK_STATE, 1);
+                        if (lockStateResult.Success)
+                        {
+                            int lockState = _byteTransform.TransUInt16(lockStateResult.Data, 0);
+                            _logger.Info($"当前锁付状态: {lockState} (0:停止, 1:进行中)");
+
+                            if (lockState == 1)
+                            {
+                                _logger.Warn("设备正在锁付中，先停止锁付操作");
+                                await WriteRegisterWithTimeout(ModbusRegisterMap.STOP_LOCK, (short)1);
+                                await Task.Delay(500);
+                            }
+                        }
+
+                        // **步骤4：发送启动松螺丝命令**
+                        _logger.Info("发送启动松螺丝命令");
+                        var startLooseResult = await WriteRegisterWithTimeout(ModbusRegisterMap.START_LOOSE, (short)1);
+                        if (!startLooseResult.Success)
+                        {
+                            _logger.Error($"启动松螺丝失败: {startLooseResult.Message}");
+                            return new DeviceResponse
+                            {
+                                Success = false,
+                                Message = $"启动松螺丝失败: {startLooseResult.Message}"
+                            };
+                        }
+                        _logger.Info("松螺丝(反转)命令启动成功");
+
+                        // **步骤5：验证松螺丝操作是否真正开始**
+                        await Task.Delay(200); // 短暂等待让设备响应
+                        var finalStateResult = await ReadRegisterWithTimeout(ModbusRegisterMap.LOOSE_STATE, 1);
+                        if (finalStateResult.Success)
+                        {
+                            int finalLooseState = _byteTransform.TransUInt16(finalStateResult.Data, 0);
+                            _logger.Info($"启动后松螺丝状态: {finalLooseState} (0:停止, 1:进行中)");
+
+                            if (finalLooseState != 1)
+                            {
+                                _logger.Warn("松螺丝操作未能正常启动，状态仍为停止");
+                                return new DeviceResponse
+                                {
+                                    Success = false,
+                                    Message = "松螺丝操作启动失败，设备状态未改变"
+                                };
+                            }
+                        }
+
+                        // **步骤6：读取当前电批转速进行最终验证**
+                        var currentSpeedResult = await ReadRegisterWithTimeout(ModbusRegisterMap.CURRENT_SPEED, 1);
+                        if (currentSpeedResult.Success)
+                        {
+                            int currentRpm = _byteTransform.TransUInt16(currentSpeedResult.Data, 0);
+                            _logger.Info($"当前电批实际转速: {currentRpm} rpm");
+                        }
+
                         return new DeviceResponse
                         {
                             Success = true,
@@ -697,7 +824,6 @@ namespace SasTools.Models.Communication
 
                 using (var cts = new CancellationTokenSource(timeoutMs))
                 {
-                    // 如果 HslCommunication 支持异步方法，使用它
                     var result = await _modbusClient.WriteAsync(adjustedAddress, value);
 
                     return new DeviceResponse
@@ -745,9 +871,29 @@ namespace SasTools.Models.Communication
         {
             if (!_disposed)
             {
-                _modbusClient?.ConnectClose();
-                _modbusClient = null;
-                _disposed = true;
+                try
+                {
+                    // 1. 清理事件订阅
+                    ConnectionStatusChanged = null;
+                    MessageReceived = null;
+
+                    // 2. 断开连接
+                    if (_modbusClient != null)
+                    {
+                        _modbusClient.ConnectClose();
+                        _modbusClient = null;
+                    }
+
+                    // 3. 清理其他资源
+                    _config = null;
+
+                    _disposed = true;
+                    _logger.Info("ModbusProtocolHandler资源释放完成");
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"ModbusProtocolHandler释放资源时发生异常: {ex.Message}", ex);
+                }
             }
         }
     }

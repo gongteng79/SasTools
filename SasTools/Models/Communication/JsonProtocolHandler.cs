@@ -58,17 +58,16 @@ namespace SasTools.Models.Communication
         {
             try
             {
-                // 使用现有的SasDevice逻辑
                 var device = new SasDevice(_communicationService, null);
 
                 string response;
                 if (parameters != null && commandType == SasCommandType.Reverse)
                 {
-                    response = device.ExecuteCommandWithParameters(commandType, parameters.Velocity, parameters.Time);
+                    response = await Task.Run(() => device.ExecuteCommandWithParameters(commandType, parameters.Velocity, parameters.Time));
                 }
                 else
                 {
-                    response = device.ExecuteCommand(commandType);
+                    response = await Task.Run(() => device.ExecuteCommand(commandType));
                 }
 
                 return new DeviceResponse
@@ -94,7 +93,7 @@ namespace SasTools.Models.Communication
             try
             {
                 var device = new SasDevice(_communicationService, null);
-                string jsonMsg = device.ExecuteCommand(SasCommandType.InputScrewData);
+                string jsonMsg = await Task.Run(() => device.ExecuteCommand(SasCommandType.InputScrewData));
 
                 if (string.IsNullOrEmpty(jsonMsg))
                 {
@@ -151,7 +150,17 @@ namespace SasTools.Models.Communication
         {
             if (!_disposed)
             {
-                _communicationService?.DisconnectAsync();
+                if (_communicationService != null)
+                {
+                    try
+                    {
+                        _communicationService.DisconnectAsync().Wait();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error($"断开连接时发生异常: {ex.Message}", ex);
+                    }
+                }
                 _communicationService = null;
                 _disposed = true;
             }

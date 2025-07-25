@@ -325,17 +325,12 @@ namespace SasTools.Domain
 
                         _logger.Info("发送正转命令到设备");
                         var forwardResponse = device.ExecuteCommand(SasCommandType.Forward);
+
                         _logger.Info($"正转命令执行结果: {forwardResponse}");
 
-                        //新增：等待正转命令生效
                         await Task.Delay(500, _cancellationTokenSource.Token);
-
                         var result = await CheckLockStatusAsync();
-
-                        //新增：详细的结果日志
                         _logger.Info($"正转状态检查结果: success={result.success}, state={result.state}, result={result.result}, error={result.errorMessage}");
-
-                        // 后续逻辑保持不变...
 
                         if (!_isRunning || _cancellationTokenSource.Token.IsCancellationRequested)
                         {
@@ -829,30 +824,27 @@ namespace SasTools.Domain
                         {
                             if (_responseParser.IsOperationCompleted(parseResult))
                             {
-                                // ✅ 操作已完成，判定成败
                                 if (_responseParser.IsCompletedOperationSuccessful(parseResult))
                                 {
-                                    _logger.Info($"✅ 锁付操作成功: state={parseResult.State}, result={parseResult.Result}");
+                                    _logger.Info($"锁付操作成功: state={parseResult.State}, result={parseResult.Result}");
                                     return (true, null, parseResult.State, parseResult.Result);
                                 }
                                 else
                                 {
                                     string errorDesc = _responseParser.GetLockErrorDescription(parseResult.Result);
-                                    _logger.Warn($"❌ 锁付操作失败: state={parseResult.State}, result={parseResult.Result}, 错误: {errorDesc}");
+                                    _logger.Warn($"锁付操作失败: state={parseResult.State}, result={parseResult.Result}, 错误: {errorDesc}");
                                     return (false, errorDesc, parseResult.State, parseResult.Result);
                                 }
                             }
                             else if (_responseParser.IsDeviceWorking(parseResult))
                             {
-                                // ⏳ 设备正在工作，继续等待
-                                _logger.Debug($"⏳ 设备正在执行锁付: state={parseResult.State}，继续等待");
+                                _logger.Debug($"设备正在执行锁付: state={parseResult.State}，继续等待");
                                 await Task.Delay(Constants.DEFAULT_POLLING_INTERVAL, _cancellationTokenSource.Token);
                                 continue;
                             }
                             else
                             {
-                                // 未知状态
-                                _logger.Warn($"❓ 设备状态未知: state={parseResult.State}");
+                                _logger.Warn($"设备状态未知: state={parseResult.State}");
                                 return (false, $"设备状态未知: {parseResult.State}", parseResult.State, parseResult.Result);
                             }
                         }
