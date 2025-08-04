@@ -51,7 +51,7 @@ namespace SasTools.UI
             {
                 Name = $"btnDevice_{deviceId}",
                 Text = deviceName,
-                Size = new Size(45,15),
+                Size = new Size(35,15),
                 Type = AntdUI.TTypeMini.Default,
                 Font = new Font("微软雅黑", 9F),
                 Tag = deviceId

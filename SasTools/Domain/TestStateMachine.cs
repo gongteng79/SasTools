@@ -407,7 +407,7 @@ namespace SasTools.Domain
                         PublishStateUpdate(MachineStatusType.Reverse);
                         shouldUpdateDisplay = false;
 
-                        _logger.Info($"执行反转命令 - 速度: {_parameter.ReverseVelocity}, 时间: {_parameter.ReverseTime}, 延时: {_parameter.ReverseDelay}");
+                        _logger.Info($"执行反转命令 - 速度: {_parameter.ReverseVelocity}, 时间: {_parameter.ReverseTime}");
 
                         // 创建包含完整参数的CommandParameters
                         var commandParams = new CommandParameters

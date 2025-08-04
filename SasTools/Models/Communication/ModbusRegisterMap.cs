@@ -96,9 +96,11 @@ namespace SasTools.Models.Communication
         public const string LOOSE_DURATION = "407";
         //松螺丝旋转角度(°)
         public const string LOOSE_ANGLE = "408";
-        //松螺丝速度(rpm)
-        public const string LOOSE_SPEED = "902";
         #endregion
+
+        #region 配置参数地址
+        //配置保存控制
+        public const string CONFIG_SAVE = "600";
 
         //锁付步骤目标速度(可以通过正负来控制正反转)
         public const string LOCK_STEP_TARGET_SPEED = "742";
@@ -106,6 +108,18 @@ namespace SasTools.Models.Communication
         public const string LOCK_STEP_TARGET_TIME = "752";
         //锁付步骤电机转动方向
         public const string LOCK_STEP_MOTOR_DIRECTION = "766";
+        #endregion
+
+        #region 松螺丝配置参数地址
+        //松螺丝扭力(N.m) - 配置参数
+        public const string LOOSE_TORQUE_CONFIG = "900";
+        //松螺丝速度(rpm) - 配置参数
+        public const string LOOSE_SPEED_CONFIG = "902";
+        //松螺丝时间(ms) - 配置参数
+        public const string LOOSE_TIME_CONFIG = "904";
+        //松螺丝角度(°) - 配置参数
+        public const string LOOSE_ANGLE_CONFIG = "905";
+        #endregion
 
         #region 错误码定义
         //锁付结果错误码位定义
