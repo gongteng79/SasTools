@@ -611,7 +611,7 @@ namespace SasTools.Models.Communication
                     };
                 }
                 _logger.Info("配置参数保存成功");
-                await Task.Delay(500); // 等待配置生效
+                await Task.Delay(300); // 等待配置生效
             }
 
             // 步骤4: 启动松螺丝操作

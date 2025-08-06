@@ -13,6 +13,8 @@ using SasTools.Events;
 using SasTools.Services;
 using System.Collections.Generic;
 using SasTools.Domain;
+using SasTools.Models;
+using SasTools.Models.Protocol;
 using static SasTools.Domain.MemoryMonitor;
 
 namespace SasTools.UI
@@ -31,7 +33,7 @@ namespace SasTools.UI
         private string _currentSelectedDevice;
 
         // 设备管理常量
-        private const int MAX_DEVICE_TABLES = 10; // 最大设备表格数量
+        private const int MAX_DEVICE_TABLES = 25; // 最大设备表格数量
 
         // UI更新相关常量
         private const int UI_UPDATE_BATCH_INTERVAL_MS = 50;           // UI批处理更新间隔（毫秒）
@@ -1244,14 +1246,16 @@ namespace SasTools.UI
                     var deviceInfo = _deviceManager?.GetDevice(evt.DeviceId);
                     if (deviceInfo != null)
                     {
-                        deviceStatusBar1.AddDevice(evt.DeviceId, deviceInfo.Name);
+                        // 获取设备IP地址
+                        string ipAddress = GetDeviceIpAddress(deviceInfo);
+                        deviceStatusBar1.AddDevice(evt.DeviceId, deviceInfo.Name, ipAddress);
 
                         // 创建设备的测试状态机
                         var stateMachine = new TestStateMachine(evt.DeviceId, evt.Device, _parameter, _eventBus);
                         _deviceManager.SetDeviceStateMachine(evt.DeviceId, stateMachine);
 
                         // 更新设备状态显示
-                        deviceStatusBar1.UpdateDeviceStatus(evt.DeviceId, MachineStatusType.Idle, true);
+                        deviceStatusBar1.UpdateDeviceStatus(evt.DeviceId, MachineStatusType.Idle, true, ipAddress);
                         // 创建设备对应的表格
                         var deviceTable = CreateDeviceTable(evt.DeviceId, deviceInfo.Name);
                         if (deviceTable != null)
@@ -1510,6 +1514,26 @@ namespace SasTools.UI
                 }));
             }
         }
+        // 获取设备IP地址的辅助方法
+        private string GetDeviceIpAddress(DeviceInfo deviceInfo)
+        {
+            if (deviceInfo.ProtocolConfig != null)
+            {
+                // 新协议配置
+                if (deviceInfo.ProtocolConfig is JsonProtocolConfig jsonConfig)
+                {
+                    return $"{jsonConfig.Host}:{jsonConfig.Port}";
+                }
+                else if (deviceInfo.ProtocolConfig is ModbusProtocolConfig modbusConfig)
+                {
+                    return $"{modbusConfig.Host}:{modbusConfig.Port}";
+                }
+            }
+
+            // 兼容旧的Host:Port格式
+            return $"{deviceInfo.Host}:{deviceInfo.Port}";
+        }
+
         #endregion
 
         #region DeviceStatusBar集成
@@ -1572,15 +1596,16 @@ namespace SasTools.UI
                         // 如果设备在状态栏中，更新其状态
                         if (deviceStatusBar1.GetAllDeviceIds().Contains(e.DeviceId))
                         {
+                            string ipAddress = GetDeviceIpAddress(e.DeviceInfo);
                             if (e.DeviceInfo.IsConnected)
                             {
                                 // 设备重新连接，更新为空闲状态
-                                deviceStatusBar1.UpdateDeviceStatus(e.DeviceId, MachineStatusType.Idle, true);
+                                deviceStatusBar1.UpdateDeviceStatus(e.DeviceId, MachineStatusType.Idle, true, ipAddress);
                             }
                             else
                             {
                                 // 设备断开连接，更新为灰色状态
-                                deviceStatusBar1.UpdateDeviceStatus(e.DeviceId, MachineStatusType.Idle, false);
+                                deviceStatusBar1.UpdateDeviceStatus(e.DeviceId, MachineStatusType.Idle, false, ipAddress);
                             }
                         }
                     }

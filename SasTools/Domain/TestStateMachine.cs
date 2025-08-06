@@ -54,7 +54,7 @@ namespace SasTools.Domain
         private bool _isRunning = false;
         private bool _isPause = false;
         private DeviceResponseParser _responseParser;
-            
+
         // 状态相关
         private TestState _state = TestState.Idle;
         private string _machineMessage = "";
@@ -91,7 +91,7 @@ namespace SasTools.Domain
 
         #endregion
 
-        #region 构造函数
+        #region 构造函数    
         public TestStateMachine(string deviceId, IDevice device, FatigueParams parameter, IEventBus eventBus)
         {
             _deviceId = deviceId ?? throw new ArgumentNullException(nameof(deviceId));
@@ -343,7 +343,7 @@ namespace SasTools.Domain
                             _forwardSuccess = true;
 
                             // 等待正转操作完全结束的延时
-                            await Task.Delay(1000, _cancellationTokenSource.Token);
+                            await Task.Delay(500, _cancellationTokenSource.Token);
                             _machineMessage = "正转OK";
                             _lastPublishedMessage = "";
                             // 发布正转OK状态

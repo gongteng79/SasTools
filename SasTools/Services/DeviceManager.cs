@@ -391,13 +391,35 @@ namespace SasTools.Services
             {
                 if (deviceInfo.IsConnected)
                 {
-                    statusBar.AddDevice(deviceInfo.Id, deviceInfo.Name);
-                    statusBar.UpdateDeviceStatus(deviceInfo.Id, MachineStatusType.Idle, true);
+                    // 获取设备IP地址
+                    string ipAddress = GetDeviceIpAddress(deviceInfo);
+                    statusBar.AddDevice(deviceInfo.Id, deviceInfo.Name, ipAddress);
+                    statusBar.UpdateDeviceStatus(deviceInfo.Id, MachineStatusType.Idle, true, ipAddress);
                 }
             }
         }
 
-        // 新增：获取设备协议信息
+        // 获取设备IP地址的辅助方法
+        private string GetDeviceIpAddress(DeviceInfo deviceInfo)
+        {
+            if (deviceInfo.ProtocolConfig != null)
+            {
+                // 新协议配置
+                if (deviceInfo.ProtocolConfig is JsonProtocolConfig jsonConfig)
+                {
+                    return $"{jsonConfig.Host}:{jsonConfig.Port}";
+                }
+                else if (deviceInfo.ProtocolConfig is ModbusProtocolConfig modbusConfig)
+                {
+                    return $"{modbusConfig.Host}:{modbusConfig.Port}";
+                }
+            }
+
+            // 兼容旧的Host:Port格式
+            return $"{deviceInfo.Host}:{deviceInfo.Port}";
+        }
+
+        //获取设备协议信息
         public string GetDeviceProtocolInfo(string deviceId)
         {
             if (_deviceInfos.TryGetValue(deviceId, out var deviceInfo))
@@ -414,7 +436,7 @@ namespace SasTools.Services
             return "未知协议";
         }
 
-        // 新增：切换设备协议
+        //切换设备协议
         public async Task<bool> SwitchDeviceProtocol(string deviceId, ProtocolType newProtocolType, ProtocolConfig newConfig)
         {
             if (!_deviceInfos.TryGetValue(deviceId, out var deviceInfo))
@@ -444,6 +466,7 @@ namespace SasTools.Services
 
         public void Dispose()
         {
+            _logger.Info($"");
             // 释放所有协议处理器
             foreach (var handler in _protocolHandlers.Values)
             {

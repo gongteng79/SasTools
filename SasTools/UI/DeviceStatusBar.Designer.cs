@@ -82,6 +82,7 @@
             // flowPanelDevices
             // 
             this.flowPanelDevices.AutoScroll = true;
+            this.flowPanelDevices.FlowDirection = System.Windows.Forms.FlowDirection.LeftToRight;
             this.flowPanelDevices.Dock = System.Windows.Forms.DockStyle.Left;
             this.flowPanelDevices.Font = new System.Drawing.Font("微软雅黑", 7.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.flowPanelDevices.Location = new System.Drawing.Point(0, 0);

@@ -15,9 +15,9 @@ namespace SasTools.UI
     public partial class DeviceStatusBar : UserControl
     {
         private Dictionary<string, AntdUI.Button> _deviceButtons;
+        private Dictionary<string, ToolTip> _deviceToolTips;
         private string _selectedDeviceId;
 
-        // 事件定义
         public event EventHandler<string> DeviceSelected;
         public event EventHandler StartAllClicked;
         public event EventHandler StopAllClicked;
@@ -32,6 +32,7 @@ namespace SasTools.UI
         private void InitializeDeviceButtons()
         {
             _deviceButtons = new Dictionary<string, AntdUI.Button>();
+            _deviceToolTips = new Dictionary<string, ToolTip>();
         }
 
         private void SetupEventHandlers()
@@ -42,7 +43,7 @@ namespace SasTools.UI
         }
 
         // 添加设备到状态栏
-        public void AddDevice(string deviceId, string deviceName)
+        public void AddDevice(string deviceId, string deviceName, string ipAddress = "")
         {
             if (_deviceButtons.ContainsKey(deviceId))
                 return;
@@ -60,8 +61,16 @@ namespace SasTools.UI
             // 设备按钮点击事件
             deviceButton.Click += DeviceButton_Click;
 
-            // 添加到容器和字典
+            var toolTip = new ToolTip();
+            toolTip.InitialDelay = 500;  // 悬停延迟500ms
+            toolTip.AutoPopDelay = 5000; // 显示5秒后自动隐藏
+            toolTip.ReshowDelay = 100;   // 重新显示延迟
+
+            string tooltipText = string.IsNullOrEmpty(ipAddress) ? "未知IP" : ipAddress;
+            toolTip.SetToolTip(deviceButton, tooltipText);
+
             _deviceButtons.Add(deviceId, deviceButton);
+            _deviceToolTips.Add(deviceId, toolTip);
             flowPanelDevices.Controls.Add(deviceButton);
         }
 
@@ -70,25 +79,27 @@ namespace SasTools.UI
         {
             if (_deviceButtons.TryGetValue(deviceId, out var button))
             {
-                //如果移除的是当前选中的设备，清楚选中状态
                 if (_selectedDeviceId == deviceId)
                 {
                     _selectedDeviceId = null;
                 }
 
-                //从UI容器中移除按钮
                 flowPanelDevices.Controls.Remove(button);
 
-                //从字典移除
                 _deviceButtons.Remove(deviceId);
 
-                //释放按钮资源
+                if (_deviceToolTips.TryGetValue(deviceId, out var toolTip))
+                {
+                    toolTip.Dispose();
+                    _deviceToolTips.Remove(deviceId);
+                }
+
                 button.Dispose();
             }
         }
 
         // 更新设备状态
-        public void UpdateDeviceStatus(string deviceId, MachineStatusType status, bool isConnected)
+        public void UpdateDeviceStatus(string deviceId, MachineStatusType status, bool isConnected, string ipAddress = "")
         {
             if (_deviceButtons.TryGetValue(deviceId, out var button))
             {
@@ -117,6 +128,16 @@ namespace SasTools.UI
                             button.Loading = false;
                             break;
                     }
+                }
+
+                // 更新ToolTip信息
+                if (_deviceToolTips.TryGetValue(deviceId, out var toolTip))
+                {
+                    string connectionStatus = isConnected ? "已连接" : "未连接";
+                    string tooltipText = string.IsNullOrEmpty(ipAddress) ?
+                        $"状态: {connectionStatus}" :
+                        $"{ipAddress} - {connectionStatus}";
+                    toolTip.SetToolTip(button, tooltipText);
                 }
             }
         }
